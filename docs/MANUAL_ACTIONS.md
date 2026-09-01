@@ -4,29 +4,48 @@ Estas acciones requieren intervención directa del usuario (cuentas, credenciale
 
 ---
 
-## 1. Crear el proyecto Supabase
+## 1. Crear el proyecto Supabase nuevo y conectarlo al repositorio de GitHub de este proyecto
 
-**Qué hacer:** crear una cuenta en Supabase y un proyecto nuevo.
+**Qué hacer:** (A) crear en GitHub un repositorio vacío para `D:\IOT`; (B) crear en Supabase un **proyecto nuevo, distinto del de Quesisimo**; (C) conectar ese proyecto nuevo al repositorio nuevo mediante la integración nativa GitHub↔Supabase (el mismo mecanismo que usaste en Quesisimo para desplegar migraciones).
 
-**Por qué:** Supabase es el backend elegido (PostgreSQL + Auth + Row Level Security + Edge Functions + Realtime). Necesitamos un proyecto real para conectar la aplicación en la Fase 2.
+**Por qué:** ya tienes cuenta de Supabase y quieres reusar el flujo de GitHub que usaste en Quesisimo, pero **sin ningún riesgo para esa base de datos**. Un proyecto Supabase nuevo es una instancia de PostgreSQL, Auth y claves API completamente aparte — no comparte nada con el proyecto de Quesisimo. Conectarlo a un repositorio de GitHub distinto (este, no el de Quesisimo) es lo que garantiza que ninguna migración de este proyecto pueda aplicarse jamás sobre la base de datos de Quesisimo.
 
 **Pasos exactos:**
-1. Ir a `supabase.com` y crear una cuenta (o iniciar sesión).
-2. Crear una nueva organización si es la primera vez.
-3. Crear un nuevo proyecto: elegir nombre (sugerido: `calidad-agua-iot` o el que prefieras), una región cercana (p. ej. la más próxima a México disponible), y una **contraseña fuerte** para la base de datos (guárdala en un gestor de contraseñas, no la compartas en el chat).
-4. Esperar a que el proyecto termine de aprovisionarse (unos minutos).
-5. En el panel del proyecto: **Project Settings → API**, copiar la **Project URL** y la **anon public key**.
+
+**A. Crear el repositorio en GitHub (hazlo primero)**
+1. En GitHub → *New repository*.
+2. Nombre sugerido: `calidad-agua-iot` (o el que prefieras).
+3. Créalo **vacío**: sin README, sin `.gitignore`, sin licencia — ya los tenemos en el repositorio local y así evitamos conflictos al hacer el primer `push`.
+4. Visibilidad: privado o público, es tu decisión (para un proyecto académico con secretos aún no incluidos, privado es lo más prudente).
+5. Copia la URL HTTPS del repositorio.
+
+**B. Crear el proyecto Supabase nuevo**
+1. En `supabase.com`, dentro de tu organización: *New Project*.
+2. Nombre sugerido: `calidad-agua-iot` (o el que prefieras).
+3. **Antes de continuar, revisa el selector de proyectos en la parte superior del dashboard de Supabase y confirma que este proyecto nuevo aparece separado del proyecto de Quesisimo** — deben ser dos entradas distintas en la lista.
+4. Región cercana a México.
+5. Contraseña fuerte para la base de datos (guárdala en un gestor de contraseñas; no me la compartas).
+6. Espera a que termine de aprovisionarse.
+
+**C. Conectar el proyecto Supabase nuevo al repositorio nuevo (no al de Quesisimo)**
+1. Dentro del proyecto Supabase nuevo: **Project Settings → Integrations → GitHub Connection**.
+2. Autoriza la GitHub App de Supabase sobre tu cuenta si aún no lo está (es un permiso de OAuth que solo tú puedes otorgar desde tu navegador).
+3. Selecciona explícitamente el repositorio `calidad-agua-iot` que acabas de crear — verifica en esa pantalla que **no** quede seleccionado el repositorio de Quesisimo.
+4. Elige la rama que disparará los despliegues (normalmente `main`) y, si te lo pide, la carpeta `supabase/` como raíz de configuración (esa carpeta la creo yo en la Fase 2, con las migraciones).
 
 **Qué debes darme después:**
-- La **Project URL** (ej. `https://xxxx.supabase.co`).
-- La **anon public key**.
-- **No** me compartas la `service_role key` ni la contraseña de la base de datos — esas se configuran directamente como secretos del proyecto, nunca se escriben en el chat ni en el repositorio.
+- La URL del repositorio de GitHub nuevo.
+- La **Project URL** y la **anon public key** del proyecto Supabase nuevo (Project Settings → API).
+- Confirmación de que la integración quedó conectada al repositorio y rama correctos (no a los de Quesisimo).
+- **No** me compartas: contraseña de la base de datos, `service_role key`, ni tokens de acceso de GitHub/Supabase.
 
 **Qué puede avanzar mientras tanto (datos simulados):**
 - Scaffolding del proyecto Angular.
-- Migraciones SQL escritas como archivos (sin aplicar).
+- Migraciones SQL escritas como archivos en `supabase/migrations/` (sin aplicar todavía).
 - Diseño de componentes con datos mock.
-- Script del simulador IoT (apuntará a `localhost` con Supabase CLI local si se opta por desarrollo local primero).
+- Script del simulador IoT.
+
+En cuanto me compartas la URL del repositorio de GitHub, agrego el remoto localmente y te pido confirmación puntual antes de hacer el primer `push` (así conecta con lo que ya llevamos: 3 commits locales de la Fase 1).
 
 ---
 
@@ -84,16 +103,6 @@ Estas acciones requieren intervención directa del usuario (cuentas, credenciale
 
 ---
 
-## 5. (Opcional) Repositorio remoto en GitHub/GitLab
+## 5. Repositorio remoto en GitHub
 
-**Qué hacer:** si deseas respaldo remoto o necesitas compartir el repositorio con el asesor/equipo, crea un repositorio vacío en GitHub o GitLab y compárteme la URL del remoto.
-
-**Por qué:** actualmente el repositorio Git es solo local (`D:\IOT\.git`). No es obligatorio para continuar el desarrollo, pero sí recomendable como respaldo de un proyecto de Residencia Profesional.
-
-**Pasos exactos:**
-1. Crear un repositorio vacío (sin README ni licencia, para evitar conflictos) en GitHub/GitLab.
-2. Copiar la URL (HTTPS o SSH).
-
-**Qué debes darme después:** la URL del remoto. Yo la configuro con `git remote add origin <url>` y te confirmo antes de hacer cualquier `push`.
-
-**Qué puede avanzar mientras tanto:** todo el trabajo se sigue versionando localmente sin problema.
+**Estado:** decidido — ver acción #1, que ahora incluye la creación de este repositorio como parte del flujo de conexión con Supabase. No se necesita una acción separada.

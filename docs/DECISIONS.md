@@ -121,7 +121,22 @@ No se declaran números de versión exactos de Angular, Node.js, Supabase CLI, e
 
 ## D-011 — Repositorio Git local sin remoto
 
-**Fecha:** 2026-09-01
-**Estado:** Confirmado
+**Fecha:** 2026-09-01 · **Superada por D-012 el 2026-09-01**
+**Estado:** Confirmado (histórico)
 
-Se inicializó un repositorio Git local en `D:\IOT` para versionar código y documentación desde la Fase 1. No se ha configurado ningún remoto (GitHub/GitLab). Si el usuario desea respaldo remoto o colaboración, ver [MANUAL_ACTIONS.md](MANUAL_ACTIONS.md) acción #5.
+Se inicializó un repositorio Git local en `D:\IOT` para versionar código y documentación desde la Fase 1. No se ha configurado ningún remoto. Ver D-012 para el esquema definitivo de remoto + despliegue.
+
+---
+
+## D-012 — Repositorio remoto en GitHub, conectado a un proyecto Supabase nuevo e independiente de Quesisimo
+
+**Fecha:** 2026-09-01
+**Estado:** Confirmado por el usuario — pendiente de ejecución manual
+
+El usuario ya tiene cuenta de Supabase (usada previamente para el proyecto "Quesisimo") y solicitó reutilizar el mismo flujo de integración GitHub↔Supabase para el despliegue de migraciones, pero de forma completamente aislada: un **proyecto Supabase nuevo** (base de datos, Auth y claves propias, sin relación con el de Quesisimo) conectado a un **repositorio de GitHub nuevo** dedicado exclusivamente a `D:\IOT`.
+
+Esto evita cualquier riesgo de que una migración o configuración de este proyecto afecte la base de datos de Quesisimo: al ser proyectos Supabase distintos vinculados a repositorios distintos, no existe ningún punto de conexión entre ambos.
+
+Pasos detallados en [MANUAL_ACTIONS.md](MANUAL_ACTIONS.md) acción #1 (fusiona lo que antes eran las acciones #1 y #5).
+
+**Cómo aplicar:** una vez el usuario comparta la URL del repositorio de GitHub, se agrega como remoto local y se le pide confirmación puntual antes de cualquier `git push`, siguiendo el protocolo de seguridad de Git. La estructura `supabase/migrations/` se crea en la Fase 2 pensando ya en este flujo de despliegue automático vía GitHub.
