@@ -1,0 +1,26 @@
+# Entornos y secretos
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+
+# Node / Angular (Fase 2+)
+node_modules/
+dist/
+.angular/
+npm-debug.log*
+yarn-error.log*
+
+# Supabase (Fase 2+)
+supabase/.branches/
+supabase/.temp/
+
+# Editor / SO
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Archivos temporales de análisis (no forman parte del entregable)
+*.tmp
