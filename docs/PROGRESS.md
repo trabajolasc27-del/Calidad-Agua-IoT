@@ -21,7 +21,7 @@
 - `.env.example` y `.gitignore` creados, sin secretos reales.
 
 ### Actividades pendientes (dentro de Fase 1)
-- Confirmación del usuario sobre las decisiones propuestas D-007 y D-008 (alcance de lectura de alertas y de calibraciones/mantenimiento para roles Técnico de campo/Analista).
+- ~~Confirmación del usuario sobre D-007 y D-008~~ — **confirmadas por el usuario el 2026-09-01**, sin cambios sobre la propuesta.
 - Autorización explícita del usuario para avanzar a la Fase 2.
 
 ### Pruebas ejecutadas

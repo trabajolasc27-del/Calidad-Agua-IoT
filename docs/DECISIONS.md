@@ -83,21 +83,21 @@ No se implementará MQTT en esta primera versión. El ESP32 se comunica exclusiv
 
 ## D-007 — Visibilidad de alertas para el rol Técnico de campo
 
-**Fecha:** 2026-09-01
-**Estado:** Propuesto — pendiente de confirmación del usuario
+**Fecha:** 2026-09-01 · **Confirmado:** 2026-09-01
+**Estado:** Confirmado por el usuario
 
-La matriz de roles proporcionada por el usuario no incluye explícitamente "atender alertas" dentro de las funciones del Técnico de campo (solo Administrador y Analista ambiental la tienen). Se propone que el Técnico de campo tenga **acceso de solo lectura** a las alertas de sus dispositivos asignados (útil para su trabajo de mantenimiento en campo), pero **sin poder** reconocer, atender ni cerrar alertas. Ver [ROLE_MATRIX.md](ROLE_MATRIX.md).
+La matriz de roles proporcionada por el usuario no incluye explícitamente "atender alertas" dentro de las funciones del Técnico de campo (solo Administrador y Analista ambiental la tienen). El Técnico de campo tiene **acceso de solo lectura** a las alertas de sus dispositivos asignados (útil para su trabajo de mantenimiento en campo), pero **sin poder** reconocer, atender ni cerrar alertas. Ver [ROLE_MATRIX.md](ROLE_MATRIX.md).
 
-**Cómo aplicar:** si el usuario confirma o corrige esta interpretación, actualizar este documento y la matriz de roles antes de escribir las políticas RLS en Fase 2.
+**Cómo aplicar:** esta interpretación queda fija; se implementa así en las políticas RLS de la Fase 2.
 
 ---
 
 ## D-008 — Analista ambiental y acceso a calibraciones/mantenimiento
 
-**Fecha:** 2026-09-01
-**Estado:** Propuesto — pendiente de confirmación del usuario
+**Fecha:** 2026-09-01 · **Confirmado:** 2026-09-01
+**Estado:** Confirmado por el usuario
 
-La matriz de roles no asigna explícitamente calibraciones/mantenimiento al Analista ambiental. Se propone acceso de **solo lectura** para el Analista (apoya el análisis de tendencias e historiales), dejando el registro (creación) exclusivo al Técnico de campo y al Administrador.
+La matriz de roles no asigna explícitamente calibraciones/mantenimiento al Analista ambiental. El Analista tiene acceso de **solo lectura** (apoya el análisis de tendencias e historiales), dejando el registro (creación) exclusivo al Técnico de campo y al Administrador.
 
 ---
 
