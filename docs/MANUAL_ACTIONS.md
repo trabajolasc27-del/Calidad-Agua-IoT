@@ -13,7 +13,7 @@ Estas acciones requieren intervención directa del usuario (cuentas, credenciale
 **Pasos exactos:**
 1. Ir a `supabase.com` y crear una cuenta (o iniciar sesión).
 2. Crear una nueva organización si es la primera vez.
-3. Crear un nuevo proyecto: elegir nombre (sugerido: `quesisimo-agua` o el que prefieras), una región cercana (p. ej. la más próxima a México disponible), y una **contraseña fuerte** para la base de datos (guárdala en un gestor de contraseñas, no la compartas en el chat).
+3. Crear un nuevo proyecto: elegir nombre (sugerido: `calidad-agua-iot` o el que prefieras), una región cercana (p. ej. la más próxima a México disponible), y una **contraseña fuerte** para la base de datos (guárdala en un gestor de contraseñas, no la compartas en el chat).
 4. Esperar a que el proyecto termine de aprovisionarse (unos minutos).
 5. En el panel del proyecto: **Project Settings → API**, copiar la **Project URL** y la **anon public key**.
 
