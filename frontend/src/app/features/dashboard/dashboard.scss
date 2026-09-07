@@ -1,0 +1,22 @@
+.spacer {
+  flex: 1 1 auto;
+}
+
+.user-chip {
+  font-size: 0.85rem;
+  margin-right: 0.75rem;
+  text-transform: capitalize;
+}
+
+.dashboard-placeholder {
+  max-width: 640px;
+  margin: 2.5rem auto;
+  padding: 0 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+
+  code {
+    font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  }
+}

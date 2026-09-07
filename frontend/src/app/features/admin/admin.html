@@ -1,0 +1,12 @@
+<mat-toolbar color="primary">
+  <a mat-button routerLink="/panel">← Panel</a>
+  <span>Administración</span>
+</mat-toolbar>
+
+<main class="admin-placeholder">
+  <p>
+    Esta ruta solo es accesible con rol <code>admin</code> (verificado por <code>roleGuard</code> y, de forma
+    definitiva, por las políticas RLS de Supabase). Los submódulos de usuarios, dispositivos, ubicaciones,
+    parámetros y umbrales se construyen conforme avanza la Fase 2.
+  </p>
+</main>

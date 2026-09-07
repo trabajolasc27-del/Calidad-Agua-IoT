@@ -1,0 +1,22 @@
+<mat-toolbar color="primary">
+  <span>Plataforma IoT de Calidad del Agua</span>
+  <span class="spacer"></span>
+  <span class="user-chip">
+    {{ authService.profile()?.full_name || authService.session()?.user?.email }}
+    · {{ authService.role() }}
+  </span>
+  <button mat-button (click)="logout()">Cerrar sesión</button>
+</mat-toolbar>
+
+<main class="dashboard-placeholder">
+  <h1>Dashboard</h1>
+  <p>
+    Sesión protegida funcionando de punta a punta: inicio de sesión, guard de ruta y perfil cargado desde
+    <code>profiles</code>. Las tarjetas de pH, oxígeno disuelto, turbidez y temperatura, el mapa y las gráficas
+    llegan en la Fase 3, cuando exista la Edge Function de ingesta conectada a dispositivos reales o simulados.
+  </p>
+
+  @if (authService.role() === 'admin') {
+    <a mat-flat-button color="primary" routerLink="/administracion">Ir a Administración</a>
+  }
+</main>
