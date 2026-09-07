@@ -113,9 +113,24 @@ No se ha decidido el proveedor de hosting para el frontend Angular (Netlify, Ver
 ## D-010 — Versiones exactas de dependencias
 
 **Fecha:** 2026-09-01
-**Estado:** Abierto — se fijará en Fase 2
+**Estado:** Resuelto — 2026-09-01, con los valores reales leídos del entorno y de `frontend/package.json` tras ejecutar el scaffolding.
 
 No se declaran números de versión exactos de Angular, Node.js, Supabase CLI, etc. en esta fase de diseño porque aún no se ha ejecutado ningún `npm init`/`ng new` real. Declarar una versión no verificada violaría la regla de no inventar información. Las versiones exactas se documentarán aquí mismo en el momento en que se ejecute el scaffolding (Fase 2, semana 4), leyendo el resultado real de los comandos.
+
+**Versiones fijadas (Fase 2, semana 4):**
+
+| Herramienta / paquete | Versión |
+|---|---|
+| Node.js | 24.14.0 |
+| npm | 11.9.0 |
+| Angular CLI / `@angular/*` | 21.2.8 (core), 21.2.14 (`@angular/cdk`, `@angular/material`) |
+| `@supabase/supabase-js` | ^2.115.0 |
+| TypeScript | ~5.9.2 |
+| Test runner | Vitest ^4.0.8 |
+| Supabase CLI (via `npx supabase`) | 2.116.0 |
+| Docker | 29.5.2 |
+
+Fuente: `frontend/package.json` y salida real de `ng version` / `docker --version` / `npx supabase --version`, no valores supuestos.
 
 ---
 
@@ -140,3 +155,14 @@ Esto evita cualquier riesgo de que una migración o configuración de este proye
 Pasos detallados en [MANUAL_ACTIONS.md](MANUAL_ACTIONS.md) acción #1 (fusiona lo que antes eran las acciones #1 y #5).
 
 **Cómo aplicar:** una vez el usuario comparta la URL del repositorio de GitHub, se agrega como remoto local y se le pide confirmación puntual antes de cualquier `git push`, siguiendo el protocolo de seguridad de Git. La estructura `supabase/migrations/` se crea en la Fase 2 pensando ya en este flujo de despliegue automático vía GitHub.
+
+**Actualización 2026-09-01:** ejecutado. Remoto `origin` = `https://github.com/trabajolasc27-del/Calidad-Agua-IoT.git`, rama local renombrada de `master` a `main` y publicada (`git push -u origin main`). Proyecto Supabase nuevo: `https://zeoedihibvbkclqsqhrf.supabase.co` (ref `zeoedihibvbkclqsqhrf`), con la integración GitHub→Supabase conectada al repositorio y rama correctos. La `anon key` se guardó en `D:\IOT\.env` (ignorado por Git).
+
+---
+
+## D-013 — Librería de UI: Angular Material
+
+**Fecha:** 2026-09-01
+**Estado:** Confirmado (decisión técnica)
+
+Se elige **Angular Material** sobre Bootstrap para el frontend: se integra nativamente con el ecosistema Angular (formularios reactivos, CDK de accesibilidad, theming), lo que ayuda a cumplir RNF-02 (comunicar gravedad con texto+ícono, no solo color) y RNF-01 (responsividad) sin depender de una librería de CSS externa. Se documentará la versión exacta instalada junto con el resto de dependencias (ver D-010).
