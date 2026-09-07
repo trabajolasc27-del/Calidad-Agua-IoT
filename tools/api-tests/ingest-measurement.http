@@ -1,0 +1,129 @@
+### Pruebas de la Edge Function ingest-measurement (docs/API_CONTRACT.md).
+### Formato compatible con la extension "REST Client" de VS Code / JetBrains
+### HTTP Client. Ajusta las variables antes de ejecutar.
+###
+### No pongas aqui secretos reales de produccion: usa el dispositivo y
+### secreto de demostracion sembrados por supabase/seed.sql, o los tuyos
+### de desarrollo local.
+
+@baseUrl = http://localhost:54321/functions/v1/ingest-measurement
+@deviceId = NODO-DEMO-001
+@deviceSecret = demo-secret-nodo-001
+
+### 1. Lote valido -> 201 Created
+POST {{baseUrl}}
+Content-Type: application/json
+Authorization: Bearer {{deviceSecret}}
+
+{
+  "device_id": "{{deviceId}}",
+  "sequence": 100001,
+  "measured_at": "2026-09-01T18:30:00Z",
+  "values": {
+    "ph": 7.12,
+    "dissolved_oxygen": 6.8,
+    "turbidity": 4.2,
+    "temperature": 28.3
+  }
+}
+
+### 2. Mismo device_id + sequence otra vez -> 409 Conflict
+POST {{baseUrl}}
+Content-Type: application/json
+Authorization: Bearer {{deviceSecret}}
+
+{
+  "device_id": "{{deviceId}}",
+  "sequence": 100001,
+  "measured_at": "2026-09-01T18:30:00Z",
+  "values": {
+    "ph": 7.12,
+    "dissolved_oxygen": 6.8,
+    "turbidity": 4.2,
+    "temperature": 28.3
+  }
+}
+
+### 3. Secreto incorrecto -> 401 Unauthorized
+POST {{baseUrl}}
+Content-Type: application/json
+Authorization: Bearer secreto-incorrecto
+
+{
+  "device_id": "{{deviceId}}",
+  "sequence": 100002,
+  "measured_at": "2026-09-01T18:31:00Z",
+  "values": {
+    "ph": 7.12,
+    "dissolved_oxygen": 6.8,
+    "turbidity": 4.2,
+    "temperature": 28.3
+  }
+}
+
+### 4. Dispositivo inexistente -> 404 Not Found
+POST {{baseUrl}}
+Content-Type: application/json
+Authorization: Bearer {{deviceSecret}}
+
+{
+  "device_id": "NODO-QUE-NO-EXISTE",
+  "sequence": 1,
+  "measured_at": "2026-09-01T18:31:00Z",
+  "values": {
+    "ph": 7.12,
+    "dissolved_oxygen": 6.8,
+    "turbidity": 4.2,
+    "temperature": 28.3
+  }
+}
+
+### 5. Falta un campo obligatorio -> 400 Bad Request
+POST {{baseUrl}}
+Content-Type: application/json
+Authorization: Bearer {{deviceSecret}}
+
+{
+  "device_id": "{{deviceId}}",
+  "sequence": 100003,
+  "measured_at": "2026-09-01T18:32:00Z",
+  "values": {
+    "ph": 7.12,
+    "dissolved_oxygen": 6.8,
+    "turbidity": 4.2
+  }
+}
+
+### 6. Valor fuera de rango fisico -> 422 Unprocessable Entity
+POST {{baseUrl}}
+Content-Type: application/json
+Authorization: Bearer {{deviceSecret}}
+
+{
+  "device_id": "{{deviceId}}",
+  "sequence": 100004,
+  "measured_at": "2026-09-01T18:33:00Z",
+  "values": {
+    "ph": 999,
+    "dissolved_oxygen": 6.8,
+    "turbidity": 4.2,
+    "temperature": 28.3
+  }
+}
+
+### 7. Valor de alerta (turbidez en banda ALERTA segun umbrales demo)
+POST {{baseUrl}}
+Content-Type: application/json
+Authorization: Bearer {{deviceSecret}}
+
+{
+  "device_id": "{{deviceId}}",
+  "sequence": 100005,
+  "measured_at": "2026-09-01T18:34:00Z",
+  "values": {
+    "ph": 7.0,
+    "dissolved_oxygen": 6.5,
+    "turbidity": 7.0,
+    "temperature": 27.0
+  }
+}
