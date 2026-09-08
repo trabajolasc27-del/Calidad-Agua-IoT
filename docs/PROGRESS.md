@@ -3,7 +3,7 @@
 ## Sesión 2 — 2026-09-08
 
 ### Fase actual
-**Fase 2 (Semanas 4–6): Fundamentos — en progreso.** Backend real desplegado y probado de punta a punta; login real, guard de sesión y guard de rol verificados con el primer usuario administrador. Falta construir las pantallas reales de administración (usuarios, dispositivos, ubicaciones, parámetros, umbrales).
+**Fase 2 (Semanas 4–6): Fundamentos — en progreso.** Backend real desplegado y probado de punta a punta; login real, guard de sesión y guard de rol verificados. Administración > Usuarios (RF-06 a RF-08) construida y **verificada end-to-end con un usuario real**: alta, invitación por correo, establecimiento de contraseña e inicio de sesión. Falta el resto de Administración (dispositivos, ubicaciones, parámetros, umbrales).
 
 ### Actividades terminadas (implementadas y verificadas)
 - Repositorio conectado: remoto `origin` = GitHub `trabajolasc27-del/Calidad-Agua-IoT`, proyecto Supabase nuevo (`zeoedihibvbkclqsqhrf`) con integración GitHub→Supabase activa en la rama `main` (D-012).
@@ -15,23 +15,30 @@
 - Documentación de Fase 1 actualizada: D-007/D-008 confirmadas por el usuario, D-010 resuelto con versiones reales, D-013 (Angular Material) agregada.
 - Primer usuario administrador creado (`trabajolasc27@gmail.com`) y promovido a `admin` en `profiles`.
 - **Login real verificado desde el navegador** contra `ng serve` + Supabase real: sesión iniciada, perfil y rol cargados, `Dashboard` muestra correo y rol, botón "Ir a Administración" visible solo para `admin`, `roleGuard` deja pasar a `/administracion`, botón de cerrar sesión presente. Ciclo completo de RF-01 a RF-05 confirmado con una cuenta real, no solo con el caso de error.
+- **Administración > Usuarios construida y verificada con datos reales** (RF-06 a RF-08): listado (con estados de carga/vacío/error), alta vía la Edge Function `admin-create-user` (invitación real por correo, la cuenta nunca pasa por un password que el admin maneje), edición de nombre/rol/estado, asignación de dispositivos a técnicos de campo. `profiles.email` agregado (denormalizado desde `auth.users`, sincronizado por trigger) para poder listar usuarios sin exponer el esquema `auth`.
+- Nueva pantalla `SetPassword` (`/restablecer-contrasena`): recibe el token que Supabase pone en la URL tras un enlace de invitación o de recuperación de contraseña y deja fijar la contraseña. Sin esto ninguno de los dos flujos por correo llegaba a ningún lado.
+- `site_url`/`uri_allow_list` del proyecto Supabase corregidos (apuntaban al `localhost:3000` por defecto, no al `4200` real de esta app), vía la Management API tocando solo esos dos campos.
 
 ### Errores encontrados y corregidos en esta sesión
 1. **`verify_jwt` de la plataforma bloqueaba el ESP32/simulador** — la Edge Function usa el header `Authorization` para el secreto propio del dispositivo, no un JWT de Supabase; la verificación por defecto de la plataforma lo rechazaba antes de que el código de la función corriera. Corregido con `verify_jwt = false` en `supabase/config.toml` para esa función.
 2. **`verify_device_secret`: columna ambigua** — `returns table (device_id uuid, ...)` declara `device_id` como variable visible en toda la función, chocando con la columna `device_credentials.device_id`. Corregido calificando la columna con alias de tabla.
 3. **`verify_device_secret`: `crypt()` no encontrado** — pgcrypto vive en el esquema `extensions` en este proyecto, no en `public`; con el `search_path` restringido a `public` (a propósito, por seguridad) la función no encontraba `crypt()`. Corregido agregando `extensions` al `search_path` de esa función específica.
+4. **Enlace de invitación llevaba a `localhost:3000`** (el `site_url` por defecto del proyecto), no al `4200` real. Corregido vía Management API (ver D-015); **no** se usó `supabase config push` porque hubiera pisado ajustes remotos no relacionados (Twilio SMS, MFA, etc.) — el propio CLI lo advierte.
+5. **Faltaba la pantalla que completa el enlace de invitación/recuperación.** Ni crear un usuario ni "olvidé mi contraseña" servían de nada sin una ruta que tomara el token de la URL y llamara `auth.updateUser({ password })`. Agregada como `SetPassword`.
 
-Los tres se encontraron probando de verdad contra el proyecto real (no se habrían visto solo leyendo el SQL), y quedaron corregidos y reverificados antes de continuar.
+Los cinco se encontraron probando de verdad contra el proyecto real (no se habrían visto solo leyendo el código), y quedaron corregidos y reverificados antes de continuar — el último, con una invitación real de punta a punta: alta → correo → contraseña → login.
 
 ### Pruebas ejecutadas
-- `ng build` (Angular): exitoso, sin advertencias de presupuesto.
+- `ng build` (Angular): exitoso, sin advertencias de presupuesto, en cada punto de esta sesión.
 - Simulador IoT contra la Edge Function real: perfiles normal/alerta/duplicado/inválido/no-autorizado/no-existe — los 6 verificados con el código HTTP esperado.
 - Verificación directa en SQL (`db query --linked`) del motor de evaluación y de la apertura de alertas.
 - Prueba de RLS: intento de `INSERT` en `locations` como `anon` correctamente rechazado (401, `new row violates row-level security policy`).
+- Ciclo completo de creación de usuario real: alta desde la pantalla de Usuarios → correo de invitación recibido → `SetPassword` → login exitoso con el usuario nuevo (confirmado por el usuario).
 
 ### Errores conocidos (no bloqueantes)
 - Docker Desktop no puede levantar Supabase local en esta máquina porque **WSL2 no está instalado** (cambio de sistema que requiere reinicio; no se hizo sin autorización explícita). No es necesario: se está probando contra el proyecto real, que está vacío de datos reales.
 - Las funciones RPC de transición de alertas (`acknowledge_alert`/`attend_alert`/`close_alert`) todavía no se probaron con una sesión de usuario real (sí se probó todo lo demás con sesión real). Se probarán al construir la pantalla de Alertas.
+- El servidor de desarrollo local (`ng serve`) se detiene solo tras un rato de inactividad de la sesión de Claude Code; si un enlace de correo da `ERR_CONNECTION_REFUSED` en `localhost:4200`, probablemente solo haga falta volver a levantarlo.
 
 ### Acciones manuales pendientes
 1. Brevo (Fase 4, no urge).
@@ -40,10 +47,10 @@ Los tres se encontraron probando de verdad contra el proyecto real (no se habrí
 4. (Opcional) Revocar el Personal Access Token de Supabase usado para este despliegue (`supabase.com/dashboard/account/tokens`) si no lo vas a seguir usando, o conservarlo si quieres que sigamos desplegando por CLI.
 
 ### Próxima actividad recomendada
-Construir las pantallas reales de Administración sobre el cascarón ya protegido por `roleGuard`: Usuarios, Dispositivos, Ubicaciones, Parámetros y Umbrales (RF-06 a RF-17), reemplazando el texto de marcador de posición actual.
+Seguir con el resto de Administración sobre el mismo patrón que Usuarios: Dispositivos (RF-11 a RF-14, incluye emitir la credencial del dispositivo), Ubicaciones (RF-09/RF-10), Parámetros y Umbrales (RF-15 a RF-17).
 
 ### Cómo continuar en otra sesión
-Indicar: **"Continúa con la Fase 2 del proyecto IOT"** para seguir con las pantallas de Administración.
+Indicar: **"Continúa con la Fase 2 del proyecto IOT"** para seguir con las pantallas de Administración (Dispositivos es la siguiente natural, porque Umbrales y el dashboard dependen de que existan dispositivos).
 
 ---
 

@@ -177,3 +177,19 @@ Se elige **Angular Material** sobre Bootstrap para el frontend: se integra nativ
 Al probar `verify_device_secret` end-to-end apareció `function crypt(text, text) does not exist` dentro de una función con `set search_path = public`. La causa: en este proyecto Supabase, pgcrypto (y probablemente otras extensiones) se instala en el esquema `extensions`, no en `public`. Cualquier función `SECURITY DEFINER` que restrinja su `search_path` a `public` por seguridad (patrón usado en todo este proyecto) y necesite `crypt()`/`gen_salt()`/`gen_random_uuid()` explícitamente debe declarar `set search_path = public, extensions`.
 
 **Cómo aplicar:** al escribir una nueva función seguridad-definer que use una función de una extensión, verificar primero en qué esquema quedó instalada esa extensión (`select extname, extnamespace::regnamespace from pg_extension;`) en vez de asumir `public`.
+
+---
+
+## D-015 — Creación de usuarios vía Edge Function + pantalla de establecer contraseña
+
+**Fecha:** 2026-09-08
+**Estado:** Confirmado (verificado end-to-end con un usuario real)
+
+RF-06/RF-07 requieren que un Administrador cree usuarios desde la app. Crear una cuenta de Supabase Auth necesita la `service_role key`, que nunca vive en el frontend (RNF-04), así que se implementó la Edge Function `admin-create-user`: verifica que quien llama sea admin (usando su propia sesión) y usa `auth.admin.inviteUserByEmail` con la `service_role key` del lado del servidor.
+
+Al probarlo con un usuario real aparecieron dos problemas que no eran evidentes de antemano:
+
+1. **`site_url` del proyecto apuntaba a `http://localhost:3000`** (el valor por defecto de Supabase para cualquier proyecto nuevo), no a `http://localhost:4200` donde corre esta app. El enlace del correo de invitación llevaba a una página inexistente. Se corrigió actualizando `site_url` y `uri_allow_list` **directamente vía la Management API** (no con `supabase config push`, que hubiera sobrescrito ajustes remotos no relacionados como Twilio SMS — el propio CLI advierte de este riesgo).
+2. **Faltaba una pantalla que recibiera el enlace y dejara fijar la contraseña.** Ni la invitación ni la recuperación de contraseña (RF-03) sirven de nada si no hay una página que tome el token de la URL y llame `supabase.auth.updateUser({ password })`. Se agregó `SetPassword` en `/restablecer-contrasena`, compartida por ambos flujos.
+
+**Cómo aplicar:** cualquier flujo de Supabase Auth que dependa de un correo con enlace (invitación, recuperación, magic link) necesita: (a) `site_url`/`uri_allow_list` apuntando al origen real de la app, y (b) una ruta en el frontend que reciba ese enlace y complete la acción — no basta con disparar el correo.
