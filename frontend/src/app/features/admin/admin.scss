@@ -1,9 +1,31 @@
-.admin-placeholder {
-  max-width: 640px;
-  margin: 2.5rem auto;
-  padding: 0 1.5rem;
+.admin-tabs {
+  display: flex;
+  gap: 0.25rem;
+  padding: 0.75rem 1.5rem 0;
+  border-bottom: 1px solid var(--mat-sys-outline-variant, #dde3e2);
+}
 
-  code {
-    font-family: 'IBM Plex Mono', ui-monospace, monospace;
+.admin-tab {
+  padding: 0.5rem 0.9rem;
+  border-radius: 8px 8px 0 0;
+  font-size: 0.88rem;
+  text-decoration: none;
+  color: var(--mat-sys-on-surface-variant, #555);
+
+  &.active {
+    color: var(--mat-sys-primary, #0f7d72);
+    font-weight: 600;
+    background: var(--mat-sys-surface-container-low, #f3f6f5);
   }
+
+  &.disabled {
+    color: var(--mat-sys-outline, #aab3b2);
+    cursor: default;
+  }
+}
+
+.admin-content {
+  max-width: 960px;
+  margin: 1.5rem auto;
+  padding: 0 1.5rem;
 }

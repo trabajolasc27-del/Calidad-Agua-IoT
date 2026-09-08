@@ -1,0 +1,79 @@
+<h2 mat-dialog-title>{{ data.mode === 'create' ? 'Nuevo usuario' : 'Editar usuario' }}</h2>
+
+<form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+  <mat-dialog-content class="dialog-content">
+    <mat-form-field appearance="outline">
+      <mat-label>Correo electrónico</mat-label>
+      <input matInput type="email" formControlName="email" autocomplete="off" required />
+      @if (form.controls.email.touched && form.controls.email.hasError('required')) {
+        <mat-error>El correo es obligatorio.</mat-error>
+      }
+      @if (form.controls.email.touched && form.controls.email.hasError('email')) {
+        <mat-error>Ingresa un correo válido.</mat-error>
+      }
+      @if (data.mode === 'edit') {
+        <mat-hint>El correo no se puede cambiar desde aquí.</mat-hint>
+      } @else {
+        <mat-hint>Se le enviará un correo de invitación para que elija su propia contraseña.</mat-hint>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Nombre completo</mat-label>
+      <input matInput formControlName="full_name" autocomplete="off" required />
+      @if (form.controls.full_name.touched && form.controls.full_name.hasError('required')) {
+        <mat-error>El nombre es obligatorio.</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Rol</mat-label>
+      <mat-select formControlName="role">
+        @for (r of roles; track r) {
+          <mat-option [value]="r">{{ roleLabels[r] }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+    @if (data.mode === 'edit') {
+      <mat-checkbox formControlName="is_active">Usuario activo</mat-checkbox>
+    }
+
+    @if (showDeviceAssignment) {
+      <div class="device-assignment">
+        <span class="device-assignment-title">Dispositivos asignados</span>
+        @if (loadingDevices()) {
+          <mat-spinner diameter="20" />
+        } @else if (devices().length === 0) {
+          <p class="hint">No hay dispositivos dados de alta todavía.</p>
+        } @else {
+          <div class="device-list">
+            @for (d of devices(); track d.id) {
+              <mat-checkbox
+                [checked]="isDeviceAssigned(d.id)"
+                (change)="toggleDevice(d.id, $event.checked)"
+              >
+                {{ d.code }} — {{ d.name }}
+              </mat-checkbox>
+            }
+          </div>
+        }
+      </div>
+    }
+
+    @if (errorMessage()) {
+      <p class="form-error" role="alert">{{ errorMessage() }}</p>
+    }
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button type="button" (click)="cancel()">Cancelar</button>
+    <button mat-flat-button color="primary" type="submit" [disabled]="submitting()">
+      @if (submitting()) {
+        <mat-spinner diameter="18" />
+      } @else {
+        Guardar
+      }
+    </button>
+  </mat-dialog-actions>
+</form>

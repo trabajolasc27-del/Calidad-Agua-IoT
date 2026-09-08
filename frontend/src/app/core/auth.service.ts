@@ -91,12 +91,30 @@ export class AuthService {
     return { ok: true };
   }
 
+  // Completa el flujo de invitación (RF-06) o de recuperación (RF-03): la
+  // sesión ya quedó establecida por el propio cliente de Supabase a partir
+  // del token en la URL (#access_token=...); aquí solo se fija la
+  // contraseña nueva.
+  async setPassword(password: string): Promise<AuthResult> {
+    const { error } = await this.supabaseService.client.auth.updateUser({ password });
+    if (error) {
+      return { ok: false, message: this.translateAuthError(error.message) };
+    }
+    return { ok: true };
+  }
+
   private translateAuthError(message: string): string {
     if (message.toLowerCase().includes('invalid login credentials')) {
       return 'Correo o contraseña incorrectos.';
     }
     if (message.toLowerCase().includes('email not confirmed')) {
       return 'Debes confirmar tu correo antes de iniciar sesión.';
+    }
+    if (message.toLowerCase().includes('password') && message.toLowerCase().includes('character')) {
+      return 'La contraseña debe tener al menos 6 caracteres.';
+    }
+    if (message.toLowerCase().includes('auth session missing')) {
+      return 'El enlace no es válido o ya expiró. Solicita uno nuevo.';
     }
     return 'No se pudo completar la operación. Intenta de nuevo en unos minutos.';
   }
