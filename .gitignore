@@ -4,6 +4,7 @@
 .env.*.local
 *.pem
 *.key
+firmware/**/secrets.h
 
 # Node / Angular (Fase 2+)
 node_modules/

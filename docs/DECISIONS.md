@@ -193,3 +193,16 @@ Al probarlo con un usuario real aparecieron dos problemas que no eran evidentes 
 2. **Faltaba una pantalla que recibiera el enlace y dejara fijar la contraseña.** Ni la invitación ni la recuperación de contraseña (RF-03) sirven de nada si no hay una página que tome el token de la URL y llame `supabase.auth.updateUser({ password })`. Se agregó `SetPassword` en `/restablecer-contrasena`, compartida por ambos flujos.
 
 **Cómo aplicar:** cualquier flujo de Supabase Auth que dependa de un correo con enlace (invitación, recuperación, magic link) necesita: (a) `site_url`/`uri_allow_list` apuntando al origen real de la app, y (b) una ruta en el frontend que reciba ese enlace y complete la acción — no basta con disparar el correo.
+
+---
+
+## D-016 — ESP32 físico de prueba con hardware provisional (sin sensores de agua reales)
+
+**Fecha:** 2026-09-08
+**Estado:** Confirmado por el usuario
+
+El usuario ya tiene un ESP32 armado en protoboard con un sensor ultrasónico HC-SR04, un fotorresistor (LDR) y un LED — ninguno de estos es un sensor de calidad del agua del alcance oficial (ver D-002). Se preguntó explícitamente la intención y el usuario confirmó: usarlo **solo para validar la conectividad** ESP32 → Edge Function → base de datos → Historial, con valores de prueba claramente marcados como no reales, antes de tener los sensores calibrados definitivos.
+
+Se creó el dispositivo `NODO-ESP32-01` en la base de datos real (`is_demo = false`, porque es hardware físico real, aunque los *valores* que envía sean de prueba) con su propia credencial, distinto de `NODO-DEMO-001` (que sigue siendo 100% sintético vía el simulador Node). Firmware en `firmware/esp32-test/`.
+
+**Cómo aplicar:** cuando lleguen los sensores reales de pH/oxígeno disuelto/turbidez/temperatura, se reemplaza únicamente el bloque de lectura de sensores del firmware — el resto (WiFi, hora por NTP, autenticación, envío) no cambia. No usar `NODO-ESP32-01` como si sus lecturas fueran datos reales de calidad del agua en ningún reporte o demostración.
