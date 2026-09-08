@@ -385,6 +385,14 @@ deno_version = 2
 # [edge_runtime.secrets]
 # secret_key = "env(SECRET_VALUE)"
 
+# ingest-measurement recibe llamadas del ESP32/simulador, no de un usuario
+# de Supabase Auth: el header Authorization lleva el secreto propio del
+# dispositivo (ver D-003, docs/API_CONTRACT.md), no un JWT de Supabase. Si
+# se deja el verificador de JWT de la plataforma activo, rechaza la
+# solicitud antes de que el codigo de la funcion la vea.
+[functions.ingest-measurement]
+verify_jwt = false
+
 [analytics]
 enabled = true
 port = 54327
