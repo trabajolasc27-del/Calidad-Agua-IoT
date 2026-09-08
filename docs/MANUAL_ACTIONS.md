@@ -113,6 +113,8 @@ En cuanto me compartas la URL del repositorio de GitHub, agrego el remoto localm
 
 ## 6. Crear el primer usuario administrador
 
+**Estado: ✅ Completado (2026-09-08).** Cuenta `trabajolasc27@gmail.com` creada y promovida a `admin`; login real, guard de sesión, guard de rol y ruta de Administración verificados de punta a punta desde el frontend corriendo en local.
+
 **Qué hacer:** dar de alta manualmente, desde el Dashboard de Supabase, la primera cuenta con rol `admin`.
 
 **Por qué:** por diseño (RF-06), solo un Administrador puede crear usuarios desde la propia aplicación — pero el primero no puede crearse a sí mismo ahí, porque todavía no existe ninguno. Este único bootstrap se hace desde el Dashboard; de ahí en adelante, esa cuenta administra al resto desde la app.

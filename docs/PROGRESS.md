@@ -3,7 +3,7 @@
 ## Sesión 2 — 2026-09-08
 
 ### Fase actual
-**Fase 2 (Semanas 4–6): Fundamentos — en progreso.** Backend real desplegado y probado de punta a punta; falta el primer usuario administrador y el resto de las pantallas de administración.
+**Fase 2 (Semanas 4–6): Fundamentos — en progreso.** Backend real desplegado y probado de punta a punta; login real, guard de sesión y guard de rol verificados con el primer usuario administrador. Falta construir las pantallas reales de administración (usuarios, dispositivos, ubicaciones, parámetros, umbrales).
 
 ### Actividades terminadas (implementadas y verificadas)
 - Repositorio conectado: remoto `origin` = GitHub `trabajolasc27-del/Calidad-Agua-IoT`, proyecto Supabase nuevo (`zeoedihibvbkclqsqhrf`) con integración GitHub→Supabase activa en la rama `main` (D-012).
@@ -13,6 +13,8 @@
 - Frontend Angular 21 + Angular Material scaffolded, compila sin errores ni advertencias. Implementado: `SupabaseService`, `AuthService` (signals: sesión, perfil, rol), `authGuard`, `roleGuard`, pantallas de inicio de sesión y recuperación de contraseña, cascarones protegidos de Dashboard y Administración.
 - Datos de demostración sembrados en el proyecto real (`seed.sql`, todo marcado `is_demo`).
 - Documentación de Fase 1 actualizada: D-007/D-008 confirmadas por el usuario, D-010 resuelto con versiones reales, D-013 (Angular Material) agregada.
+- Primer usuario administrador creado (`trabajolasc27@gmail.com`) y promovido a `admin` en `profiles`.
+- **Login real verificado desde el navegador** contra `ng serve` + Supabase real: sesión iniciada, perfil y rol cargados, `Dashboard` muestra correo y rol, botón "Ir a Administración" visible solo para `admin`, `roleGuard` deja pasar a `/administracion`, botón de cerrar sesión presente. Ciclo completo de RF-01 a RF-05 confirmado con una cuenta real, no solo con el caso de error.
 
 ### Errores encontrados y corregidos en esta sesión
 1. **`verify_jwt` de la plataforma bloqueaba el ESP32/simulador** — la Edge Function usa el header `Authorization` para el secreto propio del dispositivo, no un JWT de Supabase; la verificación por defecto de la plataforma lo rechazaba antes de que el código de la función corriera. Corregido con `verify_jwt = false` en `supabase/config.toml` para esa función.
@@ -29,20 +31,19 @@ Los tres se encontraron probando de verdad contra el proyecto real (no se habrí
 
 ### Errores conocidos (no bloqueantes)
 - Docker Desktop no puede levantar Supabase local en esta máquina porque **WSL2 no está instalado** (cambio de sistema que requiere reinicio; no se hizo sin autorización explícita). No es necesario: se está probando contra el proyecto real, que está vacío de datos reales.
-- Las funciones RPC de transición de alertas (`acknowledge_alert`/`attend_alert`/`close_alert`) todavía no se probaron con una sesión de usuario real, porque no existe ningún usuario todavía (ver Acciones manuales pendientes).
+- Las funciones RPC de transición de alertas (`acknowledge_alert`/`attend_alert`/`close_alert`) todavía no se probaron con una sesión de usuario real (sí se probó todo lo demás con sesión real). Se probarán al construir la pantalla de Alertas.
 
 ### Acciones manuales pendientes
-1. **Crear el primer usuario administrador** (bloquea probar login real y el resto de Administración): Supabase Dashboard → Authentication → Users → Add user (correo + contraseña que tú elijas) → luego Table Editor → `profiles` → editar la fila de ese usuario → cambiar `role` a `admin` (se creó automáticamente con `field_tech` por el trigger `on_auth_user_created`).
-2. Brevo (Fase 4, no urge).
-3. Sensores de oxígeno disuelto y temperatura para el ESP32 (Fase 5, no bloquea).
-4. Hosting/dominio (Fase 5, no bloquea).
-5. (Opcional) Revocar el Personal Access Token de Supabase usado para este despliegue (`supabase.com/dashboard/account/tokens`) si no lo vas a seguir usando, o conservarlo si quieres que seguamos desplegando por CLI.
+1. Brevo (Fase 4, no urge).
+2. Sensores de oxígeno disuelto y temperatura para el ESP32 (Fase 5, no bloquea).
+3. Hosting/dominio (Fase 5, no bloquea).
+4. (Opcional) Revocar el Personal Access Token de Supabase usado para este despliegue (`supabase.com/dashboard/account/tokens`) si no lo vas a seguir usando, o conservarlo si quieres que sigamos desplegando por CLI.
 
 ### Próxima actividad recomendada
-En cuanto exista el primer administrador: probar el login real desde el frontend (`ng serve`), verificar que `/administracion` sea accesible solo para ese rol, y continuar la Fase 2 con las pantallas reales de administración (usuarios, dispositivos, ubicaciones, parámetros, umbrales) sobre datos reales en vez de los cascarones actuales.
+Construir las pantallas reales de Administración sobre el cascarón ya protegido por `roleGuard`: Usuarios, Dispositivos, Ubicaciones, Parámetros y Umbrales (RF-06 a RF-17), reemplazando el texto de marcador de posición actual.
 
 ### Cómo continuar en otra sesión
-Indicar: **"Continúa con la Fase 2 del proyecto IOT"**. Si ya creaste el primer administrador, indica el correo usado para que pueda guiarte a probar el login real.
+Indicar: **"Continúa con la Fase 2 del proyecto IOT"** para seguir con las pantallas de Administración.
 
 ---
 
