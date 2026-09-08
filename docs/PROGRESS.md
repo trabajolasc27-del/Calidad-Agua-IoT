@@ -1,5 +1,51 @@
 # Registro de Progreso
 
+## Sesión 2 — 2026-09-08
+
+### Fase actual
+**Fase 2 (Semanas 4–6): Fundamentos — en progreso.** Backend real desplegado y probado de punta a punta; falta el primer usuario administrador y el resto de las pantallas de administración.
+
+### Actividades terminadas (implementadas y verificadas)
+- Repositorio conectado: remoto `origin` = GitHub `trabajolasc27-del/Calidad-Agua-IoT`, proyecto Supabase nuevo (`zeoedihibvbkclqsqhrf`) con integración GitHub→Supabase activa en la rama `main` (D-012).
+- 15 migraciones SQL escritas y **aplicadas al proyecto real**: 14 tablas, 7 enums, políticas RLS completas por rol, motor de evaluación (`evaluate_batch`), transiciones de alerta (`acknowledge_alert`/`attend_alert`/`close_alert`), autenticación de dispositivo (`verify_device_secret`) e ingesta transaccional (`ingest_measurement_batch`).
+- Edge Function `ingest-measurement` desplegada al proyecto real (requirió desactivar `verify_jwt` para esa función, ver Errores conocidos/corregidos).
+- **Verificado end-to-end contra el proyecto real** (no local, no simulado) con `tools/simulator/simulate.mjs`: los 6 códigos de respuesta del contrato responden correctamente (201, 400, 401, 404, 409, 422), y una alerta se abre automáticamente tras 2 lecturas consecutivas fuera de rango, con la severidad correcta.
+- Frontend Angular 21 + Angular Material scaffolded, compila sin errores ni advertencias. Implementado: `SupabaseService`, `AuthService` (signals: sesión, perfil, rol), `authGuard`, `roleGuard`, pantallas de inicio de sesión y recuperación de contraseña, cascarones protegidos de Dashboard y Administración.
+- Datos de demostración sembrados en el proyecto real (`seed.sql`, todo marcado `is_demo`).
+- Documentación de Fase 1 actualizada: D-007/D-008 confirmadas por el usuario, D-010 resuelto con versiones reales, D-013 (Angular Material) agregada.
+
+### Errores encontrados y corregidos en esta sesión
+1. **`verify_jwt` de la plataforma bloqueaba el ESP32/simulador** — la Edge Function usa el header `Authorization` para el secreto propio del dispositivo, no un JWT de Supabase; la verificación por defecto de la plataforma lo rechazaba antes de que el código de la función corriera. Corregido con `verify_jwt = false` en `supabase/config.toml` para esa función.
+2. **`verify_device_secret`: columna ambigua** — `returns table (device_id uuid, ...)` declara `device_id` como variable visible en toda la función, chocando con la columna `device_credentials.device_id`. Corregido calificando la columna con alias de tabla.
+3. **`verify_device_secret`: `crypt()` no encontrado** — pgcrypto vive en el esquema `extensions` en este proyecto, no en `public`; con el `search_path` restringido a `public` (a propósito, por seguridad) la función no encontraba `crypt()`. Corregido agregando `extensions` al `search_path` de esa función específica.
+
+Los tres se encontraron probando de verdad contra el proyecto real (no se habrían visto solo leyendo el SQL), y quedaron corregidos y reverificados antes de continuar.
+
+### Pruebas ejecutadas
+- `ng build` (Angular): exitoso, sin advertencias de presupuesto.
+- Simulador IoT contra la Edge Function real: perfiles normal/alerta/duplicado/inválido/no-autorizado/no-existe — los 6 verificados con el código HTTP esperado.
+- Verificación directa en SQL (`db query --linked`) del motor de evaluación y de la apertura de alertas.
+- Prueba de RLS: intento de `INSERT` en `locations` como `anon` correctamente rechazado (401, `new row violates row-level security policy`).
+
+### Errores conocidos (no bloqueantes)
+- Docker Desktop no puede levantar Supabase local en esta máquina porque **WSL2 no está instalado** (cambio de sistema que requiere reinicio; no se hizo sin autorización explícita). No es necesario: se está probando contra el proyecto real, que está vacío de datos reales.
+- Las funciones RPC de transición de alertas (`acknowledge_alert`/`attend_alert`/`close_alert`) todavía no se probaron con una sesión de usuario real, porque no existe ningún usuario todavía (ver Acciones manuales pendientes).
+
+### Acciones manuales pendientes
+1. **Crear el primer usuario administrador** (bloquea probar login real y el resto de Administración): Supabase Dashboard → Authentication → Users → Add user (correo + contraseña que tú elijas) → luego Table Editor → `profiles` → editar la fila de ese usuario → cambiar `role` a `admin` (se creó automáticamente con `field_tech` por el trigger `on_auth_user_created`).
+2. Brevo (Fase 4, no urge).
+3. Sensores de oxígeno disuelto y temperatura para el ESP32 (Fase 5, no bloquea).
+4. Hosting/dominio (Fase 5, no bloquea).
+5. (Opcional) Revocar el Personal Access Token de Supabase usado para este despliegue (`supabase.com/dashboard/account/tokens`) si no lo vas a seguir usando, o conservarlo si quieres que seguamos desplegando por CLI.
+
+### Próxima actividad recomendada
+En cuanto exista el primer administrador: probar el login real desde el frontend (`ng serve`), verificar que `/administracion` sea accesible solo para ese rol, y continuar la Fase 2 con las pantallas reales de administración (usuarios, dispositivos, ubicaciones, parámetros, umbrales) sobre datos reales en vez de los cascarones actuales.
+
+### Cómo continuar en otra sesión
+Indicar: **"Continúa con la Fase 2 del proyecto IOT"**. Si ya creaste el primer administrador, indica el correo usado para que pueda guiarte a probar el login real.
+
+---
+
 ## Sesión 1 — 2026-09-01
 
 ### Fase actual

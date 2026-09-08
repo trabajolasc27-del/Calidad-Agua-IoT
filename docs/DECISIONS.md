@@ -166,3 +166,14 @@ Pasos detallados en [MANUAL_ACTIONS.md](MANUAL_ACTIONS.md) acción #1 (fusiona l
 **Estado:** Confirmado (decisión técnica)
 
 Se elige **Angular Material** sobre Bootstrap para el frontend: se integra nativamente con el ecosistema Angular (formularios reactivos, CDK de accesibilidad, theming), lo que ayuda a cumplir RNF-02 (comunicar gravedad con texto+ícono, no solo color) y RNF-01 (responsividad) sin depender de una librería de CSS externa. Se documentará la versión exacta instalada junto con el resto de dependencias (ver D-010).
+
+---
+
+## D-014 — pgcrypto vive en el esquema `extensions`, no en `public`
+
+**Fecha:** 2026-09-08
+**Estado:** Confirmado (hallazgo técnico, verificado en el proyecto real)
+
+Al probar `verify_device_secret` end-to-end apareció `function crypt(text, text) does not exist` dentro de una función con `set search_path = public`. La causa: en este proyecto Supabase, pgcrypto (y probablemente otras extensiones) se instala en el esquema `extensions`, no en `public`. Cualquier función `SECURITY DEFINER` que restrinja su `search_path` a `public` por seguridad (patrón usado en todo este proyecto) y necesite `crypt()`/`gen_salt()`/`gen_random_uuid()` explícitamente debe declarar `set search_path = public, extensions`.
+
+**Cómo aplicar:** al escribir una nueva función seguridad-definer que use una función de una extensión, verificar primero en qué esquema quedó instalada esa extensión (`select extname, extnamespace::regnamespace from pg_extension;`) en vez de asumir `public`.

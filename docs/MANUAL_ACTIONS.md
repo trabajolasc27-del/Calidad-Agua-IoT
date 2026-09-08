@@ -6,6 +6,8 @@ Estas acciones requieren intervención directa del usuario (cuentas, credenciale
 
 ## 1. Crear el proyecto Supabase nuevo y conectarlo al repositorio de GitHub de este proyecto
 
+**Estado: ✅ Completado (2026-09-08).** Repositorio, proyecto Supabase, integración, migraciones y Edge Function desplegados y verificados end-to-end. Se deja el detalle abajo como referencia.
+
 **Qué hacer:** (A) crear en GitHub un repositorio vacío para `D:\IOT`; (B) crear en Supabase un **proyecto nuevo, distinto del de Quesisimo**; (C) conectar ese proyecto nuevo al repositorio nuevo mediante la integración nativa GitHub↔Supabase (el mismo mecanismo que usaste en Quesisimo para desplegar migraciones).
 
 **Por qué:** ya tienes cuenta de Supabase y quieres reusar el flujo de GitHub que usaste en Quesisimo, pero **sin ningún riesgo para esa base de datos**. Un proyecto Supabase nuevo es una instancia de PostgreSQL, Auth y claves API completamente aparte — no comparte nada con el proyecto de Quesisimo. Conectarlo a un repositorio de GitHub distinto (este, no el de Quesisimo) es lo que garantiza que ninguna migración de este proyecto pueda aplicarse jamás sobre la base de datos de Quesisimo.
@@ -106,3 +108,21 @@ En cuanto me compartas la URL del repositorio de GitHub, agrego el remoto localm
 ## 5. Repositorio remoto en GitHub
 
 **Estado:** decidido — ver acción #1, que ahora incluye la creación de este repositorio como parte del flujo de conexión con Supabase. No se necesita una acción separada.
+
+---
+
+## 6. Crear el primer usuario administrador
+
+**Qué hacer:** dar de alta manualmente, desde el Dashboard de Supabase, la primera cuenta con rol `admin`.
+
+**Por qué:** por diseño (RF-06), solo un Administrador puede crear usuarios desde la propia aplicación — pero el primero no puede crearse a sí mismo ahí, porque todavía no existe ninguno. Este único bootstrap se hace desde el Dashboard; de ahí en adelante, esa cuenta administra al resto desde la app.
+
+**Pasos exactos:**
+1. Ve a tu proyecto Supabase → **Authentication → Users → Add user → Create new user**.
+2. Ingresa tu correo y una contraseña (la que tú quieras usar para entrar a la plataforma).
+3. Ve a **Table Editor → `profiles`** y busca la fila con tu correo (se creó sola, con `role = field_tech`, por el trigger `on_auth_user_created`).
+4. Edita esa fila: cambia la columna `role` a `admin`.
+
+**Qué debes darme después:** nada obligatorio — solo avísame cuando esté listo si quieres que probemos el login real juntos desde el frontend (`ng serve`).
+
+**Qué puede avanzar mientras tanto:** el resto del frontend (pantallas, servicios) se sigue construyendo con los cascarones actuales; esto solo bloquea probar el login real y las pantallas de Administración con datos reales.
