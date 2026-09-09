@@ -23,6 +23,11 @@ export const routes: Routes = [
     loadComponent: () => import('./features/dashboard/dashboard').then((m) => m.Dashboard),
   },
   {
+    path: 'mapa',
+    canActivate: [authGuard],
+    loadComponent: () => import('./features/map/map-view').then((m) => m.MapView),
+  },
+  {
     path: 'administracion',
     canActivate: [roleGuard(['admin'])],
     loadComponent: () => import('./features/admin/admin').then((m) => m.Admin),

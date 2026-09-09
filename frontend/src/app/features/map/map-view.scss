@@ -1,0 +1,80 @@
+.toolbar-title {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.map-page {
+  max-width: 900px;
+  margin: 1.5rem auto 3rem;
+  padding: 0 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.map-container {
+  height: 380px;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid var(--mat-sys-outline-variant, #dde3e2);
+
+  // El contenido de los popups lo inyecta Leaflet como HTML crudo (fuera
+  // del compilador de plantillas de Angular), por lo que la encapsulacion
+  // de estilos normal no llega ahi -- ::ng-deep es necesario aqui.
+  ::ng-deep .leaflet-popup-content .ok {
+    color: #2f8f4e;
+  }
+  ::ng-deep .leaflet-popup-content .inactive {
+    color: #b23b3b;
+  }
+  ::ng-deep .leaflet-popup-content ul {
+    margin: 0.35rem 0 0;
+    padding-left: 1.1rem;
+    font-size: 0.85rem;
+  }
+}
+
+.locations-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border: 1px solid var(--mat-sys-outline-variant, #dde3e2);
+  border-radius: 10px;
+  overflow: hidden;
+
+  li {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.6rem 0.85rem;
+    font-size: 0.9rem;
+
+    & + li {
+      border-top: 1px solid var(--mat-sys-outline-variant, #dde3e2);
+    }
+  }
+
+  .loc-count {
+    color: var(--mat-sys-on-surface-variant, #666);
+    font-size: 0.82rem;
+  }
+}
+
+.state-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 2.5rem 1rem;
+}
+
+.state-message {
+  margin: 0;
+  color: var(--mat-sys-on-surface-variant, #666);
+  font-size: 0.9rem;
+
+  &.error {
+    color: #b23b3b;
+  }
+}

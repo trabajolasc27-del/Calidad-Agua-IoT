@@ -5,6 +5,7 @@
     {{ authService.profile()?.full_name || authService.session()?.user?.email }}
     · {{ authService.role() }}
   </span>
+  <a mat-button routerLink="/mapa">Mapa</a>
   @if (authService.role() === 'admin') {
     <a mat-button routerLink="/administracion">Administración</a>
   }

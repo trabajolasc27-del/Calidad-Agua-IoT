@@ -1,0 +1,37 @@
+<mat-toolbar color="primary">
+  <a mat-button routerLink="/panel">← Panel</a>
+  <span class="toolbar-title">Ubicaciones y mapa</span>
+</mat-toolbar>
+
+<main class="map-page">
+  <div class="map-container" #mapEl></div>
+
+  @switch (state()) {
+    @case ('loading') {
+      <div class="state-panel">
+        <mat-spinner diameter="32" />
+      </div>
+    }
+    @case ('error') {
+      <div class="state-panel">
+        <p class="state-message error">{{ errorMessage() }}</p>
+        <button mat-stroked-button (click)="load()">Reintentar</button>
+      </div>
+    }
+    @case ('empty') {
+      <div class="state-panel">
+        <p class="state-message">Todavía no hay ubicaciones registradas.</p>
+      </div>
+    }
+    @case ('data') {
+      <ul class="locations-list">
+        @for (loc of locations(); track loc.id) {
+          <li>
+            <span class="loc-name">{{ loc.name }}</span>
+            <span class="loc-count">{{ deviceCount(loc) }} dispositivo(s)</span>
+          </li>
+        }
+      </ul>
+    }
+  }
+</main>

@@ -27,14 +27,14 @@ Estado global: **Fase 1 en progreso.** El detalle día a día del avance real vi
 - [ ] **Punto de control:** compilación ✅, revisión de seguridad básica ✅ (parcial, hecha pieza por pieza en cada pantalla). Falta la suite de pruebas automatizada antes de dar la Fase 2 por cerrada del todo.
 
 ## Fase 3 — Semanas 7 a 9: Recepción y visualización
-- [ ] Crear la Edge Function `ingest-measurement`.
-- [ ] Implementar autenticación de dispositivo y control de duplicados.
-- [ ] Crear simulador IoT (perfiles normal/alerta/crítico).
-- [ ] Guardar lotes y mediciones de forma transaccional.
-- [ ] Implementar dashboard, gráficas y mapa.
-- [ ] Implementar actualización en tiempo real (Supabase Realtime).
-- [ ] Agregar reconexión y manejo de errores de red.
-- [ ] **Punto de control:** demostrar el recorrido simulador → API → base de datos → dashboard. Si se requiere el ESP32 físico, detenerse y solicitar acceso/datos (ver [MANUAL_ACTIONS.md](MANUAL_ACTIONS.md) #3).
+- [x] Crear la Edge Function `ingest-measurement`.
+- [x] Implementar autenticación de dispositivo y control de duplicados.
+- [x] Crear simulador IoT (perfiles normal/alerta/crítico/inválido/duplicado/no-existe/no-autorizado).
+- [x] Guardar lotes y mediciones de forma transaccional.
+- [x] Implementar dashboard, gráficas y mapa — tarjetas de los 4 parámetros con mini-gráfica de tendencia (Chart.js), estado del dispositivo, alertas activas, y mapa general de solo lectura para todos los roles (RF-10).
+- [x] Implementar actualización en tiempo real (Supabase Realtime) — verificado en vivo: una lectura nueva del simulador actualiza el Dashboard sin recargar la página.
+- [x] Agregar reconexión y manejo de errores de red — indicador "en vivo / reconectando", estados de carga/vacío/error en cada sección con opción de reintentar.
+- [x] **Punto de control:** recorrido simulador → API → base de datos → Dashboard demostrado end-to-end contra el proyecto real, sin ESP32 físico (queda pendiente por hardware, ver [MANUAL_ACTIONS.md](MANUAL_ACTIONS.md)).
 
 ## Fase 4 — Semanas 10 a 12: Evaluación, alertas y reportes
 - [ ] Implementar el motor de reglas (función SQL) y sus pruebas unitarias.
