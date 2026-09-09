@@ -206,3 +206,16 @@ El usuario ya tiene un ESP32 armado en protoboard con un sensor ultrasónico HC-
 Se creó el dispositivo `NODO-ESP32-01` en la base de datos real (`is_demo = false`, porque es hardware físico real, aunque los *valores* que envía sean de prueba) con su propia credencial, distinto de `NODO-DEMO-001` (que sigue siendo 100% sintético vía el simulador Node). Firmware en `firmware/esp32-test/`.
 
 **Cómo aplicar:** cuando lleguen los sensores reales de pH/oxígeno disuelto/turbidez/temperatura, se reemplaza únicamente el bloque de lectura de sensores del firmware — el resto (WiFi, hora por NTP, autenticación, envío) no cambia. No usar `NODO-ESP32-01` como si sus lecturas fueran datos reales de calidad del agua en ningún reporte o demostración.
+
+---
+
+## D-017 — Ubicación fija (asignada por admin) vs. GPS en vivo por dispositivo
+
+**Fecha:** 2026-09-09
+**Estado:** Abierto — se sigue con el modelo fijo hasta que el usuario decida
+
+El usuario planteó que la ubicación de un dispositivo debería verse "por GPS". El diseño actual (`locations` con latitud/longitud fija + `devices.location_id`, mapa en RF-09/RF-10) ya cubre "ver dónde está cada nodo", pero asume una ubicación **fija**, asignada una vez por un Administrador (coherente con un nodo instalado en un pozo/cisterna/laguna que no se mueve).
+
+Si en cambio se quiere que el propio ESP32 reporte su coordenada GPS en cada lectura (dispositivo móvil o cuya posición no se conoce de antemano), eso requiere: (a) un módulo GPS adicional en el hardware (no considerado en el BOM ni en D-002), y (b) guardar latitud/longitud por medición en vez de solo por dispositivo — un cambio de modelo de datos no trivial.
+
+**Cómo aplicar:** la pantalla de Ubicaciones se construye con el modelo fijo mientras no haya una decisión explícita en contra. Si el usuario confirma que quiere GPS en vivo, esto se retoma como un cambio de alcance de hardware y de base de datos, no como un ajuste menor de UI.
