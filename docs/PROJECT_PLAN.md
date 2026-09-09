@@ -15,16 +15,16 @@ Estado global: **Fase 1 en progreso.** El detalle día a día del avance real vi
 - [ ] **Punto de control:** presentar documentos y acciones manuales al usuario, esperar autorización para Fase 2.
 
 ## Fase 2 — Semanas 4 a 6: Fundamentos
-- [ ] Crear/configurar el proyecto Angular.
-- [ ] Configurar variables de entorno (`.env`, no versionado).
-- [ ] Preparar Supabase (local con CLI y/o proyecto remoto — requiere acción manual, ver [MANUAL_ACTIONS.md](MANUAL_ACTIONS.md) #1).
-- [ ] Escribir migraciones versionadas según [DATABASE_DESIGN.md](DATABASE_DESIGN.md).
-- [ ] Crear datos de demostración (`seed.sql`, `is_demo = true`).
-- [ ] Implementar autenticación (login, logout, recuperación de contraseña).
-- [ ] Implementar roles y políticas RLS.
-- [ ] Implementar administración de usuarios, ubicaciones y dispositivos.
-- [ ] Agregar pruebas (unitarias de servicios/motor de evaluación donde ya exista lógica).
-- [ ] **Punto de control:** compilación, pruebas y revisión de seguridad básica. No avanzar si hay una falla crítica.
+- [x] Crear/configurar el proyecto Angular.
+- [x] Configurar variables de entorno (`.env`, no versionado).
+- [x] Preparar Supabase (proyecto remoto real, conectado vía GitHub — ver [MANUAL_ACTIONS.md](MANUAL_ACTIONS.md) #1).
+- [x] Escribir migraciones versionadas según [DATABASE_DESIGN.md](DATABASE_DESIGN.md) — 17 migraciones aplicadas al proyecto real.
+- [x] Crear datos de demostración (`seed.sql`, `is_demo = true`).
+- [x] Implementar autenticación (login, logout, recuperación de contraseña) — verificado en vivo con una cuenta real.
+- [x] Implementar roles y políticas RLS — verificado: RLS rechaza escrituras no autorizadas de `anon`, funciones admin verifican rol internamente.
+- [x] Implementar administración de usuarios, dispositivos, ubicaciones, parámetros y umbrales — las 5 pantallas, verificadas en vivo contra el proyecto real.
+- [ ] Agregar pruebas automatizadas (unitarias del motor de evaluación, de servicios). **Pendiente real** — lo hecho hasta ahora es verificación manual/en vivo, no una suite automatizada.
+- [ ] **Punto de control:** compilación ✅, revisión de seguridad básica ✅ (parcial, hecha pieza por pieza en cada pantalla). Falta la suite de pruebas automatizada antes de dar la Fase 2 por cerrada del todo.
 
 ## Fase 3 — Semanas 7 a 9: Recepción y visualización
 - [ ] Crear la Edge Function `ingest-measurement`.

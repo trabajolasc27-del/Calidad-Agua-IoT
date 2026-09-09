@@ -3,11 +3,14 @@
 ## Sesión 3 — 2026-09-09
 
 ### Fase actual
-**Fase 2 (Semanas 4–6): Fundamentos — en progreso.** Administración ya tiene Usuarios, Dispositivos y Ubicaciones completos y verificados en vivo. Falta Parámetros y Umbrales para cerrar la Fase 2.
+**Fase 2 (Semanas 4–6): Fundamentos — funcionalmente completa.** Las 5 pantallas de Administración (Usuarios, Dispositivos, Ubicaciones, Parámetros, Umbrales) están construidas y verificadas en vivo contra el proyecto real. Falta únicamente la suite de pruebas automatizadas para cerrar del todo el checklist de la Fase 2 (ver [PROJECT_PLAN.md](PROJECT_PLAN.md)).
 
 ### Actividades terminadas (implementadas y verificadas)
 - **Administración > Dispositivos (RF-11 a RF-14):** listado, alta/edición, activar/desactivar, y emisión/rotación de credencial vía la nueva RPC `admin_rotate_device_credential` (genera y hashea el secreto del lado del servidor, D-003; se muestra en un diálogo aparte, una sola vez, con botón de copiar).
 - **Administración > Ubicaciones (RF-09):** listado con mapa general (Leaflet + OpenStreetMap, marcador por ubicación con conteo de dispositivos vía embed de PostgREST), alta/edición con mini-mapa interactivo para fijar la coordenada (clic o arrastrar el marcador, también editable a mano), eliminación. **Verificado en vivo:** teselas y marcadores cargan, el picker sincroniza mapa↔formulario, una ubicación nueva aparece correctamente en tabla y mapa general.
+- **Administración > Parámetros (RF-15):** catálogo fijo de los 4 parámetros oficiales, edición de nombre/unidad/rango físico/estado. Deliberadamente sin alta ni baja desde la interfaz, para no abrir la puerta a agregar parámetros fuera de alcance (p. ej. sensores de gas) sin pasar por una decisión explícita documentada.
+- **Administración > Umbrales (RF-16/RF-17):** una tarjeta por parámetro con su versión activa (los 4 límites + lecturas consecutivas para abrir alerta) e historial de versiones anteriores en un panel expandible. "Nueva versión" llama a la RPC `admin_create_threshold_version`, que desactiva la versión activa e inserta la nueva en una sola transacción. **Verificado en vivo:** crear una versión nueva para oxígeno disuelto desactivó correctamente la versión 1 (que pasó al historial) y dejó la versión 2 activa.
+- Con esto, **las 5 pantallas de Administración quedan completas** (RF-06 a RF-17).
 - Firmware de prueba de conectividad para ESP32 (`firmware/esp32-test/`), con guía completa de instalación de Arduino IDE, paquete de placas ESP32, drivers (CP2102) y selección de placa/puerto — documentado con el usuario paso a paso hasta identificar que Windows Application Control bloquea el ejecutable, no la placa (pendiente de hardware disponible para completar la prueba real).
 - Dispositivo `NODO-ESP32-01` no llegó a probarse con hardware real en esta sesión (usuario sin el dispositivo a la mano); queda listo para cuando lo tenga.
 
@@ -15,9 +18,9 @@
 1. **El CLI de Supabase (`supabase.exe` descargado vía npx) quedó bloqueado por una directiva de Application Control de Windows** ("Una directiva de Control de aplicaciones bloqueó este archivo") — posiblemente por ser una máquina gestionada por la institución. No se intentó sortear la política (sería modificar configuración de seguridad del sistema, fuera de lugar). En su lugar, se cambió a invocar la **Management API de Supabase directamente por HTTP** (`POST /v1/projects/{ref}/database/query` con el Personal Access Token) para aplicar migraciones y hacer consultas de verificación — mismo resultado, sin depender del ejecutable bloqueado.
 
 ### Pruebas ejecutadas
-- `ng build`: exitoso, sin advertencias (incluye el fix de `allowedCommonJsDependencies` para Leaflet).
-- Verificación en vivo en el navegador (con sesión de administrador ya activa): pantalla de Dispositivos muestra los 3 dispositivos reales (`NODO-004`, `NODO-DEMO-001`, `NODO-ESP32-01`); pantalla de Ubicaciones — mapa con teselas y marcadores reales confirmado por inspección directa del DOM (no solo captura de pantalla), alta de una ubicación de prueba con selección de coordenada por clic en el mapa, verificada end-to-end en la tabla.
-- RPC `admin_rotate_device_credential` verificada por consulta directa contra el proyecto real (existe y es invocable).
+- `ng build`: exitoso, sin advertencias, después de cada pantalla (incluye el fix de `allowedCommonJsDependencies` para Leaflet).
+- Verificación en vivo en el navegador (con sesión de administrador ya activa): pantalla de Dispositivos muestra los 3 dispositivos reales (`NODO-004`, `NODO-DEMO-001`, `NODO-ESP32-01`); pantalla de Ubicaciones — mapa con teselas y marcadores reales confirmado por inspección directa del DOM (no solo captura de pantalla), alta de una ubicación de prueba con selección de coordenada por clic en el mapa, verificada end-to-end en la tabla; pantalla de Umbrales — las 4 tarjetas muestran los umbrales sembrados correctamente, se creó una versión nueva real para oxígeno disuelto y el historial se actualizó como se esperaba (RF-16 completo, no solo el formulario).
+- RPC `admin_rotate_device_credential` y `admin_create_threshold_version` verificadas por consulta directa e invocación real contra el proyecto real.
 
 ### Errores conocidos (no bloqueantes)
 - Los mismos de la sesión 2 (WSL2 ausente, transiciones de alerta sin probar con sesión real) siguen vigentes.
@@ -32,10 +35,10 @@
 5. Decidir si se quiere GPS en vivo por dispositivo o mantener ubicación fija por admin (D-017, abierto).
 
 ### Próxima actividad recomendada
-Cerrar Administración con Parámetros y Umbrales (RF-15 a RF-17) — con eso, la Fase 2 queda funcionalmente completa y se puede pasar a la Fase 3 (Dashboard, gráficas, mapa general de solo lectura, tiempo real).
+Dos caminos válidos, a elegir con el usuario: (a) escribir la suite de pruebas automatizadas pendiente para cerrar el checklist de la Fase 2 al 100%, o (b) pasar directo a la Fase 3 (Dashboard con tarjetas en vivo, gráficas, mapa general de solo lectura para todos los roles, actualización en tiempo real vía Supabase Realtime), dejando las pruebas automatizadas como deuda técnica explícita y documentada.
 
 ### Cómo continuar en otra sesión
-Indicar: **"Continúa con la Fase 2 del proyecto IOT"** para seguir con Parámetros y Umbrales.
+Indicar: **"Continúa con el proyecto IOT"** y precisar si se quiere ir por pruebas automatizadas o por la Fase 3.
 
 ---
 
