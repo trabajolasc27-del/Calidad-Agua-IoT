@@ -1,5 +1,44 @@
 # Registro de Progreso
 
+## Sesión 3 — 2026-09-09
+
+### Fase actual
+**Fase 2 (Semanas 4–6): Fundamentos — en progreso.** Administración ya tiene Usuarios, Dispositivos y Ubicaciones completos y verificados en vivo. Falta Parámetros y Umbrales para cerrar la Fase 2.
+
+### Actividades terminadas (implementadas y verificadas)
+- **Administración > Dispositivos (RF-11 a RF-14):** listado, alta/edición, activar/desactivar, y emisión/rotación de credencial vía la nueva RPC `admin_rotate_device_credential` (genera y hashea el secreto del lado del servidor, D-003; se muestra en un diálogo aparte, una sola vez, con botón de copiar).
+- **Administración > Ubicaciones (RF-09):** listado con mapa general (Leaflet + OpenStreetMap, marcador por ubicación con conteo de dispositivos vía embed de PostgREST), alta/edición con mini-mapa interactivo para fijar la coordenada (clic o arrastrar el marcador, también editable a mano), eliminación. **Verificado en vivo:** teselas y marcadores cargan, el picker sincroniza mapa↔formulario, una ubicación nueva aparece correctamente en tabla y mapa general.
+- Firmware de prueba de conectividad para ESP32 (`firmware/esp32-test/`), con guía completa de instalación de Arduino IDE, paquete de placas ESP32, drivers (CP2102) y selección de placa/puerto — documentado con el usuario paso a paso hasta identificar que Windows Application Control bloquea el ejecutable, no la placa (pendiente de hardware disponible para completar la prueba real).
+- Dispositivo `NODO-ESP32-01` no llegó a probarse con hardware real en esta sesión (usuario sin el dispositivo a la mano); queda listo para cuando lo tenga.
+
+### Errores encontrados y corregidos en esta sesión
+1. **El CLI de Supabase (`supabase.exe` descargado vía npx) quedó bloqueado por una directiva de Application Control de Windows** ("Una directiva de Control de aplicaciones bloqueó este archivo") — posiblemente por ser una máquina gestionada por la institución. No se intentó sortear la política (sería modificar configuración de seguridad del sistema, fuera de lugar). En su lugar, se cambió a invocar la **Management API de Supabase directamente por HTTP** (`POST /v1/projects/{ref}/database/query` con el Personal Access Token) para aplicar migraciones y hacer consultas de verificación — mismo resultado, sin depender del ejecutable bloqueado.
+
+### Pruebas ejecutadas
+- `ng build`: exitoso, sin advertencias (incluye el fix de `allowedCommonJsDependencies` para Leaflet).
+- Verificación en vivo en el navegador (con sesión de administrador ya activa): pantalla de Dispositivos muestra los 3 dispositivos reales (`NODO-004`, `NODO-DEMO-001`, `NODO-ESP32-01`); pantalla de Ubicaciones — mapa con teselas y marcadores reales confirmado por inspección directa del DOM (no solo captura de pantalla), alta de una ubicación de prueba con selección de coordenada por clic en el mapa, verificada end-to-end en la tabla.
+- RPC `admin_rotate_device_credential` verificada por consulta directa contra el proyecto real (existe y es invocable).
+
+### Errores conocidos (no bloqueantes)
+- Los mismos de la sesión 2 (WSL2 ausente, transiciones de alerta sin probar con sesión real) siguen vigentes.
+- El `confirm()` nativo del navegador (usado para confirmar eliminar una ubicación) no es automatizable con las herramientas de este agente; funciona normal para un usuario real. Queda una ubicación de prueba (`"Punto de prueba"`) sin eliminar en el proyecto real — el usuario puede borrarla cuando quiera desde la propia pantalla.
+- El servidor de desarrollo local sigue deteniéndose solo tras inactividad prolongada de la sesión; si algo da `ERR_CONNECTION_REFUSED` en `localhost:4200`, basta con relanzarlo.
+
+### Acciones manuales pendientes
+1. Conseguir el ESP32 físico para completar la prueba de conectividad de `firmware/esp32-test/` (no bloquea nada más del desarrollo).
+2. Brevo (Fase 4, no urge).
+3. Sensores de oxígeno disuelto y temperatura para el ESP32 (Fase 5, no bloquea).
+4. Hosting/dominio (Fase 5, no bloquea).
+5. Decidir si se quiere GPS en vivo por dispositivo o mantener ubicación fija por admin (D-017, abierto).
+
+### Próxima actividad recomendada
+Cerrar Administración con Parámetros y Umbrales (RF-15 a RF-17) — con eso, la Fase 2 queda funcionalmente completa y se puede pasar a la Fase 3 (Dashboard, gráficas, mapa general de solo lectura, tiempo real).
+
+### Cómo continuar en otra sesión
+Indicar: **"Continúa con la Fase 2 del proyecto IOT"** para seguir con Parámetros y Umbrales.
+
+---
+
 ## Sesión 2 — 2026-09-08
 
 ### Fase actual
