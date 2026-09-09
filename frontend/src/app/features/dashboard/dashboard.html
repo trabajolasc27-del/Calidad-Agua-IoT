@@ -1,22 +1,106 @@
 <mat-toolbar color="primary">
-  <span>Plataforma IoT de Calidad del Agua</span>
+  <span class="toolbar-title">Plataforma IoT de Calidad del Agua</span>
   <span class="spacer"></span>
   <span class="user-chip">
     {{ authService.profile()?.full_name || authService.session()?.user?.email }}
     · {{ authService.role() }}
   </span>
+  @if (authService.role() === 'admin') {
+    <a mat-button routerLink="/administracion">Administración</a>
+  }
   <button mat-button (click)="logout()">Cerrar sesión</button>
 </mat-toolbar>
 
-<main class="dashboard-placeholder">
-  <h1>Dashboard</h1>
-  <p>
-    Sesión protegida funcionando de punta a punta: inicio de sesión, guard de ruta y perfil cargado desde
-    <code>profiles</code>. Las tarjetas de pH, oxígeno disuelto, turbidez y temperatura, el mapa y las gráficas
-    llegan en la Fase 3, cuando exista la Edge Function de ingesta conectada a dispositivos reales o simulados.
-  </p>
+<main class="dashboard">
+  <div class="toolbar-row">
+    @switch (devicesState()) {
+      @case ('loading') {
+        <mat-spinner diameter="24" />
+      }
+      @case ('error') {
+        <p class="state-message error">{{ devicesError() }}</p>
+        <button mat-stroked-button (click)="loadDevices()">Reintentar</button>
+      }
+      @case ('empty') {
+        <p class="state-message">No tienes dispositivos visibles todavía.</p>
+      }
+      @case ('data') {
+        <mat-select class="device-select" [formControl]="deviceControl">
+          @for (d of devices(); track d.id) {
+            <mat-option [value]="d.id">{{ d.code }} — {{ d.name }}</mat-option>
+          }
+        </mat-select>
 
-  @if (authService.role() === 'admin') {
-    <a mat-flat-button color="primary" routerLink="/administracion">Ir a Administración</a>
+        <span class="live-indicator" [class.live]="liveStatus() === 'SUBSCRIBED'">
+          <mat-icon aria-hidden="true">{{ liveStatus() === 'SUBSCRIBED' ? 'sensors' : 'sensors_off' }}</mat-icon>
+          @if (liveStatus() === 'SUBSCRIBED') {
+            En vivo · actualizado hace {{ secondsSinceUpdate() }}s
+          } @else {
+            Reconectando…
+          }
+        </span>
+      }
+    }
+  </div>
+
+  @switch (dataState()) {
+    @case ('loading') {
+      <div class="state-panel">
+        <mat-spinner diameter="32" />
+      </div>
+    }
+    @case ('error') {
+      <div class="state-panel">
+        <p class="state-message error">{{ dataError() }}</p>
+        @if (selectedDevice()) {
+          <button mat-stroked-button (click)="refreshData(selectedDevice()!.id)">Reintentar</button>
+        }
+      </div>
+    }
+    @case ('empty') {
+      <div class="state-panel">
+        <p class="state-message">Este dispositivo todavía no ha enviado ninguna medición.</p>
+      </div>
+    }
+    @case ('data') {
+      <section class="cards-grid">
+        @for (m of measurements(); track m.parameter.id) {
+          <wq-parameter-card [measurement]="m" />
+        }
+      </section>
+
+      <section class="panels-row">
+        <div class="panel">
+          <span class="panel-title">Estado del dispositivo</span>
+          @if (selectedDevice(); as device) {
+            <div class="device-status">
+              <span class="status-pill" [class.ok]="device.status === 'active'" [class.inactive]="device.status !== 'active'">
+                {{ device.status === 'active' ? 'Activo' : 'Inactivo' }}
+              </span>
+              <span class="last-seen">Última comunicación: {{ lastSeenLabel() }}</span>
+            </div>
+          }
+        </div>
+
+        <div class="panel">
+          <span class="panel-title">Alertas activas</span>
+          @if (alerts().length === 0) {
+            <p class="state-message">Sin alertas activas.</p>
+          } @else {
+            <ul class="alerts-list">
+              @for (a of alerts(); track a.id) {
+                <li>
+                  <span class="alert-pill" [class.warn]="a.severity === 'WARNING'" [class.crit]="a.severity === 'CRITICAL'">
+                    {{ a.severity === 'CRITICAL' ? 'Crítico' : 'Alerta' }}
+                  </span>
+                  <span class="alert-param">{{ a.parameter_name }}</span>
+                  <span class="alert-status">{{ a.status }}</span>
+                </li>
+              }
+            </ul>
+          }
+        </div>
+      </section>
+    }
   }
 </main>

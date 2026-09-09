@@ -1,0 +1,99 @@
+.card {
+  border-radius: 10px;
+  border: 1px solid var(--mat-sys-outline-variant, #dde3e2);
+  border-left: 4px solid var(--border-color, #8a9c9d);
+  padding: 0.75rem 0.85rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  background: var(--mat-sys-surface, #fff);
+
+  &.ok {
+    --border-color: #2f8f4e;
+  }
+  &.warn {
+    --border-color: #9c6d0a;
+  }
+  &.crit {
+    --border-color: #b23b3b;
+  }
+  &.neutral {
+    --border-color: #8a9c9d;
+  }
+}
+
+.card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.param-name {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--mat-sys-on-surface-variant, #444);
+}
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 0.1rem 0.45rem;
+  border-radius: 999px;
+  white-space: nowrap;
+
+  mat-icon {
+    font-size: 0.95rem;
+    height: 0.95rem;
+    width: 0.95rem;
+  }
+
+  .card.ok & {
+    background: #e3f3e6;
+    color: #2f8f4e;
+  }
+  .card.warn & {
+    background: #f8ecd2;
+    color: #9c6d0a;
+  }
+  .card.crit & {
+    background: #fbe3e1;
+    color: #b23b3b;
+  }
+  .card.neutral & {
+    background: var(--mat-sys-surface-container-low, #f3f6f5);
+    color: #8a9c9d;
+  }
+}
+
+.value-row {
+  display: flex;
+  align-items: baseline;
+  gap: 0.3rem;
+}
+
+.value {
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1;
+
+  &.muted {
+    font-size: 0.85rem;
+    font-weight: 400;
+    font-family: inherit;
+    color: var(--mat-sys-on-surface-variant, #666);
+  }
+}
+
+.unit {
+  font-size: 0.75rem;
+  color: var(--mat-sys-on-surface-variant, #666);
+}
+
+.sparkline-box {
+  height: 42px;
+}

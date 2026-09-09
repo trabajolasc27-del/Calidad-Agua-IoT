@@ -1,22 +1,188 @@
+mat-toolbar {
+  gap: 0.35rem;
+}
+
+// mat-toolbar es un flex container; sus hijos por defecto no pueden
+// encogerse mas alla de su contenido (min-width:auto), lo que en
+// pantallas angostas hace que el titulo se encime con el correo del
+// usuario en vez de truncarse. min-width:0 habilita el encogimiento.
+.toolbar-title {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .spacer {
   flex: 1 1 auto;
+  min-width: 0.5rem;
 }
 
 .user-chip {
+  min-width: 0;
   font-size: 0.85rem;
   margin-right: 0.75rem;
   text-transform: capitalize;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 220px;
 }
 
-.dashboard-placeholder {
-  max-width: 640px;
-  margin: 2.5rem auto;
+@media (max-width: 520px) {
+  .user-chip {
+    display: none;
+  }
+}
+
+.dashboard {
+  max-width: 900px;
+  margin: 1.5rem auto 3rem;
   padding: 0 1.5rem;
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 1.25rem;
+}
 
-  code {
-    font-family: 'IBM Plex Mono', ui-monospace, monospace;
+.toolbar-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.device-select {
+  min-width: 220px;
+  font-size: 0.9rem;
+}
+
+.live-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.78rem;
+  color: var(--mat-sys-on-surface-variant, #666);
+
+  mat-icon {
+    font-size: 1rem;
+    height: 1rem;
+    width: 1rem;
+  }
+
+  &.live {
+    color: #2f8f4e;
+  }
+}
+
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0.85rem;
+}
+
+.panels-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.85rem;
+}
+
+.panel {
+  border: 1px solid var(--mat-sys-outline-variant, #dde3e2);
+  border-radius: 10px;
+  padding: 0.85rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.panel-title {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--mat-sys-on-surface-variant, #666);
+}
+
+.device-status {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.last-seen {
+  font-size: 0.82rem;
+  color: var(--mat-sys-on-surface-variant, #666);
+}
+
+.status-pill,
+.alert-pill {
+  align-self: flex-start;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.15rem 0.55rem;
+  border-radius: 999px;
+}
+
+.status-pill.ok {
+  background: #e3f3e6;
+  color: #2f8f4e;
+}
+.status-pill.inactive {
+  background: #fbe3e1;
+  color: #b23b3b;
+}
+
+.alerts-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+  }
+}
+
+.alert-pill.warn {
+  background: #f8ecd2;
+  color: #9c6d0a;
+}
+.alert-pill.crit {
+  background: #fbe3e1;
+  color: #b23b3b;
+}
+
+.alert-status {
+  margin-left: auto;
+  font-size: 0.72rem;
+  color: var(--mat-sys-on-surface-variant, #666);
+}
+
+.state-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 2.5rem 1rem;
+}
+
+.state-message {
+  margin: 0;
+  color: var(--mat-sys-on-surface-variant, #666);
+  font-size: 0.9rem;
+
+  &.error {
+    color: #b23b3b;
+  }
+}
+
+@media (max-width: 640px) {
+  .panels-row {
+    grid-template-columns: 1fr;
   }
 }

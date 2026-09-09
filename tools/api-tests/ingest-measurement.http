@@ -5,6 +5,12 @@
 ### No pongas aqui secretos reales de produccion: usa el dispositivo y
 ### secreto de demostracion sembrados por supabase/seed.sql, o los tuyos
 ### de desarrollo local.
+###
+### El secreto de abajo es el original de seed.sql, pero se invalida en
+### cuanto alguien rota la credencial de NODO-DEMO-001 desde Administracion
+### > Dispositivos (cada rotacion revoca la anterior). El valor vigente
+### siempre esta en D:\IOT\.env (SIMULATOR_DEVICE_SECRET) -- si esta
+### plantilla falla con 401, copia el valor de ahi.
 
 @baseUrl = http://localhost:54321/functions/v1/ingest-measurement
 @deviceId = NODO-DEMO-001

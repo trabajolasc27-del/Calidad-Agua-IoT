@@ -1,0 +1,22 @@
+<div class="card" [class]="statusMeta.cls">
+  <div class="card-top">
+    <span class="param-name">{{ measurement.parameter.name }}</span>
+    <span class="status-pill">
+      <mat-icon aria-hidden="true">{{ statusMeta.icon }}</mat-icon>
+      {{ statusMeta.label }}
+    </span>
+  </div>
+
+  <div class="value-row">
+    @if (measurement.value !== null) {
+      <span class="value">{{ measurement.value }}</span>
+      <span class="unit">{{ measurement.parameter.unit }}</span>
+    } @else {
+      <span class="value muted">Sin lecturas</span>
+    }
+  </div>
+
+  <div class="sparkline-box">
+    <canvas #sparkline></canvas>
+  </div>
+</div>
