@@ -21,7 +21,7 @@ interface AdminTab {
 export class Admin {
   readonly tabs: AdminTab[] = [
     { label: 'Usuarios', path: 'usuarios' },
-    { label: 'Dispositivos', path: null },
+    { label: 'Dispositivos', path: 'dispositivos' },
     { label: 'Ubicaciones', path: null },
     { label: 'Parámetros', path: null },
     { label: 'Umbrales', path: null },

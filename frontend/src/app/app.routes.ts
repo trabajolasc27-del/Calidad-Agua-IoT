@@ -32,6 +32,10 @@ export const routes: Routes = [
         path: 'usuarios',
         loadComponent: () => import('./features/admin/users/users').then((m) => m.Users),
       },
+      {
+        path: 'dispositivos',
+        loadComponent: () => import('./features/admin/devices/devices').then((m) => m.Devices),
+      },
     ],
   },
   { path: '**', redirectTo: 'panel' },
