@@ -3,7 +3,7 @@
 ## Sesión 3 — 2026-09-09
 
 ### Fase actual
-**Fase 2 (Semanas 4–6): Fundamentos — funcionalmente completa.** Las 5 pantallas de Administración (Usuarios, Dispositivos, Ubicaciones, Parámetros, Umbrales) están construidas y verificadas en vivo contra el proyecto real. Falta únicamente la suite de pruebas automatizadas para cerrar del todo el checklist de la Fase 2 (ver [PROJECT_PLAN.md](PROJECT_PLAN.md)).
+**Fase 3 (Semanas 7–9): Recepción y visualización — funcionalmente completa.** Dashboard con datos en vivo, gráficas y mapa general listos y verificados de punta a punta contra el proyecto real. La Fase 2 también quedó funcionalmente completa (5 pantallas de Administración); en ambas falta únicamente la suite de pruebas automatizadas, dejada como decisión explícita del usuario para más adelante (ver [PROJECT_PLAN.md](PROJECT_PLAN.md)).
 
 ### Actividades terminadas (implementadas y verificadas)
 - **Administración > Dispositivos (RF-11 a RF-14):** listado, alta/edición, activar/desactivar, y emisión/rotación de credencial vía la nueva RPC `admin_rotate_device_credential` (genera y hashea el secreto del lado del servidor, D-003; se muestra en un diálogo aparte, una sola vez, con botón de copiar).
@@ -13,19 +13,28 @@
 - Con esto, **las 5 pantallas de Administración quedan completas** (RF-06 a RF-17).
 - Firmware de prueba de conectividad para ESP32 (`firmware/esp32-test/`), con guía completa de instalación de Arduino IDE, paquete de placas ESP32, drivers (CP2102) y selección de placa/puerto — documentado con el usuario paso a paso hasta identificar que Windows Application Control bloquea el ejecutable, no la placa (pendiente de hardware disponible para completar la prueba real).
 - Dispositivo `NODO-ESP32-01` no llegó a probarse con hardware real en esta sesión (usuario sin el dispositivo a la mano); queda listo para cuando lo tenga.
+- **Dashboard con datos en vivo (RF-22 a RF-26):** selector de dispositivo, tarjetas de los 4 parámetros con semaforización (ícono+color+texto) y mini-gráfica de tendencia (Chart.js), estado del dispositivo, alertas activas, indicador "en vivo/reconectando" y "actualizado hace Xs". Se habilitó Supabase Realtime en `measurement_batches` y `alerts` (aparte de RLS, hay que agregarlas a la publicación `supabase_realtime` explícitamente) y se suscribe por dispositivo seleccionado.
+- **Mapa general de solo lectura (RF-10)**, nueva ruta `/mapa` para cualquier rol: marcador por ubicación, popup con los dispositivos de esa ubicación y su estado. Separado de Administración > Ubicaciones (esa sigue siendo solo para admin, con edición).
+- Con esto, **la Fase 3 completa queda funcionalmente lista** (ingesta, simulador, dashboard, gráficas, mapa, tiempo real).
 
 ### Errores encontrados y corregidos en esta sesión
 1. **El CLI de Supabase (`supabase.exe` descargado vía npx) quedó bloqueado por una directiva de Application Control de Windows** ("Una directiva de Control de aplicaciones bloqueó este archivo") — posiblemente por ser una máquina gestionada por la institución. No se intentó sortear la política (sería modificar configuración de seguridad del sistema, fuera de lugar). En su lugar, se cambió a invocar la **Management API de Supabase directamente por HTTP** (`POST /v1/projects/{ref}/database/query` con el Personal Access Token) para aplicar migraciones y hacer consultas de verificación — mismo resultado, sin depender del ejecutable bloqueado.
+2. **El toolbar del Dashboard se encimaba** (título sobre el correo del usuario) en pantallas angostas — los hijos de `mat-toolbar` no se encogen por defecto (`min-width:auto` en flex). Corregido con `min-width:0` en los elementos y ellipsis en el título; el correo se oculta del todo bajo 520px.
+3. **La credencial de `NODO-DEMO-001` quedó rotada** por una prueba anterior de la pantalla de Dispositivos, invalidando el secreto documentado en `seed.sql`/`.env`. Se emitió una nueva y se actualizó `.env`; se agregó una nota en `tools/api-tests/ingest-measurement.http` explicando que las credenciales rotan y dónde encontrar la vigente.
+4. Un `:global()` en el SCSS del mapa general (sintaxis de otro framework, no válida en Angular) — corregido con `::ng-deep`, necesario porque Leaflet inyecta el HTML del popup fuera del compilador de plantillas de Angular.
 
 ### Pruebas ejecutadas
-- `ng build`: exitoso, sin advertencias, después de cada pantalla (incluye el fix de `allowedCommonJsDependencies` para Leaflet).
-- Verificación en vivo en el navegador (con sesión de administrador ya activa): pantalla de Dispositivos muestra los 3 dispositivos reales (`NODO-004`, `NODO-DEMO-001`, `NODO-ESP32-01`); pantalla de Ubicaciones — mapa con teselas y marcadores reales confirmado por inspección directa del DOM (no solo captura de pantalla), alta de una ubicación de prueba con selección de coordenada por clic en el mapa, verificada end-to-end en la tabla; pantalla de Umbrales — las 4 tarjetas muestran los umbrales sembrados correctamente, se creó una versión nueva real para oxígeno disuelto y el historial se actualizó como se esperaba (RF-16 completo, no solo el formulario).
+- `ng build`: exitoso, sin advertencias, después de cada pantalla.
+- Verificación en vivo en el navegador (con sesión de administrador ya activa): Dispositivos, Ubicaciones, Parámetros y Umbrales verificados con datos reales (ver detalle en la entrada anterior).
+- **Dashboard verificado de punta a punta con un evento real:** se envió una lectura nueva con el simulador (`tools/simulator/simulate.mjs`) y, **sin recargar el navegador**, las 4 tarjetas, las mini-gráficas y la hora de última comunicación se actualizaron solas vía Realtime; la alerta abierta se mantuvo correctamente (no se cierra sola al volver a rango normal).
+- Mapa general (`/mapa`) verificado: 3 marcadores reales, popup de una ubicación sin dispositivos muestra "Sin dispositivos." como se espera.
 - RPC `admin_rotate_device_credential` y `admin_create_threshold_version` verificadas por consulta directa e invocación real contra el proyecto real.
 
 ### Errores conocidos (no bloqueantes)
 - Los mismos de la sesión 2 (WSL2 ausente, transiciones de alerta sin probar con sesión real) siguen vigentes.
 - El `confirm()` nativo del navegador (usado para confirmar eliminar una ubicación) no es automatizable con las herramientas de este agente; funciona normal para un usuario real. Queda una ubicación de prueba (`"Punto de prueba"`) sin eliminar en el proyecto real — el usuario puede borrarla cuando quiera desde la propia pantalla.
 - El servidor de desarrollo local sigue deteniéndose solo tras inactividad prolongada de la sesión; si algo da `ERR_CONNECTION_REFUSED` en `localhost:4200`, basta con relanzarlo.
+- Pruebas automatizadas (unitarias/e2e) siguen sin escribirse — decisión explícita del usuario de priorizar la Fase 3 primero.
 
 ### Acciones manuales pendientes
 1. Conseguir el ESP32 físico para completar la prueba de conectividad de `firmware/esp32-test/` (no bloquea nada más del desarrollo).
@@ -35,10 +44,10 @@
 5. Decidir si se quiere GPS en vivo por dispositivo o mantener ubicación fija por admin (D-017, abierto).
 
 ### Próxima actividad recomendada
-Dos caminos válidos, a elegir con el usuario: (a) escribir la suite de pruebas automatizadas pendiente para cerrar el checklist de la Fase 2 al 100%, o (b) pasar directo a la Fase 3 (Dashboard con tarjetas en vivo, gráficas, mapa general de solo lectura para todos los roles, actualización en tiempo real vía Supabase Realtime), dejando las pruebas automatizadas como deuda técnica explícita y documentada.
+Con Fases 2 y 3 funcionalmente completas, lo que sigue por diseño es la **Fase 4** (motor de reglas ya existe desde antes, así que aquí toca sobre todo interfaz: gestión de alertas en pantalla — reconocer/atender/cerrar usando las RPC ya creadas —, Historial con filtros, Reportes con exportación PDF/Excel, y notificaciones por correo vía Brevo). Alternativa igual de válida: escribir la suite de pruebas automatizadas pendiente de las Fases 2 y 3 antes de seguir sumando pantallas.
 
 ### Cómo continuar en otra sesión
-Indicar: **"Continúa con el proyecto IOT"** y precisar si se quiere ir por pruebas automatizadas o por la Fase 3.
+Indicar: **"Continúa con el proyecto IOT"** y precisar si se quiere ir por la Fase 4 o por pruebas automatizadas.
 
 ---
 
