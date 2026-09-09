@@ -22,7 +22,7 @@ export class Admin {
   readonly tabs: AdminTab[] = [
     { label: 'Usuarios', path: 'usuarios' },
     { label: 'Dispositivos', path: 'dispositivos' },
-    { label: 'Ubicaciones', path: null },
+    { label: 'Ubicaciones', path: 'ubicaciones' },
     { label: 'Parámetros', path: null },
     { label: 'Umbrales', path: null },
   ];

@@ -1,0 +1,38 @@
+.dialog-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  min-width: 420px;
+  padding-top: 0.25rem;
+}
+
+.hint {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--mat-sys-on-surface-variant, #666);
+}
+
+.picker-map {
+  height: 220px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--mat-sys-outline-variant, #dde3e2);
+}
+
+.coords-row {
+  display: flex;
+  gap: 0.75rem;
+
+  mat-form-field {
+    flex: 1;
+  }
+}
+
+.form-error {
+  margin: 0;
+  padding: 0.6rem 0.75rem;
+  border-radius: 8px;
+  background: #fbe3e1;
+  color: #b23b3b;
+  font-size: 0.85rem;
+}

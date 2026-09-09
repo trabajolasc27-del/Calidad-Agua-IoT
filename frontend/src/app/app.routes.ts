@@ -36,6 +36,10 @@ export const routes: Routes = [
         path: 'dispositivos',
         loadComponent: () => import('./features/admin/devices/devices').then((m) => m.Devices),
       },
+      {
+        path: 'ubicaciones',
+        loadComponent: () => import('./features/admin/locations/locations').then((m) => m.Locations),
+      },
     ],
   },
   { path: '**', redirectTo: 'panel' },

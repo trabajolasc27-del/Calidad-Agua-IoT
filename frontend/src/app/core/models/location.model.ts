@@ -1,8 +1,19 @@
-// Subconjunto de public.locations usado para seleccionar ubicacion al
-// dar de alta un dispositivo. El CRUD completo de Ubicaciones llega en
-// la siguiente pantalla de Administracion.
+// Refleja public.locations (ver docs/DATABASE_DESIGN.md 3.2).
 
 export interface LocationSummary {
   id: string;
   name: string;
+}
+
+export interface Location {
+  id: string;
+  name: string;
+  description: string | null;
+  latitude: number;
+  longitude: number;
+  is_demo: boolean;
+  created_at: string;
+  updated_at: string;
+  // Viene de un embed de PostgREST (locations -> devices(count)).
+  devices?: { count: number }[];
 }
