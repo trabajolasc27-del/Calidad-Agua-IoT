@@ -1,0 +1,102 @@
+<div class="thresholds-page">
+  <div class="thresholds-header">
+    <h2>Umbrales</h2>
+    <p class="hint">
+      Los umbrales son informativos y configurables, no un valor normativo oficial. Cada versión nueva no borra
+      la anterior: las mediciones ya evaluadas conservan el umbral con el que se evaluaron (RNF-05).
+    </p>
+  </div>
+
+  @switch (state()) {
+    @case ('loading') {
+      <div class="state-panel">
+        <mat-spinner diameter="32" />
+      </div>
+    }
+    @case ('error') {
+      <div class="state-panel">
+        <p class="state-message error">{{ errorMessage() }}</p>
+        <button mat-stroked-button (click)="load()">Reintentar</button>
+      </div>
+    }
+    @case ('data') {
+      <div class="cards">
+        @for (entry of entries(); track entry.parameter.id) {
+          <div class="param-card">
+            <div class="param-card-header">
+              <div>
+                <h3>{{ entry.parameter.name }}</h3>
+                <span class="unit">{{ entry.parameter.unit }}</span>
+              </div>
+              <button mat-flat-button color="primary" (click)="openCreateDialog(entry)">Nueva versión</button>
+            </div>
+
+            @if (entry.active) {
+              <div class="limits-summary">
+                <div class="limit-cell crit">
+                  <span class="label">Crítico bajo</span>
+                  <span class="value">{{ entry.active.critical_low ?? '—' }}</span>
+                </div>
+                <div class="limit-cell warn">
+                  <span class="label">Alerta bajo</span>
+                  <span class="value">{{ entry.active.warning_low ?? '—' }}</span>
+                </div>
+                <div class="limit-cell ok">
+                  <span class="label">Conforme</span>
+                  <span class="value">entre los dos de en medio</span>
+                </div>
+                <div class="limit-cell warn">
+                  <span class="label">Alerta alto</span>
+                  <span class="value">{{ entry.active.warning_high ?? '—' }}</span>
+                </div>
+                <div class="limit-cell crit">
+                  <span class="label">Crítico alto</span>
+                  <span class="value">{{ entry.active.critical_high ?? '—' }}</span>
+                </div>
+              </div>
+              <p class="meta">
+                Versión {{ entry.active.version }}
+                @if (entry.active.is_demo) {
+                  <span class="demo-flag">demo</span>
+                }
+                · {{ entry.active.consecutive_breaches_to_alert }} lectura(s) consecutiva(s) para abrir alerta
+              </p>
+            } @else {
+              <p class="state-message">Sin umbral configurado todavía para este parámetro.</p>
+            }
+
+            @if (entry.history.length > 0) {
+              <mat-expansion-panel class="history-panel">
+                <mat-expansion-panel-header>
+                  <mat-panel-title>Historial ({{ entry.history.length }} versión(es) anterior(es))</mat-panel-title>
+                </mat-expansion-panel-header>
+                <table class="history-table">
+                  <thead>
+                    <tr>
+                      <th>Versión</th>
+                      <th>Crít. bajo</th>
+                      <th>Alerta bajo</th>
+                      <th>Alerta alto</th>
+                      <th>Crít. alto</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (h of entry.history; track h.id) {
+                      <tr>
+                        <td>{{ h.version }}</td>
+                        <td>{{ h.critical_low ?? '—' }}</td>
+                        <td>{{ h.warning_low ?? '—' }}</td>
+                        <td>{{ h.warning_high ?? '—' }}</td>
+                        <td>{{ h.critical_high ?? '—' }}</td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </mat-expansion-panel>
+            }
+          </div>
+        }
+      </div>
+    }
+  }
+</div>

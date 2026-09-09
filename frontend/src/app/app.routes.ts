@@ -40,6 +40,14 @@ export const routes: Routes = [
         path: 'ubicaciones',
         loadComponent: () => import('./features/admin/locations/locations').then((m) => m.Locations),
       },
+      {
+        path: 'parametros',
+        loadComponent: () => import('./features/admin/parameters/parameters').then((m) => m.Parameters),
+      },
+      {
+        path: 'umbrales',
+        loadComponent: () => import('./features/admin/thresholds/thresholds').then((m) => m.Thresholds),
+      },
     ],
   },
   { path: '**', redirectTo: 'panel' },

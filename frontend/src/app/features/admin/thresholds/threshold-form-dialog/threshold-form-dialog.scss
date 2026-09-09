@@ -1,0 +1,29 @@
+.dialog-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  min-width: 420px;
+  padding-top: 0.25rem;
+}
+
+.hint {
+  margin: 0;
+  font-size: 0.8rem;
+  line-height: 1.4;
+  color: var(--mat-sys-on-surface-variant, #666);
+}
+
+.limits-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem 0.75rem;
+}
+
+.form-error {
+  margin: 0;
+  padding: 0.6rem 0.75rem;
+  border-radius: 8px;
+  background: #fbe3e1;
+  color: #b23b3b;
+  font-size: 0.85rem;
+}

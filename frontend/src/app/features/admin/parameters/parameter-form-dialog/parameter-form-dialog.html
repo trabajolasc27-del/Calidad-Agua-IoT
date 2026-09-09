@@ -1,0 +1,48 @@
+<h2 mat-dialog-title>Editar {{ data.parameter.code }}</h2>
+
+<form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+  <mat-dialog-content class="dialog-content">
+    <mat-form-field appearance="outline">
+      <mat-label>Nombre</mat-label>
+      <input matInput formControlName="name" autocomplete="off" required />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Unidad</mat-label>
+      <input matInput formControlName="unit" autocomplete="off" required />
+    </mat-form-field>
+
+    <p class="hint">
+      Límites físicos plausibles usados para validar cada lectura recibida (RF-18); no son valores normativos.
+    </p>
+
+    <div class="coords-row">
+      <mat-form-field appearance="outline">
+        <mat-label>Mínimo físico</mat-label>
+        <input matInput type="number" formControlName="physical_min" />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Máximo físico</mat-label>
+        <input matInput type="number" formControlName="physical_max" />
+      </mat-form-field>
+    </div>
+
+    <mat-checkbox formControlName="is_active">Parámetro activo</mat-checkbox>
+
+    @if (errorMessage()) {
+      <p class="form-error" role="alert">{{ errorMessage() }}</p>
+    }
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button type="button" (click)="cancel()">Cancelar</button>
+    <button mat-flat-button color="primary" type="submit" [disabled]="submitting()">
+      @if (submitting()) {
+        <mat-spinner diameter="18" />
+      } @else {
+        Guardar
+      }
+    </button>
+  </mat-dialog-actions>
+</form>

@@ -1,0 +1,66 @@
+<div class="parameters-page">
+  <div class="parameters-header">
+    <h2>Parámetros</h2>
+    <p class="hint">
+      Catálogo fijo de los 4 parámetros del alcance oficial. No se agregan ni eliminan parámetros desde aquí.
+    </p>
+  </div>
+
+  @switch (state()) {
+    @case ('loading') {
+      <div class="state-panel">
+        <mat-spinner diameter="32" />
+      </div>
+    }
+    @case ('error') {
+      <div class="state-panel">
+        <p class="state-message error">{{ errorMessage() }}</p>
+        <button mat-stroked-button (click)="load()">Reintentar</button>
+      </div>
+    }
+    @case ('data') {
+      <table mat-table [dataSource]="parameters()" class="parameters-table">
+        <ng-container matColumnDef="code">
+          <th mat-header-cell *matHeaderCellDef>Código</th>
+          <td mat-cell *matCellDef="let p"><code>{{ p.code }}</code></td>
+        </ng-container>
+
+        <ng-container matColumnDef="name">
+          <th mat-header-cell *matHeaderCellDef>Nombre</th>
+          <td mat-cell *matCellDef="let p">{{ p.name }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="unit">
+          <th mat-header-cell *matHeaderCellDef>Unidad</th>
+          <td mat-cell *matCellDef="let p">{{ p.unit }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="range">
+          <th mat-header-cell *matHeaderCellDef>Rango físico</th>
+          <td mat-cell *matCellDef="let p">{{ p.physical_min ?? '—' }} a {{ p.physical_max ?? '—' }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="status">
+          <th mat-header-cell *matHeaderCellDef>Estado</th>
+          <td mat-cell *matCellDef="let p">
+            @if (p.is_active) {
+              <span class="status-pill ok">Activo</span>
+            } @else {
+              <span class="status-pill inactive">Inactivo</span>
+            }
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef></th>
+          <td mat-cell *matCellDef="let p">
+            <button mat-button (click)="edit(p)">Editar</button>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+      </table>
+    }
+  }
+</div>
