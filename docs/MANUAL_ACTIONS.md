@@ -61,7 +61,7 @@ En cuanto me compartas la URL del repositorio de GitHub, agrego el remoto localm
 1. Crear cuenta en `brevo.com`.
 2. Verificar el correo remitente (o el dominio) que usará el sistema para enviar alertas, siguiendo el asistente de verificación de Brevo (agrega un registro DNS si usas dominio propio, o verifica un correo individual si es más simple para el prototipo académico).
 3. Generar una **API key** transaccional desde el panel de Brevo (SMTP & API → API Keys).
-4. Guardar esa API key como secreto del proyecto Supabase, **no en el chat**: `supabase secrets set BREVO_API_KEY=<valor>` (CLI) o desde el Dashboard de Supabase → Edge Functions → Secrets.
+4. Guardar esa API key como secreto del proyecto Supabase, **no en el chat**. En esta máquina el CLI de Supabase está bloqueado por la política de Application Control de Windows (ver [DECISIONS.md](DECISIONS.md) y el registro de la sesión 3), así que usa el **Dashboard de Supabase** en vez del comando `supabase secrets set`: entra al proyecto → **Edge Functions** → **Secrets** (o **Manage secrets**) → **Add new secret** → nombre `BREVO_API_KEY`, valor la API key que copiaste → **Save**.
 
 **Qué debes darme después:**
 - Confirmación de que el remitente quedó verificado y de que el secreto `BREVO_API_KEY` ya está configurado en Supabase (solo la confirmación, no el valor).
