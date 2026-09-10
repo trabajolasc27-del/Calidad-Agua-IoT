@@ -43,6 +43,7 @@ Estado global: **Fase 1 en progreso.** El detalle día a día del avance real vi
 - [x] Crear historiales con filtros.
 - [x] Implementar estadísticas de reportes (min/max/promedio, conteos).
 - [x] Exportar PDF y Excel.
+- [ ] Crear pantalla de calibraciones y mantenimiento (RF-35/RF-36). **Detectado como faltante al redactar la bitácora de la sesión 3** — la tabla `calibrations`/`maintenance_records` y sus políticas RLS ya existen desde Fase 2, pero nunca se construyó la interfaz; no estaba explícito como línea propia en este plan, solo implícito en el nombre de la fase.
 - [ ] Integrar notificaciones por correo (Brevo) — requiere acción manual antes de configurar, ver [MANUAL_ACTIONS.md](MANUAL_ACTIONS.md) #2.
 - [ ] **Punto de control:** antes de configurar Brevo, entregar instrucciones para crear cuenta, verificar remitente y guardar la API key como secreto (nunca en el chat).
 
