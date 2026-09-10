@@ -1,0 +1,49 @@
+<mat-toolbar color="primary">
+  <a mat-button routerLink="/panel">← Panel</a>
+  <span class="toolbar-title">Alertas</span>
+</mat-toolbar>
+
+<main class="alerts-page">
+  <mat-button-toggle-group [value]="filter()" (change)="setFilter($event.value)" class="status-filter">
+    <mat-button-toggle value="NEW">Nuevas</mat-button-toggle>
+    <mat-button-toggle value="ACKNOWLEDGED">Reconocidas</mat-button-toggle>
+    <mat-button-toggle value="ATTENDED">Atendidas</mat-button-toggle>
+    <mat-button-toggle value="CLOSED">Cerradas</mat-button-toggle>
+    <mat-button-toggle value="ALL">Todas</mat-button-toggle>
+  </mat-button-toggle-group>
+
+  @switch (state()) {
+    @case ('loading') {
+      <div class="state-panel">
+        <mat-spinner diameter="32" />
+      </div>
+    }
+    @case ('error') {
+      <div class="state-panel">
+        <p class="state-message error">{{ errorMessage() }}</p>
+        <button mat-stroked-button (click)="load()">Reintentar</button>
+      </div>
+    }
+    @case ('empty') {
+      <div class="state-panel">
+        <p class="state-message">No hay alertas en este estado.</p>
+      </div>
+    }
+    @case ('data') {
+      <ul class="alerts-list">
+        @for (a of alerts(); track a.id) {
+          <li (click)="open(a)">
+            <span class="severity-pill" [class.warn]="a.severity === 'WARNING'" [class.crit]="a.severity === 'CRITICAL'">
+              {{ a.severity === 'CRITICAL' ? 'Crítico' : 'Alerta' }}
+            </span>
+            <div class="alert-info">
+              <span class="alert-device">{{ a.devices?.code }} · {{ a.parameters?.name }}</span>
+              <span class="alert-date">{{ a.opened_at | date: 'short' }}</span>
+            </div>
+            <span class="status-tag">{{ statusLabel[a.status] }}</span>
+          </li>
+        }
+      </ul>
+    }
+  }
+</main>

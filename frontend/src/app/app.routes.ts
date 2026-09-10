@@ -28,6 +28,11 @@ export const routes: Routes = [
     loadComponent: () => import('./features/map/map-view').then((m) => m.MapView),
   },
   {
+    path: 'alertas',
+    canActivate: [authGuard],
+    loadComponent: () => import('./features/alerts/alerts').then((m) => m.Alerts),
+  },
+  {
     path: 'administracion',
     canActivate: [roleGuard(['admin'])],
     loadComponent: () => import('./features/admin/admin').then((m) => m.Admin),

@@ -1,0 +1,87 @@
+<h2 mat-dialog-title>
+  {{ alert().devices?.code }} · {{ alert().parameters?.name }}
+</h2>
+
+<mat-dialog-content class="content">
+  <div class="summary">
+    <span class="severity-pill" [class.warn]="alert().severity === 'WARNING'" [class.crit]="alert().severity === 'CRITICAL'">
+      {{ alert().severity === 'CRITICAL' ? 'Crítico' : 'Alerta' }}
+    </span>
+    <span class="status-pill">{{ statusLabel[alert().status] }}</span>
+    <span class="device-name">{{ alert().devices?.name }}</span>
+  </div>
+
+  <div class="timeline">
+    <span class="section-title">Línea de tiempo</span>
+    @if (loadingHistory()) {
+      <mat-spinner diameter="24" />
+    } @else {
+      @for (h of history(); track h.id) {
+        <div class="timeline-item">
+          <span class="tl-dot"></span>
+          <div class="tl-body">
+            <span class="tl-status">{{ statusLabel[h.to_status] }}</span>
+            <span class="tl-meta">
+              {{ h.changed_at | date: 'short' }}
+              @if (h.profiles?.full_name) {
+                · {{ h.profiles?.full_name }}
+              } @else {
+                · sistema
+              }
+            </span>
+            @if (h.comment) {
+              <p class="tl-comment">{{ h.comment }}</p>
+            }
+          </div>
+        </div>
+      }
+    }
+  </div>
+
+  @if (canAct && alert().status !== 'CLOSED') {
+    <div class="action-box">
+      @if (alert().status === 'ACKNOWLEDGED' || alert().status === 'ATTENDED') {
+        <mat-form-field appearance="outline">
+          <mat-label>Comentario de seguimiento (opcional)</mat-label>
+          <textarea matInput [formControl]="commentControl" rows="2"></textarea>
+        </mat-form-field>
+      }
+
+      @if (errorMessage()) {
+        <p class="form-error" role="alert">{{ errorMessage() }}</p>
+      }
+
+      @if (alert().status === 'NEW') {
+        <button mat-flat-button color="primary" [disabled]="submitting()" (click)="acknowledge()">
+          @if (submitting()) {
+            <mat-spinner diameter="18" />
+          } @else {
+            Reconocer
+          }
+        </button>
+      } @else if (alert().status === 'ACKNOWLEDGED') {
+        <button mat-flat-button color="primary" [disabled]="submitting()" (click)="attend()">
+          @if (submitting()) {
+            <mat-spinner diameter="18" />
+          } @else {
+            Marcar como atendida
+          }
+        </button>
+      } @else if (alert().status === 'ATTENDED') {
+        <button mat-flat-button color="primary" [disabled]="submitting()" (click)="close()">
+          @if (submitting()) {
+            <mat-spinner diameter="18" />
+          } @else {
+            Cerrar alerta
+          }
+        </button>
+      }
+    </div>
+  } @else if (!canAct && alert().status !== 'CLOSED') {
+    <p class="hint">Solo Administrador o Analista ambiental pueden reconocer, atender o cerrar alertas.</p>
+  }
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="closeDialog()">Cerrar</button>
+</mat-dialog-actions>

@@ -6,6 +6,7 @@
     · {{ authService.role() }}
   </span>
   <a mat-button routerLink="/mapa">Mapa</a>
+  <a mat-button routerLink="/alertas">Alertas</a>
   @if (authService.role() === 'admin') {
     <a mat-button routerLink="/administracion">Administración</a>
   }
