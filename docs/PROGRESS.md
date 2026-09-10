@@ -3,7 +3,7 @@
 ## Sesión 3 — 2026-09-09
 
 ### Fase actual
-**Fase 3 (Semanas 7–9): Recepción y visualización — funcionalmente completa.** Dashboard con datos en vivo, gráficas y mapa general listos y verificados de punta a punta contra el proyecto real. La Fase 2 también quedó funcionalmente completa (5 pantallas de Administración); en ambas falta únicamente la suite de pruebas automatizadas, dejada como decisión explícita del usuario para más adelante (ver [PROJECT_PLAN.md](PROJECT_PLAN.md)).
+**Fase 4 (Semanas 10–12): Evaluación, alertas y reportes — funcionalmente completa, salvo Brevo.** Fases 2 y 3 ya estaban funcionalmente completas (ver más abajo). Dentro de esta misma sesión se completaron además Alertas, Historial y Reportes (RF-30 a RF-39); solo queda pendiente el punto de control de Brevo (acción manual del usuario) para cerrar la fase del todo. En las tres fases falta únicamente la suite de pruebas automatizadas, dejada como decisión explícita del usuario para más adelante (ver [PROJECT_PLAN.md](PROJECT_PLAN.md)).
 
 ### Actividades terminadas (implementadas y verificadas)
 - **Administración > Dispositivos (RF-11 a RF-14):** listado, alta/edición, activar/desactivar, y emisión/rotación de credencial vía la nueva RPC `admin_rotate_device_credential` (genera y hashea el secreto del lado del servidor, D-003; se muestra en un diálogo aparte, una sola vez, con botón de copiar).
@@ -16,12 +16,18 @@
 - **Dashboard con datos en vivo (RF-22 a RF-26):** selector de dispositivo, tarjetas de los 4 parámetros con semaforización (ícono+color+texto) y mini-gráfica de tendencia (Chart.js), estado del dispositivo, alertas activas, indicador "en vivo/reconectando" y "actualizado hace Xs". Se habilitó Supabase Realtime en `measurement_batches` y `alerts` (aparte de RLS, hay que agregarlas a la publicación `supabase_realtime` explícitamente) y se suscribe por dispositivo seleccionado.
 - **Mapa general de solo lectura (RF-10)**, nueva ruta `/mapa` para cualquier rol: marcador por ubicación, popup con los dispositivos de esa ubicación y su estado. Separado de Administración > Ubicaciones (esa sigue siendo solo para admin, con edición).
 - Con esto, **la Fase 3 completa queda funcionalmente lista** (ingesta, simulador, dashboard, gráficas, mapa, tiempo real).
+- **Alertas (RF-30 a RF-33):** listado filtrable por estado (Nuevas/Reconocidas/Atendidas/Cerradas/Todas), diálogo de detalle con historial de transiciones y acciones "Reconocer"/"Atender"/"Cerrar" (con comentario opcional) contra las RPC `acknowledge_alert`/`attend_alert`/`close_alert` ya existentes desde el motor de reglas. El estado mostrado se deriva siempre de la última entrada de `alert_history` tras cada acción, nunca se asume en el cliente. **Verificado en vivo:** una alerta real de turbidez se reconoció, se atendió con comentario y quedó reflejada correctamente en el historial.
+- **Historial (RF-27 a RF-29):** tabla paginada con 6 filtros (dispositivo, ubicación, parámetro, estado de evaluación, fecha desde/hasta) que se aplican solos al cambiar cualquier campo, y gráfica de tendencia (Chart.js) que solo aparece cuando hay un parámetro fijo seleccionado (para no mezclar unidades). El filtro por ubicación se resuelve primero a una lista de IDs de dispositivo en el cliente, evitando un filtro anidado a dos niveles en PostgREST. **Verificado en vivo:** filtrar por parámetro + rango de fechas devuelve las filas correctas y dibuja la tendencia.
+- **Reportes (RF-37 a RF-39):** selector de dispositivo + rango de fechas, estadísticas por parámetro (mínimo/máximo/promedio/lecturas/alertas/críticos) calculadas del lado del cliente sobre las mediciones del periodo, conteo de mediciones y alertas del periodo, mini-gráfica de tendencia por parámetro, y exportación a PDF (`pdfmake`) y Excel (`exceljs`). Restringido a Administrador y Analista ambiental en el guard de ruta, según la matriz de roles (Técnico de campo no genera reportes). **Verificado en vivo:** reporte generado para `NODO-DEMO-001` con 24 mediciones reales mostró estadísticas correctas por parámetro y ambos botones de exportación se ejecutaron sin errores en consola.
 
 ### Errores encontrados y corregidos en esta sesión
 1. **El CLI de Supabase (`supabase.exe` descargado vía npx) quedó bloqueado por una directiva de Application Control de Windows** ("Una directiva de Control de aplicaciones bloqueó este archivo") — posiblemente por ser una máquina gestionada por la institución. No se intentó sortear la política (sería modificar configuración de seguridad del sistema, fuera de lugar). En su lugar, se cambió a invocar la **Management API de Supabase directamente por HTTP** (`POST /v1/projects/{ref}/database/query` con el Personal Access Token) para aplicar migraciones y hacer consultas de verificación — mismo resultado, sin depender del ejecutable bloqueado.
 2. **El toolbar del Dashboard se encimaba** (título sobre el correo del usuario) en pantallas angostas — los hijos de `mat-toolbar` no se encogen por defecto (`min-width:auto` en flex). Corregido con `min-width:0` en los elementos y ellipsis en el título; el correo se oculta del todo bajo 520px.
 3. **La credencial de `NODO-DEMO-001` quedó rotada** por una prueba anterior de la pantalla de Dispositivos, invalidando el secreto documentado en `seed.sql`/`.env`. Se emitió una nueva y se actualizó `.env`; se agregó una nota en `tools/api-tests/ingest-measurement.http` explicando que las credenciales rotan y dónde encontrar la vigente.
 4. Un `:global()` en el SCSS del mapa general (sintaxis de otro framework, no válida en Angular) — corregido con `::ng-deep`, necesario porque Leaflet inyecta el HTML del popup fuera del compilador de plantillas de Angular.
+5. **`TS2729`** en el diálogo de detalle de alerta: el inicializador de campo (`signal(this.data.alert)`) corría antes que el cuerpo del constructor, donde recién se asigna la propiedad de parámetro `data`. Corregido moviendo la inicialización del signal al cuerpo del constructor.
+6. **Clics de navegador poco confiables por coordenadas**: en una prueba del diálogo de alerta, un comentario para "Atender" se perdió (quedó vacío) porque el clic por coordenadas falló al viewport reportado no coincidir siempre con el real. Corregido usando `find()`/`read_page()` para obtener referencias de elemento (`ref_N`) y clickear por referencia en vez de por coordenadas — más confiable, y se verificó con `read_page` que el texto sí quedó guardado.
+7. **`npm install pdfmake` instaló por defecto la 0.3.11**, una reescritura orientada a Node sin la API clásica de navegador ni tipos de TypeScript — ver [DECISIONS.md](DECISIONS.md) D-018. Se bajó a `pdfmake@0.2.23` + `@types/pdfmake@0.2.13`.
 
 ### Pruebas ejecutadas
 - `ng build`: exitoso, sin advertencias, después de cada pantalla.
@@ -29,25 +35,30 @@
 - **Dashboard verificado de punta a punta con un evento real:** se envió una lectura nueva con el simulador (`tools/simulator/simulate.mjs`) y, **sin recargar el navegador**, las 4 tarjetas, las mini-gráficas y la hora de última comunicación se actualizaron solas vía Realtime; la alerta abierta se mantuvo correctamente (no se cierra sola al volver a rango normal).
 - Mapa general (`/mapa`) verificado: 3 marcadores reales, popup de una ubicación sin dispositivos muestra "Sin dispositivos." como se espera.
 - RPC `admin_rotate_device_credential` y `admin_create_threshold_version` verificadas por consulta directa e invocación real contra el proyecto real.
+- Alertas: reconocer/atender/cerrar verificado en vivo contra una alerta real, incluyendo el comentario guardado en `alert_history`.
+- Historial: filtros combinados (parámetro + fechas) y gráfica de tendencia verificados en vivo.
+- Reportes: generación de reporte real para `NODO-DEMO-001` (24 mediciones, 4 parámetros, 1 alerta en el periodo) y ambas exportaciones (PDF/Excel) verificadas sin errores en consola del navegador.
+- `ng build` y `tsc --noEmit` limpios (sin advertencias ni errores) tras agregar Reportes.
 
 ### Errores conocidos (no bloqueantes)
-- Los mismos de la sesión 2 (WSL2 ausente, transiciones de alerta sin probar con sesión real) siguen vigentes.
+- Los mismos de la sesión 2 (WSL2 ausente) siguen vigentes.
 - El `confirm()` nativo del navegador (usado para confirmar eliminar una ubicación) no es automatizable con las herramientas de este agente; funciona normal para un usuario real. Queda una ubicación de prueba (`"Punto de prueba"`) sin eliminar en el proyecto real — el usuario puede borrarla cuando quiera desde la propia pantalla.
 - El servidor de desarrollo local sigue deteniéndose solo tras inactividad prolongada de la sesión; si algo da `ERR_CONNECTION_REFUSED` en `localhost:4200`, basta con relanzarlo.
-- Pruebas automatizadas (unitarias/e2e) siguen sin escribirse — decisión explícita del usuario de priorizar la Fase 3 primero.
+- Pruebas automatizadas (unitarias/e2e) siguen sin escribirse — decisión explícita del usuario de priorizar avanzar en funcionalidad primero.
+- 2 vulnerabilidades moderadas transitivas de `npm audit` en `uuid` (vía `exceljs`) — documentadas y no corregidas a propósito, ver D-019.
 
 ### Acciones manuales pendientes
 1. Conseguir el ESP32 físico para completar la prueba de conectividad de `firmware/esp32-test/` (no bloquea nada más del desarrollo).
-2. Brevo (Fase 4, no urge).
+2. Brevo (Fase 4 — **siguiente paso real**, ver más abajo).
 3. Sensores de oxígeno disuelto y temperatura para el ESP32 (Fase 5, no bloquea).
 4. Hosting/dominio (Fase 5, no bloquea).
 5. Decidir si se quiere GPS en vivo por dispositivo o mantener ubicación fija por admin (D-017, abierto).
 
 ### Próxima actividad recomendada
-Con Fases 2 y 3 funcionalmente completas, lo que sigue por diseño es la **Fase 4** (motor de reglas ya existe desde antes, así que aquí toca sobre todo interfaz: gestión de alertas en pantalla — reconocer/atender/cerrar usando las RPC ya creadas —, Historial con filtros, Reportes con exportación PDF/Excel, y notificaciones por correo vía Brevo). Alternativa igual de válida: escribir la suite de pruebas automatizadas pendiente de las Fases 2 y 3 antes de seguir sumando pantallas.
+Fase 4 queda funcionalmente completa salvo **notificaciones por correo vía Brevo**: antes de tocar código hay que entregar al usuario los pasos manuales (crear cuenta, verificar remitente, generar API key y guardarla como secreto — nunca pedirla por chat), como indica el punto de control del propio plan. Con eso resuelto, cerrar Fase 4 en el plan y arrancar Fase 5 (integración de hardware real) o la suite de pruebas automatizadas, según decida el usuario.
 
 ### Cómo continuar en otra sesión
-Indicar: **"Continúa con el proyecto IOT"** y precisar si se quiere ir por la Fase 4 o por pruebas automatizadas.
+Indicar: **"Continúa con el proyecto IOT"**. Lo pendiente inmediato es el punto de control de Brevo (entregar instrucciones manuales) antes de escribir la Edge Function de notificaciones.
 
 ---
 

@@ -1,0 +1,99 @@
+<mat-toolbar color="primary">
+  <a mat-button routerLink="/panel">← Panel</a>
+  <span class="toolbar-title">Reportes</span>
+</mat-toolbar>
+
+<main class="reports-page">
+  <form [formGroup]="filtersForm" class="filters" (ngSubmit)="generate()">
+    <mat-form-field appearance="outline">
+      <mat-label>Dispositivo</mat-label>
+      <mat-select formControlName="deviceId">
+        @for (d of devices(); track d.id) {
+          <mat-option [value]="d.id">{{ d.code }} — {{ d.name }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Desde</mat-label>
+      <input matInput type="date" formControlName="dateFrom" />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Hasta</mat-label>
+      <input matInput type="date" formControlName="dateTo" />
+    </mat-form-field>
+
+    <button mat-flat-button color="primary" type="submit">Generar reporte</button>
+  </form>
+
+  @switch (state()) {
+    @case ('loading') {
+      <div class="state-panel">
+        <mat-spinner diameter="32" />
+      </div>
+    }
+    @case ('error') {
+      <div class="state-panel">
+        <p class="state-message error">{{ errorMessage() }}</p>
+      </div>
+    }
+    @case ('empty') {
+      <div class="state-panel">
+        <p class="state-message">No hay mediciones para este dispositivo en el periodo seleccionado.</p>
+      </div>
+    }
+    @case ('data') {
+      @if (report(); as r) {
+        <section class="summary">
+          <div class="summary-item">
+            <span class="summary-label">Dispositivo</span>
+            <span class="summary-value">{{ r.device.code }} — {{ r.device.name }}</span>
+          </div>
+          <div class="summary-item">
+            <span class="summary-label">Mediciones totales</span>
+            <span class="summary-value">{{ r.totalMeasurements }}</span>
+          </div>
+          <div class="summary-item">
+            <span class="summary-label">Alertas abiertas en el periodo</span>
+            <span class="summary-value">{{ r.alertsOpened }}</span>
+          </div>
+        </section>
+
+        @if (truncated()) {
+          <p class="state-message warn">
+            El periodo tiene más mediciones de las que este reporte puede procesar; las estadísticas se calcularon solo con las primeras
+            2000.
+          </p>
+        }
+
+        <div class="export-actions">
+          <button mat-stroked-button [disabled]="exporting()" (click)="exportPdf()">Exportar PDF</button>
+          <button mat-stroked-button [disabled]="exporting()" (click)="exportExcel()">Exportar Excel</button>
+        </div>
+
+        <section class="parameter-stats">
+          @for (s of r.parameterStats; track s.code) {
+            <article class="stat-card">
+              <header>
+                <h3>{{ s.name }}</h3>
+                <span class="unit">{{ s.unit }}</span>
+              </header>
+              <div class="stat-grid">
+                <div><span class="label">Mín</span><span class="value">{{ s.min ?? '—' }}</span></div>
+                <div><span class="label">Máx</span><span class="value">{{ s.max ?? '—' }}</span></div>
+                <div><span class="label">Promedio</span><span class="value">{{ s.avg ?? '—' }}</span></div>
+                <div><span class="label">Lecturas</span><span class="value">{{ s.count }}</span></div>
+                <div><span class="label">Alertas</span><span class="value">{{ s.alertCount }}</span></div>
+                <div><span class="label">Críticos</span><span class="value">{{ s.criticalCount }}</span></div>
+              </div>
+              <div class="trend-box">
+                <canvas #trendCanvas></canvas>
+              </div>
+            </article>
+          }
+        </section>
+      }
+    }
+  }
+</main>

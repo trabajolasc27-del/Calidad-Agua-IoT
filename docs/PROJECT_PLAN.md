@@ -37,12 +37,12 @@ Estado global: **Fase 1 en progreso.** El detalle día a día del avance real vi
 - [x] **Punto de control:** recorrido simulador → API → base de datos → Dashboard demostrado end-to-end contra el proyecto real, sin ESP32 físico (queda pendiente por hardware, ver [MANUAL_ACTIONS.md](MANUAL_ACTIONS.md)).
 
 ## Fase 4 — Semanas 10 a 12: Evaluación, alertas y reportes
-- [ ] Implementar el motor de reglas (función SQL) y sus pruebas unitarias.
-- [ ] Configurar estados y transiciones de alerta (`acknowledge`/`attend`/`close`).
-- [ ] Crear gestión de alertas en la interfaz.
-- [ ] Crear historiales con filtros.
-- [ ] Implementar estadísticas de reportes (min/max/promedio, conteos).
-- [ ] Exportar PDF y Excel.
+- [x] Implementar el motor de reglas (función SQL). **Pruebas unitarias automatizadas pendientes** — ver nota en Fase 2/3 sobre pruebas diferidas; verificado manualmente con datos reales del simulador y del ESP32 de pruebas.
+- [x] Configurar estados y transiciones de alerta (`acknowledge`/`attend`/`close`).
+- [x] Crear gestión de alertas en la interfaz.
+- [x] Crear historiales con filtros.
+- [x] Implementar estadísticas de reportes (min/max/promedio, conteos).
+- [x] Exportar PDF y Excel.
 - [ ] Integrar notificaciones por correo (Brevo) — requiere acción manual antes de configurar, ver [MANUAL_ACTIONS.md](MANUAL_ACTIONS.md) #2.
 - [ ] **Punto de control:** antes de configurar Brevo, entregar instrucciones para crear cuenta, verificar remitente y guardar la API key como secreto (nunca en el chat).
 

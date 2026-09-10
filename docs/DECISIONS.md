@@ -219,3 +219,23 @@ El usuario planteó que la ubicación de un dispositivo debería verse "por GPS"
 Si en cambio se quiere que el propio ESP32 reporte su coordenada GPS en cada lectura (dispositivo móvil o cuya posición no se conoce de antemano), eso requiere: (a) un módulo GPS adicional en el hardware (no considerado en el BOM ni en D-002), y (b) guardar latitud/longitud por medición en vez de solo por dispositivo — un cambio de modelo de datos no trivial.
 
 **Cómo aplicar:** la pantalla de Ubicaciones se construye con el modelo fijo mientras no haya una decisión explícita en contra. Si el usuario confirma que quiere GPS en vivo, esto se retoma como un cambio de alcance de hardware y de base de datos, no como un ajuste menor de UI.
+
+## D-018 — Downgrade de `pdfmake` a la serie 0.2.x para exportación de reportes
+
+**Fecha:** 2026-09-09
+**Estado:** Confirmado (decisión técnica, sin impacto en alcance funcional)
+
+`npm install pdfmake` instaló por defecto la versión 0.3.11, que reescribió la librería para uso principalmente en Node (depende de `pdfkit` completo, requiere registrar fuentes como archivos en vez de la `vfs` clásica en base64, y no trae tipos de TypeScript). Adoptar esa API en un build de navegador con esbuild/Angular habría significado resolver polyfills de Node (fs, zlib) y una superficie de API no documentada para uso en cliente — alto riesgo de una sesión de depuración larga para una funcionalidad secundaria (exportar PDF).
+
+Se bajó la versión a `pdfmake@0.2.23` (última de la serie 0.2.x), que expone la API clásica y ampliamente documentada para navegador (`pdfMake.vfs = ...; pdfMake.createPdf(docDefinition).download()`), con tipos vía `@types/pdfmake@0.2.13`. Se agregó `"pdfmake"` (y `"exceljs"`, que emite una advertencia similar de CommonJS) a `allowedCommonJsDependencies` en `angular.json`.
+
+**Cómo aplicar:** si en el futuro se necesita una función de `pdfmake` que solo existe en 0.3.x, evaluar si conviene mover la generación de PDF a un endpoint/Edge Function en vez de en el navegador, en lugar de forzar la 0.3.x en el cliente.
+
+## D-019 — Vulnerabilidad transitiva moderada en `uuid` (vía `exceljs`) — no se aplica el fix sugerido
+
+**Fecha:** 2026-09-09
+**Estado:** Confirmado (decisión técnica, documentada en vez de "resuelta")
+
+`npm audit` reporta 2 vulnerabilidades moderadas en `uuid`, dependencia transitiva de `exceljs@4.4.0`. El fix sugerido por `npm audit fix --force` baja `exceljs` a `3.4.0`, un cambio mayor (breaking) de una librería que en este proyecto solo se usa para generar un archivo `.xlsx` de reporte a partir de datos ya validados y calculados en el cliente (no se procesa ningún archivo `.xlsx` de entrada no confiable). La vulnerabilidad reportada en `uuid` no aplica a este patrón de uso.
+
+**Cómo aplicar:** no forzar el downgrade. Si en el futuro `exceljs` se usa para leer archivos `.xlsx` subidos por un usuario (superficie de ataque distinta), revisar esta decisión.
