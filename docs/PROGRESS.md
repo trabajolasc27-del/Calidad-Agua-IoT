@@ -11,10 +11,18 @@ Comparando los 3 documentos contra cada pantalla ya construida se confirmó una 
 El resto de la comparación (4 parámetros oficiales, 3 roles, plan de 16 semanas/4 etapas, wireframes, motor de evaluación, historial, reportes) no encontró otras discrepancias de alcance contra los documentos oficiales.
 
 ### Pruebas ejecutadas
-`tsc --noEmit` y `ng build` limpios tras el cambio. La consulta con el nuevo embed (`measurements!first_measurement_id(value)`) se validó contra el esquema real del proyecto vía una petición REST anónima (`200 []`, confirma sintaxis correcta; el arreglo vacío es RLS negando a `anon`, no un error). **No se pudo verificar visualmente con una sesión autenticada real**: la sesión de navegador de la sesión anterior había expirado y no corresponde iniciar sesión escribiendo la contraseña del usuario en su nombre. Queda pendiente una verificación visual en vivo la próxima vez que haya una sesión autenticada abierta.
+`tsc --noEmit` y `ng build` limpios tras el cambio. La consulta con el nuevo embed (`measurements!first_measurement_id(value)`) se validó primero contra el esquema real vía una petición REST anónima (`200 []`, confirma sintaxis correcta).
+
+Más tarde en la misma sesión, ya con el usuario autenticado, se verificó en vivo con datos reales generados por el simulador (`node tools/simulator/simulate.mjs --profile=alerta`):
+- El umbral de turbidez de `NODO-DEMO-001` requiere 2 lecturas consecutivas fuera de rango antes de abrir alerta (`consecutive_breaches_to_alert = 2` en el seed) — comportamiento esperado, no un bug: tras la primera lectura la tarjeta del Dashboard ya marcaba "Alerta" pero el panel de alertas activas seguía vacío; tras la segunda, la alerta se abrió y **el panel "Alertas activas" del Dashboard mostró el valor correctamente vía Realtime, sin recargar la página** ("Turbidez · 7 NTU").
+- El listado de Alertas mostró `valor: 7 NTU` junto a la fila.
+- El detalle de la alerta mostró "Valor detectado: 7 NTU".
+- Se recorrió el ciclo completo de la alerta desde la interfaz (Reconocer → Marcar como atendida → Cerrar alerta) para dejarla limpia; la línea de tiempo quedó completa (Nueva·sistema → Reconocida → Atendida → Cerrada, las tres últimas por `trabajolasc27@gmail.com`) y el panel de alertas activas volvió a quedar vacío.
+
+Con esto el hallazgo D-020 queda **verificado en vivo de punta a punta**, no solo por análisis estático.
 
 ### Cómo continuar en otra sesión
-Abrir el navegador ya autenticado como admin (o que el usuario inicie sesión) y confirmar visualmente que Alertas y el Dashboard muestran el valor junto a cada alerta antes de dar este hallazgo por cerrado del todo.
+Hallazgo cerrado. Seguir con lo ya pendiente de Fase 4 (Brevo) o con las pruebas del Arduino que el usuario tenía en curso.
 
 ---
 
