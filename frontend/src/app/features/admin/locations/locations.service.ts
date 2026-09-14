@@ -4,10 +4,10 @@ import { SupabaseService } from '../../../core/supabase.service';
 import type { Location } from '../../../core/models/location.model';
 
 export interface LocationInput {
-  name: string;
-  description: string | null;
-  latitude: number;
-  longitude: number;
+  nombre: string;
+  descripcion: string | null;
+  latitud: number;
+  longitud: number;
 }
 
 export interface ServiceResult {
@@ -24,9 +24,9 @@ export class LocationsService {
 
   async listLocations(): Promise<Location[]> {
     const { data, error } = await this.supabaseService.client
-      .from('locations')
-      .select('*, devices(count)')
-      .order('name', { ascending: true });
+      .from('ubicaciones')
+      .select('*, dispositivos(count)')
+      .order('nombre', { ascending: true });
 
     if (error) {
       throw new Error(`No se pudo cargar la lista de ubicaciones: ${error.message}`);
@@ -35,7 +35,7 @@ export class LocationsService {
   }
 
   async createLocation(input: LocationInput): Promise<ServiceResult> {
-    const { error } = await this.supabaseService.client.from('locations').insert(input);
+    const { error } = await this.supabaseService.client.from('ubicaciones').insert(input);
     if (error) {
       return { ok: false, message: error.message };
     }
@@ -43,7 +43,7 @@ export class LocationsService {
   }
 
   async updateLocation(id: string, input: LocationInput): Promise<ServiceResult> {
-    const { error } = await this.supabaseService.client.from('locations').update(input).eq('id', id);
+    const { error } = await this.supabaseService.client.from('ubicaciones').update(input).eq('id', id);
     if (error) {
       return { ok: false, message: error.message };
     }
@@ -51,7 +51,7 @@ export class LocationsService {
   }
 
   async deleteLocation(id: string): Promise<ServiceResult> {
-    const { error } = await this.supabaseService.client.from('locations').delete().eq('id', id);
+    const { error } = await this.supabaseService.client.from('ubicaciones').delete().eq('id', id);
     if (error) {
       return { ok: false, message: error.message };
     }

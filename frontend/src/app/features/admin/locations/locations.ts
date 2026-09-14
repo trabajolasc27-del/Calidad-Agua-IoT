@@ -76,21 +76,21 @@ export class Locations implements AfterViewInit, OnDestroy {
     this.markers = [];
 
     for (const loc of locations) {
-      const deviceCount = loc.devices?.[0]?.count ?? 0;
-      const marker = L.marker([loc.latitude, loc.longitude])
+      const deviceCount = loc.dispositivos?.[0]?.count ?? 0;
+      const marker = L.marker([loc.latitud, loc.longitud])
         .addTo(this.map)
-        .bindPopup(`<strong>${loc.name}</strong><br>${deviceCount} dispositivo(s)`);
+        .bindPopup(`<strong>${loc.nombre}</strong><br>${deviceCount} dispositivo(s)`);
       this.markers.push(marker);
     }
 
     if (locations.length > 0) {
-      const bounds = L.latLngBounds(locations.map((l) => [l.latitude, l.longitude] as [number, number]));
+      const bounds = L.latLngBounds(locations.map((l) => [l.latitud, l.longitud] as [number, number]));
       this.map.fitBounds(bounds, { padding: [30, 30], maxZoom: 15 });
     }
   }
 
   deviceCount(loc: Location): number {
-    return loc.devices?.[0]?.count ?? 0;
+    return loc.dispositivos?.[0]?.count ?? 0;
   }
 
   openCreateDialog(): void {
@@ -105,8 +105,8 @@ export class Locations implements AfterViewInit, OnDestroy {
     const deviceCount = this.deviceCount(location);
     const message =
       deviceCount > 0
-        ? `"${location.name}" tiene ${deviceCount} dispositivo(s) asignados; se quedarán sin ubicación. ¿Eliminar de todas formas?`
-        : `¿Eliminar "${location.name}"?`;
+        ? `"${location.nombre}" tiene ${deviceCount} dispositivo(s) asignados; se quedarán sin ubicación. ¿Eliminar de todas formas?`
+        : `¿Eliminar "${location.nombre}"?`;
     if (!confirm(message)) return;
 
     const result = await this.locationsService.deleteLocation(location.id);

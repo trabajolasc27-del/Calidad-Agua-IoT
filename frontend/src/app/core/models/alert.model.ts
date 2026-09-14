@@ -1,42 +1,42 @@
-export type AlertSeverity = 'WARNING' | 'CRITICAL';
-export type AlertStatus = 'NEW' | 'ACKNOWLEDGED' | 'ATTENDED' | 'CLOSED';
+export type AlertSeverity = 'ALERTA' | 'CRITICO';
+export type AlertStatus = 'NUEVA' | 'RECONOCIDA' | 'ATENDIDA' | 'CERRADA';
 
 export interface DashboardAlert {
   id: string;
-  parameter_name: string;
-  value: number | null;
-  unit: string | null;
-  severity: AlertSeverity;
-  status: AlertStatus;
-  opened_at: string;
+  nombre_parametro: string;
+  valor: number | null;
+  unidad: string | null;
+  gravedad: AlertSeverity;
+  estado: AlertStatus;
+  abierta_en: string;
 }
 
 export interface Alert {
   id: string;
-  device_id: string;
-  parameter_id: string;
-  severity: AlertSeverity;
-  status: AlertStatus;
-  opened_at: string;
-  acknowledged_at: string | null;
-  acknowledged_by: string | null;
-  attended_at: string | null;
-  attended_by: string | null;
-  closed_at: string | null;
-  closed_by: string | null;
-  follow_up_comment: string | null;
-  devices: { code: string; name: string } | null;
-  parameters: { name: string; unit: string } | null;
+  dispositivo_id: string;
+  parametro_id: string;
+  gravedad: AlertSeverity;
+  estado: AlertStatus;
+  abierta_en: string;
+  reconocida_en: string | null;
+  reconocida_por: string | null;
+  atendida_en: string | null;
+  atendida_por: string | null;
+  cerrada_en: string | null;
+  cerrada_por: string | null;
+  comentario_seguimiento: string | null;
+  dispositivos: { codigo: string; nombre: string } | null;
+  parametros: { nombre: string; unidad: string } | null;
   // Medicion que origino la alerta (RF-32: la lista/detalle debe mostrar
   // el valor detectado, no solo el parametro y la gravedad).
-  measurements: { value: number } | null;
+  mediciones: { valor: number } | null;
 }
 
 export interface AlertHistoryEntry {
   id: string;
-  from_status: AlertStatus | null;
-  to_status: AlertStatus;
-  comment: string | null;
-  changed_at: string;
-  profiles: { full_name: string | null } | null;
+  estado_origen: AlertStatus | null;
+  estado_destino: AlertStatus;
+  comentario: string | null;
+  cambiado_en: string;
+  perfiles: { nombre_completo: string | null } | null;
 }

@@ -9,7 +9,7 @@
       <mat-label>Dispositivo</mat-label>
       <mat-select formControlName="deviceId">
         @for (d of devices(); track d.id) {
-          <mat-option [value]="d.id">{{ d.code }} — {{ d.name }}</mat-option>
+          <mat-option [value]="d.id">{{ d.codigo }} — {{ d.nombre }}</mat-option>
         }
       </mat-select>
     </mat-form-field>
@@ -48,7 +48,7 @@
         <section class="summary">
           <div class="summary-item">
             <span class="summary-label">Dispositivo</span>
-            <span class="summary-value">{{ r.device.code }} — {{ r.device.name }}</span>
+            <span class="summary-value">{{ r.device.codigo }} — {{ r.device.nombre }}</span>
           </div>
           <div class="summary-item">
             <span class="summary-label">Mediciones totales</span>
@@ -73,11 +73,11 @@
         </div>
 
         <section class="parameter-stats">
-          @for (s of r.parameterStats; track s.code) {
+          @for (s of r.parameterStats; track s.codigo) {
             <article class="stat-card">
               <header>
-                <h3>{{ s.name }}</h3>
-                <span class="unit">{{ s.unit }}</span>
+                <h3>{{ s.nombre }}</h3>
+                <span class="unit">{{ s.unidad }}</span>
               </header>
               <div class="stat-grid">
                 <div><span class="label">Mín</span><span class="value">{{ s.min ?? '—' }}</span></div>

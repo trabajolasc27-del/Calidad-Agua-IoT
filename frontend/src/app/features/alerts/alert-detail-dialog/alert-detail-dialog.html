@@ -1,20 +1,20 @@
 <h2 mat-dialog-title>
-  {{ alert().devices?.code }} · {{ alert().parameters?.name }}
+  {{ alert().dispositivos?.codigo }} · {{ alert().parametros?.nombre }}
 </h2>
 
 <mat-dialog-content class="content">
   <div class="summary">
-    <span class="severity-pill" [class.warn]="alert().severity === 'WARNING'" [class.crit]="alert().severity === 'CRITICAL'">
-      {{ alert().severity === 'CRITICAL' ? 'Crítico' : 'Alerta' }}
+    <span class="severity-pill" [class.warn]="alert().gravedad === 'ALERTA'" [class.crit]="alert().gravedad === 'CRITICO'">
+      {{ alert().gravedad === 'CRITICO' ? 'Crítico' : 'Alerta' }}
     </span>
-    <span class="status-pill">{{ statusLabel[alert().status] }}</span>
-    <span class="device-name">{{ alert().devices?.name }}</span>
+    <span class="status-pill">{{ statusLabel[alert().estado] }}</span>
+    <span class="device-name">{{ alert().dispositivos?.nombre }}</span>
   </div>
 
-  @if (alert().measurements?.value != null) {
+  @if (alert().mediciones?.valor != null) {
     <p class="value-line">
-      Valor detectado: <strong>{{ alert().measurements?.value }} {{ alert().parameters?.unit }}</strong>
-      · fecha: {{ alert().opened_at | date: 'short' }}
+      Valor detectado: <strong>{{ alert().mediciones?.valor }} {{ alert().parametros?.unidad }}</strong>
+      · fecha: {{ alert().abierta_en | date: 'short' }}
     </p>
   }
 
@@ -27,17 +27,17 @@
         <div class="timeline-item">
           <span class="tl-dot"></span>
           <div class="tl-body">
-            <span class="tl-status">{{ statusLabel[h.to_status] }}</span>
+            <span class="tl-status">{{ statusLabel[h.estado_destino] }}</span>
             <span class="tl-meta">
-              {{ h.changed_at | date: 'short' }}
-              @if (h.profiles?.full_name) {
-                · {{ h.profiles?.full_name }}
+              {{ h.cambiado_en | date: 'short' }}
+              @if (h.perfiles?.nombre_completo) {
+                · {{ h.perfiles?.nombre_completo }}
               } @else {
                 · sistema
               }
             </span>
-            @if (h.comment) {
-              <p class="tl-comment">{{ h.comment }}</p>
+            @if (h.comentario) {
+              <p class="tl-comment">{{ h.comentario }}</p>
             }
           </div>
         </div>
@@ -45,9 +45,9 @@
     }
   </div>
 
-  @if (canAct && alert().status !== 'CLOSED') {
+  @if (canAct && alert().estado !== 'CERRADA') {
     <div class="action-box">
-      @if (alert().status === 'ACKNOWLEDGED' || alert().status === 'ATTENDED') {
+      @if (alert().estado === 'RECONOCIDA' || alert().estado === 'ATENDIDA') {
         <mat-form-field appearance="outline">
           <mat-label>Comentario de seguimiento (opcional)</mat-label>
           <textarea matInput [formControl]="commentControl" rows="2"></textarea>
@@ -58,7 +58,7 @@
         <p class="form-error" role="alert">{{ errorMessage() }}</p>
       }
 
-      @if (alert().status === 'NEW') {
+      @if (alert().estado === 'NUEVA') {
         <button mat-flat-button color="primary" [disabled]="submitting()" (click)="acknowledge()">
           @if (submitting()) {
             <mat-spinner diameter="18" />
@@ -66,7 +66,7 @@
             Reconocer
           }
         </button>
-      } @else if (alert().status === 'ACKNOWLEDGED') {
+      } @else if (alert().estado === 'RECONOCIDA') {
         <button mat-flat-button color="primary" [disabled]="submitting()" (click)="attend()">
           @if (submitting()) {
             <mat-spinner diameter="18" />
@@ -74,7 +74,7 @@
             Marcar como atendida
           }
         </button>
-      } @else if (alert().status === 'ATTENDED') {
+      } @else if (alert().estado === 'ATENDIDA') {
         <button mat-flat-button color="primary" [disabled]="submitting()" (click)="close()">
           @if (submitting()) {
             <mat-spinner diameter="18" />
@@ -84,7 +84,7 @@
         </button>
       }
     </div>
-  } @else if (!canAct && alert().status !== 'CLOSED') {
+  } @else if (!canAct && alert().estado !== 'CERRADA') {
     <p class="hint">Solo Administrador o Analista ambiental pueden reconocer, atender o cerrar alertas.</p>
   }
 </mat-dialog-content>

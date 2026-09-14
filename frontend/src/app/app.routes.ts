@@ -39,12 +39,12 @@ export const routes: Routes = [
   },
   {
     path: 'reportes',
-    canActivate: [roleGuard(['admin', 'analyst'])],
+    canActivate: [roleGuard(['administrador', 'analista'])],
     loadComponent: () => import('./features/reports/reports').then((m) => m.Reports),
   },
   {
     path: 'administracion',
-    canActivate: [roleGuard(['admin'])],
+    canActivate: [roleGuard(['administrador'])],
     loadComponent: () => import('./features/admin/admin').then((m) => m.Admin),
     children: [
       { path: '', pathMatch: 'full', redirectTo: 'usuarios' },

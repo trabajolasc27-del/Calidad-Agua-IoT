@@ -27,10 +27,10 @@ import type { Parameter } from '../../../../core/models/parameter.model';
 })
 export class ParameterFormDialog {
   readonly form = new FormGroup({
-    name: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
-    unit: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
-    physical_min: new FormControl<number | null>(null),
-    physical_max: new FormControl<number | null>(null),
+    nombre: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
+    unidad: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
+    minimo_fisico: new FormControl<number | null>(null),
+    maximo_fisico: new FormControl<number | null>(null),
     is_active: new FormControl(true, { nonNullable: true }),
   });
 
@@ -44,10 +44,10 @@ export class ParameterFormDialog {
   ) {
     const p = data.parameter;
     this.form.patchValue({
-      name: p.name,
-      unit: p.unit,
-      physical_min: p.physical_min,
-      physical_max: p.physical_max,
+      nombre: p.nombre,
+      unidad: p.unidad,
+      minimo_fisico: p.minimo_fisico,
+      maximo_fisico: p.maximo_fisico,
       is_active: p.is_active,
     });
   }

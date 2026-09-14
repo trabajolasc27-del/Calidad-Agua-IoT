@@ -82,7 +82,7 @@ export class Devices implements OnInit {
   }
 
   async toggleStatus(device: Device): Promise<void> {
-    const next = device.status === 'active' ? 'inactive' : 'active';
+    const next = device.estado === 'activo' ? 'inactivo' : 'activo';
     const result = await this.devicesService.setStatus(device.id, next);
     if (result.ok) {
       void this.load();
@@ -92,7 +92,7 @@ export class Devices implements OnInit {
   }
 
   async rotateCredential(device: Device): Promise<void> {
-    await this.issueCredential(device.id, device.code);
+    await this.issueCredential(device.id, device.codigo);
   }
 
   private async issueCredential(deviceId: string, deviceCode: string): Promise<void> {
@@ -109,6 +109,6 @@ export class Devices implements OnInit {
   }
 
   private findCode(deviceId: string): string {
-    return this.devices().find((d) => d.id === deviceId)?.code ?? deviceId;
+    return this.devices().find((d) => d.id === deviceId)?.codigo ?? deviceId;
   }
 }

@@ -21,7 +21,7 @@ export class AuthService {
   readonly profile = this.profileSignal.asReadonly();
   readonly ready = this.readySignal.asReadonly();
   readonly isAuthenticated = computed(() => this.sessionSignal() !== null);
-  readonly role = computed(() => this.profileSignal()?.role ?? null);
+  readonly role = computed(() => this.profileSignal()?.rol ?? null);
 
   // Resuelve una vez que se comprobo la sesion inicial (evita que un guard
   // redirija a /login por error mientras getSession() todavia esta en vuelo,
@@ -55,7 +55,7 @@ export class AuthService {
 
   private async loadProfile(userId: string): Promise<void> {
     const { data, error } = await this.supabaseService.client
-      .from('profiles')
+      .from('perfiles')
       .select('*')
       .eq('id', userId)
       .single();

@@ -4,7 +4,7 @@ import { Router, type CanActivateFn } from '@angular/router';
 import { AuthService } from '../auth.service';
 import type { UserRole } from '../models/profile.model';
 
-// Guard de fabrica: roleGuard(['admin']) restringe una ruta a esos roles.
+// Guard de fabrica: roleGuard(['administrador']) restringe una ruta a esos roles.
 // Es un refuerzo de UX (oculta/rechaza en la interfaz); la proteccion real
 // vive en las politicas RLS de Supabase (ver docs/ROLE_MATRIX.md).
 export function roleGuard(allowedRoles: UserRole[]): CanActivateFn {

@@ -41,27 +41,27 @@ function parseArgs(argv) {
 const PROFILES = {
   // Los cuatro parametros dentro de rango CONFORME segun los umbrales
   // demo de supabase/seed.sql.
-  normal: { ph: 7.1, dissolved_oxygen: 6.8, turbidity: 4.2, temperature: 28.3 },
-  // Turbidez en banda ALERTA (entre warning_high y critical_high).
-  alerta: { ph: 7.0, dissolved_oxygen: 6.5, turbidity: 7.0, temperature: 27.0 },
-  // Oxigeno disuelto por debajo de critical_low: banda CRITICO.
-  critico: { ph: 7.0, dissolved_oxygen: 1.4, turbidity: 4.0, temperature: 27.0 },
+  normal: { ph: 7.1, oxigeno_disuelto: 6.8, turbidez: 4.2, temperatura: 28.3 },
+  // Turbidez en banda ALERTA (entre alerta_alto y critico_alto).
+  alerta: { ph: 7.0, oxigeno_disuelto: 6.5, turbidez: 7.0, temperatura: 27.0 },
+  // Oxigeno disuelto por debajo de critico_bajo: banda CRITICO.
+  critico: { ph: 7.0, oxigeno_disuelto: 1.4, turbidez: 4.0, temperatura: 27.0 },
   // Valor fuera de cualquier rango fisico plausible, para forzar 422.
-  invalido: { ph: 999, dissolved_oxygen: 6.8, turbidity: 4.2, temperature: 28.3 },
+  invalido: { ph: 999, oxigeno_disuelto: 6.8, turbidez: 4.2, temperatura: 28.3 },
 };
 
 function buildPayload(deviceId, sequence, values) {
   return {
-    device_id: deviceId,
-    sequence,
-    measured_at: new Date().toISOString(),
-    values,
+    codigo_dispositivo: deviceId,
+    secuencia: sequence,
+    medido_en: new Date().toISOString(),
+    valores: values,
   };
 }
 
 async function send(targetUrl, secret, payload, { malformed = false } = {}) {
   const body = malformed
-    ? JSON.stringify({ device_id: payload.device_id }) // payload incompleto a proposito
+    ? JSON.stringify({ codigo_dispositivo: payload.codigo_dispositivo }) // payload incompleto a proposito
     : JSON.stringify(payload);
 
   const response = await fetch(targetUrl, {
@@ -131,7 +131,7 @@ async function main() {
 
     case "no-existe": {
       const payload = buildPayload("NODO-QUE-NO-EXISTE", sequence, PROFILES.normal);
-      console.log("Enviando con device_id inexistente para forzar 404...");
+      console.log("Enviando con codigo_dispositivo inexistente para forzar 404...");
       await send(targetUrl, secret, payload);
       break;
     }

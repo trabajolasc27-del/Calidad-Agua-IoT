@@ -14,7 +14,7 @@ Notación: Actor, Precondición, Flujo principal, Flujos alternos, Postcondició
 ### UC-02 Recibir medición de un nodo ESP32
 - **Actor:** dispositivo ESP32 (o simulador).
 - **Precondición:** el dispositivo existe, está activo y posee credencial vigente.
-- **Flujo principal:** el nodo envía POST con `device_id`, `sequence`, `measured_at`, `values` → la Edge Function autentica el dispositivo → valida formato y tipos → verifica que `(device_id, sequence)` no exista → inserta `measurement_batches` y `measurements` en una transacción → actualiza `last_seen` → invoca el motor de evaluación → responde 201.
+- **Flujo principal:** el nodo envía POST con `codigo_dispositivo`, `secuencia`, `medido_en`, `valores` → la Edge Function autentica el dispositivo → valida formato y tipos → verifica que `(dispositivo_id, secuencia)` no exista → inserta `lotes_medicion` y `mediciones` en una transacción → actualiza `ultima_comunicacion` → invoca el motor de evaluación → responde 201.
 - **Flujos alternos:** credencial inválida → 401; dispositivo inexistente → 404; JSON mal formado o campos faltantes → 400; secuencia duplicada → 409; valores no numéricos/no finitos → 422; error interno → 500 (sin filtrar detalles internos ni credenciales en la respuesta ni en logs).
 - **Postcondición:** el lote queda almacenado, cada parámetro tiene un resultado de evaluación, y se crean alertas si corresponde.
 

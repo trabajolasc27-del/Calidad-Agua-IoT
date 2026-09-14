@@ -21,8 +21,22 @@ Más tarde en la misma sesión, ya con el usuario autenticado, se verificó en v
 
 Con esto el hallazgo D-020 queda **verificado en vivo de punta a punta**, no solo por análisis estático.
 
+### Traducción de atributos y campos de la base de datos al español
+Los docentes del usuario pidieron, más adelante en la misma sesión, que los atributos y campos de la base de datos quedaran en español porque se harán trámites administrativos con el proyecto (explícitamente no el código de la aplicación). Dado el tamaño y riesgo del cambio (proyecto Supabase real, en vivo), se entró primero a modo plan para acordar con el usuario un diccionario completo de nombres antes de tocar nada — ver [DECISIONS.md](DECISIONS.md) D-021 para el mapa completo y el razonamiento de cada límite.
+
+**Alcance confirmado por el usuario:** tablas + columnas de negocio + valores de enum + el contrato JSON del ESP32 (esto último implicó tocar también el firmware); los campos técnicos universales (`id`, `created_at`, `updated_at`, `is_active`, `is_demo`) se quedaron en inglés.
+
+**Ejecutado en este orden:**
+1. Migración `20260914120000_spanish_rename.sql` — tipos enumerados, 14 tablas, columnas de negocio, valores del catálogo de parámetros, y (drop + create, porque el cuerpo de una función plpgsql no se reescribe solo) las funciones RLS/de negocio y las ~34 políticas RLS. Aplicada contra el proyecto real vía Management API; verificada con lecturas de solo lectura que confirmaron el esquema nuevo y que los datos reales (dispositivos, umbrales, las 2 alertas ya cerradas) sobrevivieron intactos.
+2. Edge Functions `ingest-measurement` y `admin-create-user` reescritas al nuevo contrato/esquema.
+3. Firmware `esp32-test.ino` y `tools/simulator/simulate.mjs` actualizados al nuevo contrato JSON del ESP32.
+4. Los 7 modelos y 12 servicios de Angular, más todas las plantillas `.html` que leían esos campos.
+5. `supabase/seed.sql` y toda la documentación (`DATABASE_DESIGN.md`, `API_CONTRACT.md`, `ARCHITECTURE.md`, `ROLE_MATRIX.md`, `USE_CASES.md`, `tools/api-tests/ingest-measurement.http`).
+
+**Pruebas ejecutadas:** `tsc --noEmit` limpio; `ng build` (que sí revisa los bindings de plantilla, a diferencia de `tsc` solo) detectó varios usos de nombres viejos en plantillas que `tsc` no había marcado — corregidos hasta build limpio dos veces seguidas. Verificación de esquema y datos reales vía Management API tras aplicar la migración.
+
 ### Cómo continuar en otra sesión
-Hallazgo cerrado. Seguir con lo ya pendiente de Fase 4 (Brevo) o con las pruebas del Arduino que el usuario tenía en curso.
+El hallazgo del valor en Alertas queda cerrado. La traducción al español está aplicada en la base de datos real y compila limpio, pero **falta el recorrido en vivo por el navegador** (login, Dashboard, Mapa, Historial, Alertas, Reportes, las 5 pantallas de Administración) y volver a correr el simulador contra la Edge Function ya redesplegada, antes de dar D-021 por cerrado del todo. Después: seguir con Brevo o con las pruebas del Arduino.
 
 ---
 

@@ -3,7 +3,7 @@ import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
 
-// Shell de Administracion, protegido por roleGuard(['admin']). Cada
+// Shell de Administracion, protegido por roleGuard(['administrador']). Cada
 // pestana es una ruta hija.
 interface AdminTab {
   label: string;

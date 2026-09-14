@@ -10,7 +10,7 @@ export interface ServiceResult {
 
 // Acceso a datos para Alertas (RF-30 a RF-34). Las transiciones de
 // estado pasan exclusivamente por las funciones RPC
-// acknowledge_alert/attend_alert/close_alert (docs/API_CONTRACT.md): no
+// reconocer_alerta/atender_alerta/cerrar_alerta (docs/API_CONTRACT.md): no
 // hay UPDATE directo sobre la tabla desde el cliente, ni siquiera para
 // admin/analista -- esa es la unica via, y ya valida el rol adentro
 // (D-007: tecnico de campo no puede invocarlas).
@@ -20,12 +20,12 @@ export class AlertsService {
 
   async listAlerts(status: AlertStatus | 'ALL'): Promise<Alert[]> {
     let query = this.supabaseService.client
-      .from('alerts')
-      .select('*, devices(code, name), parameters(name, unit), measurements!first_measurement_id(value)')
-      .order('opened_at', { ascending: false });
+      .from('alertas')
+      .select('*, dispositivos(codigo, nombre), parametros(nombre, unidad), mediciones!primera_medicion_id(valor)')
+      .order('abierta_en', { ascending: false });
 
     if (status !== 'ALL') {
-      query = query.eq('status', status);
+      query = query.eq('estado', status);
     }
 
     const { data, error } = await query;
@@ -37,10 +37,10 @@ export class AlertsService {
 
   async getHistory(alertId: string): Promise<AlertHistoryEntry[]> {
     const { data, error } = await this.supabaseService.client
-      .from('alert_history')
-      .select('id, from_status, to_status, comment, changed_at, profiles(full_name)')
-      .eq('alert_id', alertId)
-      .order('changed_at', { ascending: true });
+      .from('historial_alertas')
+      .select('id, estado_origen, estado_destino, comentario, cambiado_en, perfiles(nombre_completo)')
+      .eq('alerta_id', alertId)
+      .order('cambiado_en', { ascending: true });
 
     if (error) {
       throw new Error(`No se pudo cargar el historial de la alerta: ${error.message}`);
@@ -49,24 +49,24 @@ export class AlertsService {
   }
 
   async acknowledge(alertId: string): Promise<ServiceResult> {
-    const { error } = await this.supabaseService.client.rpc('acknowledge_alert', { _alert_id: alertId });
+    const { error } = await this.supabaseService.client.rpc('reconocer_alerta', { _id_alerta: alertId });
     if (error) return { ok: false, message: error.message };
     return { ok: true };
   }
 
   async attend(alertId: string, comment: string | null): Promise<ServiceResult> {
-    const { error } = await this.supabaseService.client.rpc('attend_alert', {
-      _alert_id: alertId,
-      _comment: comment,
+    const { error } = await this.supabaseService.client.rpc('atender_alerta', {
+      _id_alerta: alertId,
+      _comentario: comment,
     });
     if (error) return { ok: false, message: error.message };
     return { ok: true };
   }
 
   async close(alertId: string, comment: string | null): Promise<ServiceResult> {
-    const { error } = await this.supabaseService.client.rpc('close_alert', {
-      _alert_id: alertId,
-      _comment: comment,
+    const { error } = await this.supabaseService.client.rpc('cerrar_alerta', {
+      _id_alerta: alertId,
+      _comentario: comment,
     });
     if (error) return { ok: false, message: error.message };
     return { ok: true };

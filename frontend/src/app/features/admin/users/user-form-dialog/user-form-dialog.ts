@@ -18,7 +18,7 @@ export interface UserFormDialogData {
   profile?: Profile;
 }
 
-const ROLES: UserRole[] = ['admin', 'analyst', 'field_tech'];
+const ROLES: UserRole[] = ['administrador', 'analista', 'tecnico_campo'];
 
 @Component({
   selector: 'wq-user-form-dialog',
@@ -43,7 +43,7 @@ export class UserFormDialog implements OnInit {
   readonly form = new FormGroup({
     email: new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.email] }),
     full_name: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
-    role: new FormControl<UserRole>('field_tech', { nonNullable: true, validators: [Validators.required] }),
+    role: new FormControl<UserRole>('tecnico_campo', { nonNullable: true, validators: [Validators.required] }),
     is_active: new FormControl(true, { nonNullable: true }),
   });
 
@@ -63,9 +63,9 @@ export class UserFormDialog implements OnInit {
     if (this.data.mode === 'edit' && this.data.profile) {
       const p = this.data.profile;
       this.form.patchValue({
-        email: p.email ?? '',
-        full_name: p.full_name ?? '',
-        role: p.role,
+        email: p.correo ?? '',
+        full_name: p.nombre_completo ?? '',
+        role: p.rol,
         is_active: p.is_active,
       });
       this.form.controls.email.disable();
@@ -86,7 +86,7 @@ export class UserFormDialog implements OnInit {
   }
 
   get showDeviceAssignment(): boolean {
-    return this.data.mode === 'edit' && this.form.controls.role.value === 'field_tech';
+    return this.data.mode === 'edit' && this.form.controls.role.value === 'tecnico_campo';
   }
 
   toggleDevice(deviceId: string, checked: boolean): void {
@@ -127,14 +127,18 @@ export class UserFormDialog implements OnInit {
 
     // Edición
     const profile = this.data.profile!;
-    const updateResult = await this.usersService.updateProfile(profile.id, { full_name, role, is_active });
+    const updateResult = await this.usersService.updateProfile(profile.id, {
+      nombre_completo: full_name,
+      rol: role,
+      is_active,
+    });
     if (!updateResult.ok) {
       this.submitting.set(false);
       this.errorMessage.set(updateResult.message ?? 'No se pudo actualizar el usuario.');
       return;
     }
 
-    if (role === 'field_tech') {
+    if (role === 'tecnico_campo') {
       const assignResult = await this.usersService.setDeviceAssignments(profile.id, Array.from(this.assignedDeviceIds()));
       if (!assignResult.ok) {
         this.submitting.set(false);

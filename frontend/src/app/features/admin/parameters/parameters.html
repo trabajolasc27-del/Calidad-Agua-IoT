@@ -22,22 +22,22 @@
       <table mat-table [dataSource]="parameters()" class="parameters-table">
         <ng-container matColumnDef="code">
           <th mat-header-cell *matHeaderCellDef>Código</th>
-          <td mat-cell *matCellDef="let p"><code>{{ p.code }}</code></td>
+          <td mat-cell *matCellDef="let p"><code>{{ p.codigo }}</code></td>
         </ng-container>
 
         <ng-container matColumnDef="name">
           <th mat-header-cell *matHeaderCellDef>Nombre</th>
-          <td mat-cell *matCellDef="let p">{{ p.name }}</td>
+          <td mat-cell *matCellDef="let p">{{ p.nombre }}</td>
         </ng-container>
 
         <ng-container matColumnDef="unit">
           <th mat-header-cell *matHeaderCellDef>Unidad</th>
-          <td mat-cell *matCellDef="let p">{{ p.unit }}</td>
+          <td mat-cell *matCellDef="let p">{{ p.unidad }}</td>
         </ng-container>
 
         <ng-container matColumnDef="range">
           <th mat-header-cell *matHeaderCellDef>Rango físico</th>
-          <td mat-cell *matCellDef="let p">{{ p.physical_min ?? '—' }} a {{ p.physical_max ?? '—' }}</td>
+          <td mat-cell *matCellDef="let p">{{ p.minimo_fisico ?? '—' }} a {{ p.maximo_fisico ?? '—' }}</td>
         </ng-container>
 
         <ng-container matColumnDef="status">

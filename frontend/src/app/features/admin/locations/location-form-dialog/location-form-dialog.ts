@@ -59,10 +59,10 @@ export class LocationFormDialog implements AfterViewInit, OnDestroy {
     if (data.mode === 'edit' && data.location) {
       const loc = data.location;
       this.form.patchValue({
-        name: loc.name,
-        description: loc.description ?? '',
-        latitude: loc.latitude,
-        longitude: loc.longitude,
+        name: loc.nombre,
+        description: loc.descripcion ?? '',
+        latitude: loc.latitud,
+        longitude: loc.longitud,
       });
     }
 
@@ -124,7 +124,7 @@ export class LocationFormDialog implements AfterViewInit, OnDestroy {
     this.errorMessage.set(null);
 
     const { name, description, latitude, longitude } = this.form.getRawValue();
-    const input = { name, description: description || null, latitude, longitude };
+    const input = { nombre: name, descripcion: description || null, latitud: latitude, longitud: longitude };
 
     const result =
       this.data.mode === 'create'

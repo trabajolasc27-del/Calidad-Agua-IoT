@@ -132,8 +132,8 @@ export class Dashboard implements OnInit, OnDestroy {
 
   lastSeenLabel(): string {
     const device = this.selectedDevice();
-    if (!device?.last_seen_at) return 'Nunca';
-    return new Date(device.last_seen_at).toLocaleString();
+    if (!device?.ultima_comunicacion) return 'Nunca';
+    return new Date(device.ultima_comunicacion).toLocaleString();
   }
 
   async logout(): Promise<void> {

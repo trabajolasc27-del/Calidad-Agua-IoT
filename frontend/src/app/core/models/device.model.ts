@@ -1,26 +1,26 @@
-// Refleja public.devices (ver docs/DATABASE_DESIGN.md 3.3).
+// Refleja public.dispositivos (ver docs/DATABASE_DESIGN.md 3.3).
 
-export type DeviceStatus = 'active' | 'inactive';
+export type DeviceStatus = 'activo' | 'inactivo';
 
 export interface DeviceSummary {
   id: string;
-  code: string;
-  name: string;
-  status: DeviceStatus;
+  codigo: string;
+  nombre: string;
+  estado: DeviceStatus;
 }
 
 export interface Device {
   id: string;
-  code: string;
-  name: string;
-  location_id: string | null;
-  status: DeviceStatus;
-  last_seen_at: string | null;
-  firmware_version: string | null;
+  codigo: string;
+  nombre: string;
+  ubicacion_id: string | null;
+  estado: DeviceStatus;
+  ultima_comunicacion: string | null;
+  version_firmware: string | null;
   is_demo: boolean;
   created_at: string;
   updated_at: string;
-  // Viene de un embed de PostgREST (devices -> locations); null si no
+  // Viene de un embed de PostgREST (dispositivos -> ubicaciones); null si no
   // tiene ubicación asignada o el embed no se pidió.
-  locations?: { name: string } | null;
+  ubicaciones?: { nombre: string } | null;
 }

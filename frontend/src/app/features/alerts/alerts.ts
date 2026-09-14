@@ -15,10 +15,10 @@ type ViewState = 'loading' | 'data' | 'empty' | 'error';
 type StatusFilter = AlertStatus | 'ALL';
 
 const STATUS_LABEL: Record<string, string> = {
-  NEW: 'Nueva',
-  ACKNOWLEDGED: 'Reconocida',
-  ATTENDED: 'Atendida',
-  CLOSED: 'Cerrada',
+  NUEVA: 'Nueva',
+  RECONOCIDA: 'Reconocida',
+  ATENDIDA: 'Atendida',
+  CERRADA: 'Cerrada',
 };
 
 // Alertas (RF-30 a RF-34): nuevas, reconocidas, atendidas y cerradas,
@@ -41,7 +41,7 @@ const STATUS_LABEL: Record<string, string> = {
 })
 export class Alerts implements OnInit {
   readonly statusLabel = STATUS_LABEL;
-  readonly filter = signal<StatusFilter>('NEW');
+  readonly filter = signal<StatusFilter>('NUEVA');
 
   readonly state = signal<ViewState>('loading');
   readonly alerts = signal<Alert[]>([]);

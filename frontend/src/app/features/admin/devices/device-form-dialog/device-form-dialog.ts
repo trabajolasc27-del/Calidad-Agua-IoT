@@ -36,7 +36,7 @@ export class DeviceFormDialog implements OnInit {
     code: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
     name: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
     location_id: new FormControl<string | null>(null),
-    status: new FormControl<DeviceStatus>('active', { nonNullable: true }),
+    status: new FormControl<DeviceStatus>('activo', { nonNullable: true }),
   });
 
   readonly submitting = signal(false);
@@ -52,7 +52,7 @@ export class DeviceFormDialog implements OnInit {
   async ngOnInit(): Promise<void> {
     if (this.data.mode === 'edit' && this.data.device) {
       const d = this.data.device;
-      this.form.patchValue({ code: d.code, name: d.name, location_id: d.location_id, status: d.status });
+      this.form.patchValue({ code: d.codigo, name: d.nombre, location_id: d.ubicacion_id, status: d.estado });
       this.form.controls.code.disable(); // el codigo identifica al dispositivo, no se cambia
     }
 
@@ -75,7 +75,7 @@ export class DeviceFormDialog implements OnInit {
     const { code, name, location_id, status } = this.form.getRawValue();
 
     if (this.data.mode === 'create') {
-      const result = await this.devicesService.createDevice({ code, name, location_id });
+      const result = await this.devicesService.createDevice({ codigo: code, nombre: name, ubicacion_id: location_id });
       this.submitting.set(false);
       if (!result.ok) {
         this.errorMessage.set(result.message ?? 'No se pudo crear el dispositivo.');
@@ -85,7 +85,11 @@ export class DeviceFormDialog implements OnInit {
       return;
     }
 
-    const result = await this.devicesService.updateDevice(this.data.device!.id, { name, location_id, status });
+    const result = await this.devicesService.updateDevice(this.data.device!.id, {
+      nombre: name,
+      ubicacion_id: location_id,
+      estado: status,
+    });
     this.submitting.set(false);
     if (!result.ok) {
       this.errorMessage.set(result.message ?? 'No se pudo actualizar el dispositivo.');

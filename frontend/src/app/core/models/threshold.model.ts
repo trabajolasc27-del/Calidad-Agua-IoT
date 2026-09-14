@@ -1,16 +1,16 @@
-// Refleja public.thresholds (ver docs/DATABASE_DESIGN.md 3.7).
+// Refleja public.umbrales (ver docs/DATABASE_DESIGN.md 3.7).
 
 export interface Threshold {
   id: string;
-  parameter_id: string;
+  parametro_id: string;
   version: number;
-  critical_low: number | null;
-  warning_low: number | null;
-  warning_high: number | null;
-  critical_high: number | null;
-  consecutive_breaches_to_alert: number;
+  critico_bajo: number | null;
+  alerta_bajo: number | null;
+  alerta_alto: number | null;
+  critico_alto: number | null;
+  lecturas_consecutivas_alerta: number;
   is_active: boolean;
   is_demo: boolean;
-  created_by: string | null;
+  creado_por: string | null;
   created_at: string;
 }

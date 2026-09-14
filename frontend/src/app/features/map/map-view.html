@@ -27,7 +27,7 @@
       <ul class="locations-list">
         @for (loc of locations(); track loc.id) {
           <li>
-            <span class="loc-name">{{ loc.name }}</span>
+            <span class="loc-name">{{ loc.nombre }}</span>
             <span class="loc-count">{{ deviceCount(loc) }} dispositivo(s)</span>
           </li>
         }

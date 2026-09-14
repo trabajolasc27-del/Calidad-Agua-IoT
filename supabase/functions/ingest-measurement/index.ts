@@ -6,20 +6,23 @@
 // autentica el dispositivo y delega la escritura transaccional + la
 // evaluacion a funciones de PostgreSQL (D-005), para que toda la logica de
 // negocio viva en un solo lugar.
+//
+// Contrato JSON en espanol desde D-021 (atributos y campos de la base de
+// datos traducidos para tramites institucionales).
 
 import { createClient } from "jsr:@supabase/supabase-js@2";
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
-const PARAMETER_CODES = ["ph", "dissolved_oxygen", "turbidity", "temperature"] as const;
-type ParameterCode = (typeof PARAMETER_CODES)[number];
+const CODIGOS_PARAMETRO = ["ph", "oxigeno_disuelto", "turbidez", "temperatura"] as const;
+type CodigoParametro = (typeof CODIGOS_PARAMETRO)[number];
 
-interface IngestPayload {
-  device_id: string;
-  sequence: number;
-  measured_at: string;
-  values: Record<string, unknown>;
+interface CargaIngesta {
+  codigo_dispositivo: string;
+  secuencia: number;
+  medido_en: string;
+  valores: Record<string, unknown>;
 }
 
 function jsonResponse(status: number, body: unknown): Response {
@@ -39,38 +42,38 @@ function isFiniteNumber(value: unknown): value is number {
 
 function validatePayload(
   body: unknown,
-): { ok: true; data: IngestPayload } | { ok: false; message: string } {
+): { ok: true; data: CargaIngesta } | { ok: false; message: string } {
   if (typeof body !== "object" || body === null) {
     return { ok: false, message: "El cuerpo debe ser un objeto JSON" };
   }
   const b = body as Record<string, unknown>;
 
-  if (typeof b.device_id !== "string" || b.device_id.trim() === "") {
-    return { ok: false, message: "Falta o es invalido el campo device_id" };
+  if (typeof b.codigo_dispositivo !== "string" || b.codigo_dispositivo.trim() === "") {
+    return { ok: false, message: "Falta o es invalido el campo codigo_dispositivo" };
   }
-  if (!isFiniteNumber(b.sequence) || b.sequence < 0 || !Number.isInteger(b.sequence)) {
-    return { ok: false, message: "Falta o es invalido el campo sequence (entero >= 0)" };
+  if (!isFiniteNumber(b.secuencia) || b.secuencia < 0 || !Number.isInteger(b.secuencia)) {
+    return { ok: false, message: "Falta o es invalido el campo secuencia (entero >= 0)" };
   }
-  if (typeof b.measured_at !== "string" || Number.isNaN(Date.parse(b.measured_at))) {
-    return { ok: false, message: "Falta o es invalida la fecha measured_at (ISO 8601)" };
+  if (typeof b.medido_en !== "string" || Number.isNaN(Date.parse(b.medido_en))) {
+    return { ok: false, message: "Falta o es invalida la fecha medido_en (ISO 8601)" };
   }
-  if (typeof b.values !== "object" || b.values === null) {
-    return { ok: false, message: "Falta el objeto values" };
+  if (typeof b.valores !== "object" || b.valores === null) {
+    return { ok: false, message: "Falta el objeto valores" };
   }
-  const values = b.values as Record<string, unknown>;
-  for (const code of PARAMETER_CODES) {
-    if (!(code in values)) {
-      return { ok: false, message: `Falta el campo values.${code}` };
+  const valores = b.valores as Record<string, unknown>;
+  for (const codigo of CODIGOS_PARAMETRO) {
+    if (!(codigo in valores)) {
+      return { ok: false, message: `Falta el campo valores.${codigo}` };
     }
   }
 
   return {
     ok: true,
     data: {
-      device_id: b.device_id,
-      sequence: b.sequence,
-      measured_at: b.measured_at,
-      values,
+      codigo_dispositivo: b.codigo_dispositivo,
+      secuencia: b.secuencia,
+      medido_en: b.medido_en,
+      valores,
     },
   };
 }
@@ -85,7 +88,7 @@ Deno.serve(async (req: Request) => {
   if (!match) {
     return errorResponse(401, "UNAUTHORIZED", "Falta el header Authorization: Bearer <secreto>");
   }
-  const deviceSecret = match[1];
+  const secretoDispositivo = match[1];
 
   let rawBody: unknown;
   try {
@@ -106,86 +109,86 @@ Deno.serve(async (req: Request) => {
 
   // Autenticacion del dispositivo. Nunca se registra el secreto recibido,
   // ni en caso de exito ni de error (docs/API_CONTRACT.md, reglas de logging).
-  const { data: authRows, error: authError } = await supabase.rpc("verify_device_secret", {
-    _device_code: payload.device_id,
-    _secret: deviceSecret,
+  const { data: filasAuth, error: authError } = await supabase.rpc("verificar_secreto_dispositivo", {
+    _codigo_dispositivo: payload.codigo_dispositivo,
+    _secreto: secretoDispositivo,
   });
 
   if (authError) {
-    console.error("verify_device_secret error:", authError.message);
+    console.error("verificar_secreto_dispositivo error:", authError.message);
     return errorResponse(500, "INTERNAL_ERROR", "Error interno, contacte al administrador");
   }
 
-  const authResult = authRows?.[0] as { device_id: string | null; auth_result: string } | undefined;
-  if (!authResult || authResult.auth_result === "not_found") {
+  const resultadoAuth = filasAuth?.[0] as { id_dispositivo: string | null; resultado_autenticacion: string } | undefined;
+  if (!resultadoAuth || resultadoAuth.resultado_autenticacion === "not_found") {
     return errorResponse(404, "DEVICE_NOT_FOUND", "Dispositivo no registrado");
   }
-  if (authResult.auth_result === "invalid_secret" || authResult.auth_result === "inactive") {
+  if (resultadoAuth.resultado_autenticacion === "invalid_secret" || resultadoAuth.resultado_autenticacion === "inactive") {
     return errorResponse(401, "UNAUTHORIZED", "Credencial de dispositivo invalida");
   }
 
-  const deviceId = authResult.device_id as string;
+  const idDispositivo = resultadoAuth.id_dispositivo as string;
 
   // Valores numericos finitos por parametro.
-  const numericValues: Record<ParameterCode, number> = {} as Record<ParameterCode, number>;
-  for (const code of PARAMETER_CODES) {
-    const v = payload.values[code];
+  const valoresNumericos: Record<CodigoParametro, number> = {} as Record<CodigoParametro, number>;
+  for (const codigo of CODIGOS_PARAMETRO) {
+    const v = payload.valores[codigo];
     if (!isFiniteNumber(v)) {
-      return errorResponse(422, "INVALID_VALUES", `values.${code} debe ser un numero finito`);
+      return errorResponse(422, "INVALID_VALUES", `valores.${codigo} debe ser un numero finito`);
     }
-    numericValues[code] = v;
+    valoresNumericos[codigo] = v;
   }
 
   // Catalogo de parametros, para validar limites fisicos antes de insertar.
-  const { data: parameterRows, error: parametersError } = await supabase
-    .from("parameters")
-    .select("id, code, physical_min, physical_max")
-    .in("code", PARAMETER_CODES as unknown as string[]);
+  const { data: filasParametro, error: parametrosError } = await supabase
+    .from("parametros")
+    .select("id, codigo, minimo_fisico, maximo_fisico")
+    .in("codigo", CODIGOS_PARAMETRO as unknown as string[]);
 
-  if (parametersError || !parameterRows || parameterRows.length !== PARAMETER_CODES.length) {
-    console.error("parameters lookup error:", parametersError?.message);
+  if (parametrosError || !filasParametro || filasParametro.length !== CODIGOS_PARAMETRO.length) {
+    console.error("parametros lookup error:", parametrosError?.message);
     return errorResponse(500, "INTERNAL_ERROR", "Error interno, contacte al administrador");
   }
 
-  for (const row of parameterRows) {
-    const value = numericValues[row.code as ParameterCode];
-    const tooLow = row.physical_min !== null && value < row.physical_min;
-    const tooHigh = row.physical_max !== null && value > row.physical_max;
-    if (tooLow || tooHigh) {
-      return errorResponse(422, "INVALID_VALUES", `values.${row.code} fuera de rango fisico permitido`);
+  for (const fila of filasParametro) {
+    const valor = valoresNumericos[fila.codigo as CodigoParametro];
+    const muyBajo = fila.minimo_fisico !== null && valor < fila.minimo_fisico;
+    const muyAlto = fila.maximo_fisico !== null && valor > fila.maximo_fisico;
+    if (muyBajo || muyAlto) {
+      return errorResponse(422, "INVALID_VALUES", `valores.${fila.codigo} fuera de rango fisico permitido`);
     }
   }
 
   // Insercion transaccional + evaluacion, delegada a Postgres (D-005).
-  const { data: batchResult, error: insertError } = await supabase.rpc("ingest_measurement_batch", {
-    _device_id: deviceId,
-    _sequence: payload.sequence,
-    _measured_at: payload.measured_at,
-    _raw_payload: payload,
-    _values: numericValues,
+  const { data: resultadoLote, error: insertError } = await supabase.rpc("ingerir_lote_medicion", {
+    _id_dispositivo: idDispositivo,
+    _secuencia: payload.secuencia,
+    _medido_en: payload.medido_en,
+    _carga_original: payload,
+    _valores: valoresNumericos,
   });
 
   if (insertError) {
     if (insertError.message?.includes("DUPLICATE_BATCH")) {
       return errorResponse(409, "DUPLICATE_BATCH", "Lote ya recibido previamente");
     }
-    console.error("ingest_measurement_batch error:", insertError.message);
+    console.error("ingerir_lote_medicion error:", insertError.message);
     return errorResponse(500, "INTERNAL_ERROR", "Error interno, contacte al administrador");
   }
 
-  const rows = (batchResult ?? []) as {
-    batch_id: string;
-    parameter_code: string;
-    evaluation_result: string | null;
+  const filas = (resultadoLote ?? []) as {
+    id_lote: string;
+    codigo_parametro: string;
+    resultado_evaluacion: string | null;
   }[];
 
-  const results: Record<string, string> = {};
-  for (const row of rows) {
-    results[row.parameter_code] = row.evaluation_result ?? "SIN_EVALUAR";
+  const resultados: Record<string, string> = {};
+  for (const fila of filas) {
+    resultados[fila.codigo_parametro] = fila.resultado_evaluacion ?? "SIN_EVALUAR";
   }
 
   return jsonResponse(201, {
-    batch_id: rows[0]?.batch_id,
-    results,
+    id_lote: filas[0]?.id_lote,
+    resultados,
   });
 });

@@ -8,18 +8,18 @@ import type { DashboardAlert } from '../../core/models/alert.model';
 
 export interface DashboardDevice {
   id: string;
-  code: string;
-  name: string;
-  status: 'active' | 'inactive';
-  last_seen_at: string | null;
+  codigo: string;
+  nombre: string;
+  estado: 'activo' | 'inactivo';
+  ultima_comunicacion: string | null;
 }
 
 interface MeasurementRow {
-  value: number;
-  evaluation_result: EvaluationResult | null;
+  valor: number;
+  resultado_evaluacion: EvaluationResult | null;
   created_at: string;
-  parameters: { code: string; name: string; unit: string } | null;
-  measurement_batches: { measured_at: string; device_id: string } | null;
+  parametros: { codigo: string; nombre: string; unidad: string } | null;
+  lotes_medicion: { medido_en: string; dispositivo_id: string } | null;
 }
 
 const RECENT_LIMIT = 30;
@@ -31,9 +31,9 @@ export class DashboardService {
 
   async listDevices(): Promise<DashboardDevice[]> {
     const { data, error } = await this.supabaseService.client
-      .from('devices')
-      .select('id, code, name, status, last_seen_at')
-      .order('code', { ascending: true });
+      .from('dispositivos')
+      .select('id, codigo, nombre, estado, ultima_comunicacion')
+      .order('codigo', { ascending: true });
 
     if (error) {
       throw new Error(`No se pudo cargar la lista de dispositivos: ${error.message}`);
@@ -43,8 +43,8 @@ export class DashboardService {
 
   async getDevice(deviceId: string): Promise<DashboardDevice | null> {
     const { data, error } = await this.supabaseService.client
-      .from('devices')
-      .select('id, code, name, status, last_seen_at')
+      .from('dispositivos')
+      .select('id, codigo, nombre, estado, ultima_comunicacion')
       .eq('id', deviceId)
       .maybeSingle();
 
@@ -56,10 +56,10 @@ export class DashboardService {
 
   async listParameters(): Promise<Parameter[]> {
     const { data, error } = await this.supabaseService.client
-      .from('parameters')
+      .from('parametros')
       .select('*')
       .eq('is_active', true)
-      .order('name', { ascending: true });
+      .order('nombre', { ascending: true });
 
     if (error) {
       throw new Error(`No se pudo cargar el catálogo de parámetros: ${error.message}`);
@@ -70,9 +70,9 @@ export class DashboardService {
   /** Últimas RECENT_LIMIT mediciones del dispositivo, mas recientes primero. */
   async getRecentMeasurements(deviceId: string): Promise<MeasurementRow[]> {
     const { data, error } = await this.supabaseService.client
-      .from('measurements')
-      .select('value, evaluation_result, created_at, parameters(code, name, unit), measurement_batches!inner(measured_at, device_id)')
-      .eq('measurement_batches.device_id', deviceId)
+      .from('mediciones')
+      .select('valor, resultado_evaluacion, created_at, parametros(codigo, nombre, unidad), lotes_medicion!inner(medido_en, dispositivo_id)')
+      .eq('lotes_medicion.dispositivo_id', deviceId)
       .order('created_at', { ascending: false })
       .limit(RECENT_LIMIT * 4); // hasta RECENT_LIMIT lotes, 4 parametros por lote
 
@@ -85,16 +85,16 @@ export class DashboardService {
   /** Combina el catalogo de parametros con la ultima lectura + tendencia de cada uno. */
   buildLatestMeasurements(parameters: Parameter[], rows: MeasurementRow[]): LatestMeasurement[] {
     return parameters.map((parameter) => {
-      const rowsForParam = rows.filter((r) => r.parameters?.code === parameter.code);
+      const rowsForParam = rows.filter((r) => r.parametros?.codigo === parameter.codigo);
       const latest = rowsForParam[0];
       return {
         parameter,
-        value: latest?.value ?? null,
-        evaluation_result: latest?.evaluation_result ?? null,
-        measured_at: latest?.measurement_batches?.measured_at ?? null,
+        value: latest?.valor ?? null,
+        evaluation_result: latest?.resultado_evaluacion ?? null,
+        measured_at: latest?.lotes_medicion?.medido_en ?? null,
         trend: rowsForParam
           .slice(0, 12)
-          .map((r) => r.value)
+          .map((r) => r.valor)
           .reverse(),
       };
     });
@@ -102,23 +102,23 @@ export class DashboardService {
 
   async getActiveAlerts(deviceId: string): Promise<DashboardAlert[]> {
     const { data, error } = await this.supabaseService.client
-      .from('alerts')
-      .select('id, severity, status, opened_at, parameters(name, unit), measurements!first_measurement_id(value)')
-      .eq('device_id', deviceId)
-      .neq('status', 'CLOSED')
-      .order('opened_at', { ascending: false });
+      .from('alertas')
+      .select('id, gravedad, estado, abierta_en, parametros(nombre, unidad), mediciones!primera_medicion_id(valor)')
+      .eq('dispositivo_id', deviceId)
+      .neq('estado', 'CERRADA')
+      .order('abierta_en', { ascending: false });
 
     if (error) {
       throw new Error(`No se pudo cargar las alertas: ${error.message}`);
     }
     return ((data ?? []) as unknown as Array<Record<string, unknown>>).map((row) => ({
       id: row['id'] as string,
-      severity: row['severity'] as DashboardAlert['severity'],
-      status: row['status'] as DashboardAlert['status'],
-      opened_at: row['opened_at'] as string,
-      parameter_name: (row['parameters'] as { name: string } | null)?.name ?? '—',
-      unit: (row['parameters'] as { unit: string } | null)?.unit ?? null,
-      value: (row['measurements'] as { value: number } | null)?.value ?? null,
+      gravedad: row['gravedad'] as DashboardAlert['gravedad'],
+      estado: row['estado'] as DashboardAlert['estado'],
+      abierta_en: row['abierta_en'] as string,
+      nombre_parametro: (row['parametros'] as { nombre: string } | null)?.nombre ?? '—',
+      unidad: (row['parametros'] as { unidad: string } | null)?.unidad ?? null,
+      valor: (row['mediciones'] as { valor: number } | null)?.valor ?? null,
     }));
   }
 
@@ -134,12 +134,12 @@ export class DashboardService {
       .channel(`dashboard-device-${deviceId}`)
       .on(
         'postgres_changes',
-        { event: 'INSERT', schema: 'public', table: 'measurement_batches', filter: `device_id=eq.${deviceId}` },
+        { event: 'INSERT', schema: 'public', table: 'lotes_medicion', filter: `dispositivo_id=eq.${deviceId}` },
         () => onChange(),
       )
       .on(
         'postgres_changes',
-        { event: '*', schema: 'public', table: 'alerts', filter: `device_id=eq.${deviceId}` },
+        { event: '*', schema: 'public', table: 'alertas', filter: `dispositivo_id=eq.${deviceId}` },
         () => onChange(),
       )
       .subscribe((status) => {

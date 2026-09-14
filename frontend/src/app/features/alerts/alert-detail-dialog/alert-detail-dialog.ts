@@ -12,10 +12,10 @@ import { AlertsService } from '../alerts.service';
 import type { Alert, AlertHistoryEntry } from '../../../core/models/alert.model';
 
 const STATUS_LABEL: Record<string, string> = {
-  NEW: 'Nueva',
-  ACKNOWLEDGED: 'Reconocida',
-  ATTENDED: 'Atendida',
-  CLOSED: 'Cerrada',
+  NUEVA: 'Nueva',
+  RECONOCIDA: 'Reconocida',
+  ATENDIDA: 'Atendida',
+  CERRADA: 'Cerrada',
 };
 
 // Detalle de una alerta: linea de tiempo completa y, si el rol lo
@@ -66,7 +66,7 @@ export class AlertDetailDialog implements OnInit {
 
   get canAct(): boolean {
     const role = this.authService.role();
-    return role === 'admin' || role === 'analyst';
+    return role === 'administrador' || role === 'analista';
   }
 
   async loadHistory(): Promise<void> {
@@ -113,7 +113,7 @@ export class AlertDetailDialog implements OnInit {
     // adivinarlo del lado del cliente.
     const last = this.history().at(-1);
     if (last) {
-      this.alert.update((a) => ({ ...a, status: last.to_status }));
+      this.alert.update((a) => ({ ...a, estado: last.estado_destino }));
     }
 
     this.submitting.set(false);

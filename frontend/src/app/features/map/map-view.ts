@@ -69,29 +69,29 @@ export class MapView implements AfterViewInit, OnDestroy {
 
     for (const loc of locations) {
       const devicesHtml =
-        loc.devices.length === 0
+        loc.dispositivos.length === 0
           ? '<p>Sin dispositivos.</p>'
-          : `<ul>${loc.devices
+          : `<ul>${loc.dispositivos
               .map(
                 (d) =>
-                  `<li><code>${d.code}</code> — ${d.name} · <strong class="${d.status === 'active' ? 'ok' : 'inactive'}">${
-                    d.status === 'active' ? 'Activo' : 'Inactivo'
+                  `<li><code>${d.codigo}</code> — ${d.nombre} · <strong class="${d.estado === 'activo' ? 'ok' : 'inactive'}">${
+                    d.estado === 'activo' ? 'Activo' : 'Inactivo'
                   }</strong></li>`,
               )
               .join('')}</ul>`;
 
-      L.marker([loc.latitude, loc.longitude])
+      L.marker([loc.latitud, loc.longitud])
         .addTo(this.map!)
-        .bindPopup(`<strong>${loc.name}</strong>${loc.description ? `<p>${loc.description}</p>` : ''}${devicesHtml}`);
+        .bindPopup(`<strong>${loc.nombre}</strong>${loc.descripcion ? `<p>${loc.descripcion}</p>` : ''}${devicesHtml}`);
     }
 
     if (locations.length > 0) {
-      const bounds = L.latLngBounds(locations.map((l) => [l.latitude, l.longitude] as [number, number]));
+      const bounds = L.latLngBounds(locations.map((l) => [l.latitud, l.longitud] as [number, number]));
       this.map.fitBounds(bounds, { padding: [30, 30], maxZoom: 15 });
     }
   }
 
   deviceCount(loc: MapLocation): number {
-    return loc.devices.length;
+    return loc.dispositivos.length;
   }
 }

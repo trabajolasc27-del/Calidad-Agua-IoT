@@ -124,10 +124,10 @@ export class Reports implements AfterViewInit, OnDestroy {
       const chart = new Chart(canvasRef.nativeElement, {
         type: 'line',
         data: {
-          labels: stats.trend.map((p) => new Date(p.measured_at).toLocaleDateString()),
+          labels: stats.trend.map((p) => new Date(p.medido_en).toLocaleDateString()),
           datasets: [
             {
-              data: stats.trend.map((p) => p.value),
+              data: stats.trend.map((p) => p.valor),
               borderColor: '#0f7d72',
               backgroundColor: '#0f7d7222',
               borderWidth: 2,
@@ -157,7 +157,7 @@ export class Reports implements AfterViewInit, OnDestroy {
       const doc: TDocumentDefinitions = {
         content: [
           { text: 'Reporte de calidad del agua', style: 'title' },
-          { text: `Dispositivo: ${report.device.code} — ${report.device.name}`, margin: [0, 8, 0, 0] },
+          { text: `Dispositivo: ${report.device.codigo} — ${report.device.nombre}`, margin: [0, 8, 0, 0] },
           { text: `Periodo: ${this.formatDate(report.dateFrom)} a ${this.formatDate(report.dateTo)}` },
           { text: `Mediciones totales: ${report.totalMeasurements}    Alertas abiertas en el periodo: ${report.alertsOpened}`, margin: [0, 0, 0, 12] },
           {
@@ -167,8 +167,8 @@ export class Reports implements AfterViewInit, OnDestroy {
               body: [
                 ['Parámetro', 'Unidad', 'Mín', 'Máx', 'Promedio', 'Lecturas', 'Alertas/Críticos'],
                 ...report.parameterStats.map((s) => [
-                  s.name,
-                  s.unit,
+                  s.nombre,
+                  s.unidad,
                   s.min?.toString() ?? '—',
                   s.max?.toString() ?? '—',
                   s.avg?.toString() ?? '—',
@@ -191,7 +191,7 @@ export class Reports implements AfterViewInit, OnDestroy {
         defaultStyle: { fontSize: 10 },
       };
 
-      pdfMake.createPdf(doc).download(`reporte-${report.device.code}-${this.formatDate(report.dateFrom)}.pdf`);
+      pdfMake.createPdf(doc).download(`reporte-${report.device.codigo}-${this.formatDate(report.dateFrom)}.pdf`);
     } finally {
       this.exporting.set(false);
     }
@@ -205,7 +205,7 @@ export class Reports implements AfterViewInit, OnDestroy {
       const workbook = new ExcelJS.Workbook();
       const sheet = workbook.addWorksheet('Estadísticas');
       sheet.addRow(['Reporte de calidad del agua']);
-      sheet.addRow([`Dispositivo: ${report.device.code} — ${report.device.name}`]);
+      sheet.addRow([`Dispositivo: ${report.device.codigo} — ${report.device.nombre}`]);
       sheet.addRow([`Periodo: ${this.formatDate(report.dateFrom)} a ${this.formatDate(report.dateTo)}`]);
       sheet.addRow([`Mediciones totales: ${report.totalMeasurements}`, `Alertas abiertas: ${report.alertsOpened}`]);
       sheet.addRow([]);
@@ -214,7 +214,7 @@ export class Reports implements AfterViewInit, OnDestroy {
       header.font = { bold: true };
 
       for (const s of report.parameterStats) {
-        sheet.addRow([s.name, s.unit, s.min, s.max, s.avg, s.count, s.alertCount, s.criticalCount]);
+        sheet.addRow([s.nombre, s.unidad, s.min, s.max, s.avg, s.count, s.alertCount, s.criticalCount]);
       }
       sheet.columns.forEach((col) => (col.width = 16));
 
@@ -223,7 +223,7 @@ export class Reports implements AfterViewInit, OnDestroy {
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `reporte-${report.device.code}-${this.formatDate(report.dateFrom)}.xlsx`;
+      a.download = `reporte-${report.device.codigo}-${this.formatDate(report.dateFrom)}.xlsx`;
       a.click();
       URL.revokeObjectURL(url);
     } finally {

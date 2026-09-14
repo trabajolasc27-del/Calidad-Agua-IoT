@@ -11,7 +11,7 @@ import { createClient } from "jsr:@supabase/supabase-js@2";
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
-const VALID_ROLES = ["admin", "analyst", "field_tech"] as const;
+const VALID_ROLES = ["administrador", "analista", "tecnico_campo"] as const;
 type UserRole = (typeof VALID_ROLES)[number];
 
 const CORS_HEADERS = {
@@ -78,12 +78,12 @@ Deno.serve(async (req: Request) => {
   }
 
   const { data: callerProfile, error: profileError } = await admin
-    .from("profiles")
-    .select("role")
+    .from("perfiles")
+    .select("rol")
     .eq("id", callerData.user.id)
     .single();
 
-  if (profileError || callerProfile?.role !== "admin") {
+  if (profileError || callerProfile?.rol !== "administrador") {
     return errorResponse(403, "FORBIDDEN", "Solo un administrador puede crear usuarios");
   }
 
@@ -111,8 +111,8 @@ Deno.serve(async (req: Request) => {
   // El trigger on_auth_user_created ya creó el perfil con role='field_tech'
   // (el más restringido por defecto); aquí se ajusta al rol solicitado.
   const { error: updateError } = await admin
-    .from("profiles")
-    .update({ role, full_name })
+    .from("perfiles")
+    .update({ rol: role, nombre_completo: full_name })
     .eq("id", newUserId);
 
   if (updateError) {

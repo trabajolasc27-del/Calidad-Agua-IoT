@@ -35,16 +35,16 @@
         <ng-container matColumnDef="name">
           <th mat-header-cell *matHeaderCellDef>Nombre</th>
           <td mat-cell *matCellDef="let l">
-            {{ l.name }}
-            @if (l.description) {
-              <span class="description">{{ l.description }}</span>
+            {{ l.nombre }}
+            @if (l.descripcion) {
+              <span class="description">{{ l.descripcion }}</span>
             }
           </td>
         </ng-container>
 
         <ng-container matColumnDef="coords">
           <th mat-header-cell *matHeaderCellDef>Coordenadas</th>
-          <td mat-cell *matCellDef="let l"><code>{{ l.latitude }}, {{ l.longitude }}</code></td>
+          <td mat-cell *matCellDef="let l"><code>{{ l.latitud }}, {{ l.longitud }}</code></td>
         </ng-container>
 
         <ng-container matColumnDef="devices">

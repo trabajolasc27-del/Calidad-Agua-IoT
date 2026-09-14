@@ -57,7 +57,7 @@ export class History implements OnInit, AfterViewInit, OnDestroy {
   });
 
   readonly devices = signal<DashboardDevice[]>([]);
-  readonly locations = signal<{ id: string; name: string }[]>([]);
+  readonly locations = signal<{ id: string; nombre: string }[]>([]);
   readonly parameters = signal<Parameter[]>([]);
 
   readonly state = signal<ViewState>('loading');
@@ -139,16 +139,16 @@ export class History implements OnInit, AfterViewInit, OnDestroy {
     this.filtersForm.reset();
   }
 
-  private renderTrend(points: { measured_at: string; value: number }[]): void {
+  private renderTrend(points: { medido_en: string; valor: number }[]): void {
     if (!this.viewReady || !this.canvasRef) return;
 
     const config: ChartConfiguration<'line'> = {
       type: 'line',
       data: {
-        labels: points.map((p) => new Date(p.measured_at).toLocaleString()),
+        labels: points.map((p) => new Date(p.medido_en).toLocaleString()),
         datasets: [
           {
-            data: points.map((p) => p.value),
+            data: points.map((p) => p.valor),
             borderColor: '#0f7d72',
             backgroundColor: '#0f7d7222',
             borderWidth: 2,

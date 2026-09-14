@@ -5,12 +5,12 @@ import type { Parameter } from '../../../core/models/parameter.model';
 import type { Threshold } from '../../../core/models/threshold.model';
 
 export interface ThresholdInput {
-  parameter_id: string;
-  critical_low: number | null;
-  warning_low: number | null;
-  warning_high: number | null;
-  critical_high: number | null;
-  consecutive_breaches_to_alert: number;
+  parametro_id: string;
+  critico_bajo: number | null;
+  alerta_bajo: number | null;
+  alerta_alto: number | null;
+  critico_alto: number | null;
+  lecturas_consecutivas_alerta: number;
 }
 
 export interface ServiceResult {
@@ -25,9 +25,10 @@ export interface ParameterWithThresholds {
 }
 
 // Acceso a datos para Administración > Umbrales (RF-16/RF-17). Crear una
-// versión nueva pasa por la RPC admin_create_threshold_version: desactiva
-// la anterior e inserta la nueva en una sola transacción (ver migración
-// 20260901121700_threshold_version_rpc.sql).
+// versión nueva pasa por la RPC admin_crear_version_umbral: desactiva la
+// anterior e inserta la nueva en una sola transacción (ver migración
+// 20260901121700_threshold_version_rpc.sql y su renombre en
+// 20260914120000_spanish_rename.sql).
 @Injectable({ providedIn: 'root' })
 export class ThresholdsService {
   constructor(private readonly supabaseService: SupabaseService) {}
@@ -36,8 +37,8 @@ export class ThresholdsService {
     const client = this.supabaseService.client;
 
     const [{ data: parameters, error: paramError }, { data: thresholds, error: threshError }] = await Promise.all([
-      client.from('parameters').select('*').order('name', { ascending: true }),
-      client.from('thresholds').select('*').order('version', { ascending: false }),
+      client.from('parametros').select('*').order('nombre', { ascending: true }),
+      client.from('umbrales').select('*').order('version', { ascending: false }),
     ]);
 
     if (paramError) {
@@ -48,7 +49,7 @@ export class ThresholdsService {
     }
 
     return ((parameters ?? []) as Parameter[]).map((parameter) => {
-      const rows = ((thresholds ?? []) as Threshold[]).filter((t) => t.parameter_id === parameter.id);
+      const rows = ((thresholds ?? []) as Threshold[]).filter((t) => t.parametro_id === parameter.id);
       const active = rows.find((t) => t.is_active) ?? null;
       const history = rows.filter((t) => !t.is_active);
       return { parameter, active, history };
@@ -56,13 +57,13 @@ export class ThresholdsService {
   }
 
   async createVersion(input: ThresholdInput): Promise<ServiceResult> {
-    const { error } = await this.supabaseService.client.rpc('admin_create_threshold_version', {
-      _parameter_id: input.parameter_id,
-      _critical_low: input.critical_low,
-      _warning_low: input.warning_low,
-      _warning_high: input.warning_high,
-      _critical_high: input.critical_high,
-      _consecutive_breaches_to_alert: input.consecutive_breaches_to_alert,
+    const { error } = await this.supabaseService.client.rpc('admin_crear_version_umbral', {
+      _id_parametro: input.parametro_id,
+      _critico_bajo: input.critico_bajo,
+      _alerta_bajo: input.alerta_bajo,
+      _alerta_alto: input.alerta_alto,
+      _critico_alto: input.critico_alto,
+      _lecturas_consecutivas_alerta: input.lecturas_consecutivas_alerta,
     });
 
     if (error) {

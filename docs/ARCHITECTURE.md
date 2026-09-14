@@ -87,7 +87,7 @@ sequenceDiagram
     participant C as Angular SPA (Realtime)
 
     D->>E: POST /functions/v1/ingest-measurement (Bearer <secreto>)
-    E->>P: Verificar device_id + hash de credencial
+    E->>P: Verificar codigo_dispositivo + hash de credencial
     alt credencial inválida
         E-->>D: 401
     else dispositivo no existe
@@ -97,9 +97,9 @@ sequenceDiagram
     else secuencia duplicada
         E-->>D: 409
     else válido
-        E->>P: INSERT measurement_batches + measurements (transacción)
-        E->>P: UPDATE devices.last_seen_at
-        E->>P: CALL evaluate_batch(batch_id)
+        E->>P: INSERT lotes_medicion + mediciones (transacción)
+        E->>P: UPDATE dispositivos.ultima_comunicacion
+        E->>P: CALL evaluar_lote(id_lote)
         P-->>P: Evalúa cada parámetro, guarda resultado, abre/actualiza alertas
         P-->>N: (si se creó una alerta) evento
         N->>N: Llama API de Brevo

@@ -16,18 +16,22 @@ export interface CreateUserResult {
 }
 
 // Acceso a datos para Administración > Usuarios (RF-06 a RF-08).
-// Leer/editar perfiles va directo contra profiles (RLS ya lo permite para
+// Leer/editar perfiles va directo contra perfiles (RLS ya lo permite para
 // admin); crear un usuario nuevo requiere la Edge Function
-// admin-create-user porque eso necesita la service_role key (RNF-04).
+// admin-create-user porque eso necesita la service_role key (RNF-04). El
+// cuerpo que recibe esa función (email/full_name/role/redirect_to) es un
+// contrato interno propio, no un campo de base de datos, y se queda en
+// inglés (D-021); el valor de "role" ya viaja en español porque UserRole
+// ahora es 'administrador' | 'analista' | 'tecnico_campo'.
 @Injectable({ providedIn: 'root' })
 export class UsersService {
   constructor(private readonly supabaseService: SupabaseService) {}
 
   async listProfiles(): Promise<Profile[]> {
     const { data, error } = await this.supabaseService.client
-      .from('profiles')
+      .from('perfiles')
       .select('*')
-      .order('full_name', { ascending: true });
+      .order('nombre_completo', { ascending: true });
 
     if (error) {
       throw new Error(`No se pudo cargar la lista de usuarios: ${error.message}`);
@@ -49,9 +53,9 @@ export class UsersService {
 
   async updateProfile(
     id: string,
-    patch: Partial<Pick<Profile, 'full_name' | 'role' | 'is_active'>>,
+    patch: Partial<Pick<Profile, 'nombre_completo' | 'rol' | 'is_active'>>,
   ): Promise<CreateUserResult> {
-    const { error } = await this.supabaseService.client.from('profiles').update(patch).eq('id', id);
+    const { error } = await this.supabaseService.client.from('perfiles').update(patch).eq('id', id);
 
     if (error) {
       return { ok: false, message: error.message };
@@ -61,9 +65,9 @@ export class UsersService {
 
   async listDevices(): Promise<DeviceSummary[]> {
     const { data, error } = await this.supabaseService.client
-      .from('devices')
-      .select('id, code, name, status')
-      .order('code', { ascending: true });
+      .from('dispositivos')
+      .select('id, codigo, nombre, estado')
+      .order('codigo', { ascending: true });
 
     if (error) {
       throw new Error(`No se pudo cargar la lista de dispositivos: ${error.message}`);
@@ -73,20 +77,20 @@ export class UsersService {
 
   async listAssignedDeviceIds(profileId: string): Promise<string[]> {
     const { data, error } = await this.supabaseService.client
-      .from('device_assignments')
-      .select('device_id')
-      .eq('profile_id', profileId);
+      .from('asignaciones_dispositivo')
+      .select('dispositivo_id')
+      .eq('perfil_id', profileId);
 
     if (error) {
       throw new Error(`No se pudo cargar la asignación de dispositivos: ${error.message}`);
     }
-    return (data ?? []).map((row) => row.device_id as string);
+    return (data ?? []).map((row) => row.dispositivo_id as string);
   }
 
   async setDeviceAssignments(profileId: string, deviceIds: string[]): Promise<CreateUserResult> {
     const client = this.supabaseService.client;
 
-    const { error: deleteError } = await client.from('device_assignments').delete().eq('profile_id', profileId);
+    const { error: deleteError } = await client.from('asignaciones_dispositivo').delete().eq('perfil_id', profileId);
     if (deleteError) {
       return { ok: false, message: deleteError.message };
     }
@@ -95,8 +99,8 @@ export class UsersService {
       return { ok: true };
     }
 
-    const rows = deviceIds.map((device_id) => ({ device_id, profile_id: profileId }));
-    const { error: insertError } = await client.from('device_assignments').insert(rows);
+    const rows = deviceIds.map((dispositivo_id) => ({ dispositivo_id, perfil_id: profileId }));
+    const { error: insertError } = await client.from('asignaciones_dispositivo').insert(rows);
     if (insertError) {
       return { ok: false, message: insertError.message };
     }

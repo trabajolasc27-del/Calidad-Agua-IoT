@@ -1,15 +1,15 @@
-<h2 mat-dialog-title>Editar {{ data.parameter.code }}</h2>
+<h2 mat-dialog-title>Editar {{ data.parameter.codigo }}</h2>
 
 <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
   <mat-dialog-content class="dialog-content">
     <mat-form-field appearance="outline">
       <mat-label>Nombre</mat-label>
-      <input matInput formControlName="name" autocomplete="off" required />
+      <input matInput formControlName="nombre" autocomplete="off" required />
     </mat-form-field>
 
     <mat-form-field appearance="outline">
       <mat-label>Unidad</mat-label>
-      <input matInput formControlName="unit" autocomplete="off" required />
+      <input matInput formControlName="unidad" autocomplete="off" required />
     </mat-form-field>
 
     <p class="hint">
@@ -19,12 +19,12 @@
     <div class="coords-row">
       <mat-form-field appearance="outline">
         <mat-label>Mínimo físico</mat-label>
-        <input matInput type="number" formControlName="physical_min" />
+        <input matInput type="number" formControlName="minimo_fisico" />
       </mat-form-field>
 
       <mat-form-field appearance="outline">
         <mat-label>Máximo físico</mat-label>
-        <input matInput type="number" formControlName="physical_max" />
+        <input matInput type="number" formControlName="maximo_fisico" />
       </mat-form-field>
     </div>
 

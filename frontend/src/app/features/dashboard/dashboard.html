@@ -2,16 +2,16 @@
   <span class="toolbar-title">Plataforma IoT de Calidad del Agua</span>
   <span class="spacer"></span>
   <span class="user-chip">
-    {{ authService.profile()?.full_name || authService.session()?.user?.email }}
+    {{ authService.profile()?.nombre_completo || authService.session()?.user?.email }}
     · {{ authService.role() }}
   </span>
   <a mat-button routerLink="/mapa">Mapa</a>
   <a mat-button routerLink="/historial">Historial</a>
   <a mat-button routerLink="/alertas">Alertas</a>
-  @if (authService.role() === 'admin' || authService.role() === 'analyst') {
+  @if (authService.role() === 'administrador' || authService.role() === 'analista') {
     <a mat-button routerLink="/reportes">Reportes</a>
   }
-  @if (authService.role() === 'admin') {
+  @if (authService.role() === 'administrador') {
     <a mat-button routerLink="/administracion">Administración</a>
   }
   <button mat-button (click)="logout()">Cerrar sesión</button>
@@ -33,7 +33,7 @@
       @case ('data') {
         <mat-select class="device-select" [formControl]="deviceControl">
           @for (d of devices(); track d.id) {
-            <mat-option [value]="d.id">{{ d.code }} — {{ d.name }}</mat-option>
+            <mat-option [value]="d.id">{{ d.codigo }} — {{ d.nombre }}</mat-option>
           }
         </mat-select>
 
@@ -80,8 +80,8 @@
           <span class="panel-title">Estado del dispositivo</span>
           @if (selectedDevice(); as device) {
             <div class="device-status">
-              <span class="status-pill" [class.ok]="device.status === 'active'" [class.inactive]="device.status !== 'active'">
-                {{ device.status === 'active' ? 'Activo' : 'Inactivo' }}
+              <span class="status-pill" [class.ok]="device.estado === 'activo'" [class.inactive]="device.estado !== 'activo'">
+                {{ device.estado === 'activo' ? 'Activo' : 'Inactivo' }}
               </span>
               <span class="last-seen">Última comunicación: {{ lastSeenLabel() }}</span>
             </div>
@@ -96,16 +96,16 @@
             <ul class="alerts-list">
               @for (a of alerts(); track a.id) {
                 <li>
-                  <span class="alert-pill" [class.warn]="a.severity === 'WARNING'" [class.crit]="a.severity === 'CRITICAL'">
-                    {{ a.severity === 'CRITICAL' ? 'Crítico' : 'Alerta' }}
+                  <span class="alert-pill" [class.warn]="a.gravedad === 'ALERTA'" [class.crit]="a.gravedad === 'CRITICO'">
+                    {{ a.gravedad === 'CRITICO' ? 'Crítico' : 'Alerta' }}
                   </span>
                   <span class="alert-param">
-                    {{ a.parameter_name }}
-                    @if (a.value != null) {
-                      · {{ a.value }} {{ a.unit }}
+                    {{ a.nombre_parametro }}
+                    @if (a.valor != null) {
+                      · {{ a.valor }} {{ a.unidad }}
                     }
                   </span>
-                  <span class="alert-status">{{ a.status }}</span>
+                  <span class="alert-status">{{ a.estado }}</span>
                 </li>
               }
             </ul>

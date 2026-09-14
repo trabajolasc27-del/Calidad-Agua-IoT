@@ -5,16 +5,16 @@ import type { DashboardDevice } from '../dashboard/dashboard.service';
 import type { EvaluationResult } from '../../core/models/measurement.model';
 
 export interface ParameterStats {
-  code: string;
-  name: string;
-  unit: string;
+  codigo: string;
+  nombre: string;
+  unidad: string;
   count: number;
   min: number | null;
   max: number | null;
   avg: number | null;
   alertCount: number;
   criticalCount: number;
-  trend: { measured_at: string; value: number }[];
+  trend: { medido_en: string; valor: number }[];
 }
 
 export interface ReportData {
@@ -39,9 +39,9 @@ export class ReportsService {
 
   async listDevices(): Promise<DashboardDevice[]> {
     const { data, error } = await this.supabaseService.client
-      .from('devices')
-      .select('id, code, name, status, last_seen_at')
-      .order('code', { ascending: true });
+      .from('dispositivos')
+      .select('id, codigo, nombre, estado, ultima_comunicacion')
+      .order('codigo', { ascending: true });
     if (error) throw new Error(`No se pudo cargar los dispositivos: ${error.message}`);
     return (data ?? []) as DashboardDevice[];
   }
@@ -51,21 +51,21 @@ export class ReportsService {
 
     const [{ data: measurementRows, error: measError, count }, { count: alertCount, error: alertError }] = await Promise.all([
       client
-        .from('measurements')
-        .select('value, evaluation_result, measurement_batches!inner(measured_at, device_id), parameters(code, name, unit)', {
+        .from('mediciones')
+        .select('valor, resultado_evaluacion, lotes_medicion!inner(medido_en, dispositivo_id), parametros(codigo, nombre, unidad)', {
           count: 'exact',
         })
-        .eq('measurement_batches.device_id', device.id)
-        .gte('measurement_batches.measured_at', dateFromIso)
-        .lte('measurement_batches.measured_at', dateToIso)
-        .order('measured_at', { ascending: true, referencedTable: 'measurement_batches' })
+        .eq('lotes_medicion.dispositivo_id', device.id)
+        .gte('lotes_medicion.medido_en', dateFromIso)
+        .lte('lotes_medicion.medido_en', dateToIso)
+        .order('medido_en', { ascending: true, referencedTable: 'lotes_medicion' })
         .limit(MAX_ROWS),
       client
-        .from('alerts')
+        .from('alertas')
         .select('id', { count: 'exact', head: true })
-        .eq('device_id', device.id)
-        .gte('opened_at', dateFromIso)
-        .lte('opened_at', dateToIso),
+        .eq('dispositivo_id', device.id)
+        .gte('abierta_en', dateFromIso)
+        .lte('abierta_en', dateToIso),
     ]);
 
     if (measError) throw new Error(`No se pudo cargar las mediciones del periodo: ${measError.message}`);
@@ -74,32 +74,32 @@ export class ReportsService {
     const byParam = new Map<string, ParameterStats>();
 
     for (const row of (measurementRows ?? []) as unknown as Array<Record<string, any>>) {
-      const p = row['parameters'] as { code: string; name: string; unit: string } | null;
+      const p = row['parametros'] as { codigo: string; nombre: string; unidad: string } | null;
       if (!p) continue;
-      const measuredAt = row['measurement_batches']?.measured_at as string;
-      const value = row['value'] as number;
-      const evalResult = row['evaluation_result'] as EvaluationResult | null;
+      const medidoEn = row['lotes_medicion']?.medido_en as string;
+      const valor = row['valor'] as number;
+      const evalResult = row['resultado_evaluacion'] as EvaluationResult | null;
 
-      let stats = byParam.get(p.code);
+      let stats = byParam.get(p.codigo);
       if (!stats) {
-        stats = { code: p.code, name: p.name, unit: p.unit, count: 0, min: null, max: null, avg: null, alertCount: 0, criticalCount: 0, trend: [] };
-        byParam.set(p.code, stats);
+        stats = { codigo: p.codigo, nombre: p.nombre, unidad: p.unidad, count: 0, min: null, max: null, avg: null, alertCount: 0, criticalCount: 0, trend: [] };
+        byParam.set(p.codigo, stats);
       }
 
       stats.count += 1;
-      stats.min = stats.min === null ? value : Math.min(stats.min, value);
-      stats.max = stats.max === null ? value : Math.max(stats.max, value);
-      stats.avg = stats.avg === null ? value : stats.avg + value; // suma provisional; se divide al final
+      stats.min = stats.min === null ? valor : Math.min(stats.min, valor);
+      stats.max = stats.max === null ? valor : Math.max(stats.max, valor);
+      stats.avg = stats.avg === null ? valor : stats.avg + valor; // suma provisional; se divide al final
       if (evalResult === 'ALERTA') stats.alertCount += 1;
       if (evalResult === 'CRITICO') stats.criticalCount += 1;
-      stats.trend.push({ measured_at: measuredAt, value });
+      stats.trend.push({ medido_en: medidoEn, valor });
     }
 
     const parameterStats = Array.from(byParam.values()).map((s) => ({
       ...s,
       avg: s.avg !== null && s.count > 0 ? Math.round((s.avg / s.count) * 100) / 100 : null,
     }));
-    parameterStats.sort((a, b) => a.name.localeCompare(b.name));
+    parameterStats.sort((a, b) => a.nombre.localeCompare(b.nombre));
 
     const report: ReportData = {
       device,

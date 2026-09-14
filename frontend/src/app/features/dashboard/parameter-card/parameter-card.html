@@ -1,6 +1,6 @@
 <div class="card" [class]="statusMeta.cls">
   <div class="card-top">
-    <span class="param-name">{{ measurement.parameter.name }}</span>
+    <span class="param-name">{{ measurement.parameter.nombre }}</span>
     <span class="status-pill">
       <mat-icon aria-hidden="true">{{ statusMeta.icon }}</mat-icon>
       {{ statusMeta.label }}
@@ -10,7 +10,7 @@
   <div class="value-row">
     @if (measurement.value !== null) {
       <span class="value">{{ measurement.value }}</span>
-      <span class="unit">{{ measurement.parameter.unit }}</span>
+      <span class="unit">{{ measurement.parameter.unidad }}</span>
     } @else {
       <span class="value muted">Sin lecturas</span>
     }

@@ -34,11 +34,11 @@ export interface ThresholdFormDialogData {
 })
 export class ThresholdFormDialog {
   readonly form = new FormGroup({
-    critical_low: new FormControl<number | null>(null),
-    warning_low: new FormControl<number | null>(null),
-    warning_high: new FormControl<number | null>(null),
-    critical_high: new FormControl<number | null>(null),
-    consecutive_breaches_to_alert: new FormControl(1, {
+    critico_bajo: new FormControl<number | null>(null),
+    alerta_bajo: new FormControl<number | null>(null),
+    alerta_alto: new FormControl<number | null>(null),
+    critico_alto: new FormControl<number | null>(null),
+    lecturas_consecutivas_alerta: new FormControl(1, {
       nonNullable: true,
       validators: [Validators.required, Validators.min(1)],
     }),
@@ -55,11 +55,11 @@ export class ThresholdFormDialog {
     const current = data.entry.active;
     if (current) {
       this.form.patchValue({
-        critical_low: current.critical_low,
-        warning_low: current.warning_low,
-        warning_high: current.warning_high,
-        critical_high: current.critical_high,
-        consecutive_breaches_to_alert: current.consecutive_breaches_to_alert,
+        critico_bajo: current.critico_bajo,
+        alerta_bajo: current.alerta_bajo,
+        alerta_alto: current.alerta_alto,
+        critico_alto: current.critico_alto,
+        lecturas_consecutivas_alerta: current.lecturas_consecutivas_alerta,
       });
     }
   }
@@ -74,7 +74,7 @@ export class ThresholdFormDialog {
     this.errorMessage.set(null);
 
     const result = await this.thresholdsService.createVersion({
-      parameter_id: this.data.entry.parameter.id,
+      parametro_id: this.data.entry.parameter.id,
       ...this.form.getRawValue(),
     });
 

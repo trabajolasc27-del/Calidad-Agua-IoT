@@ -5,10 +5,10 @@
 
 <main class="alerts-page">
   <mat-button-toggle-group [value]="filter()" (change)="setFilter($event.value)" class="status-filter">
-    <mat-button-toggle value="NEW">Nuevas</mat-button-toggle>
-    <mat-button-toggle value="ACKNOWLEDGED">Reconocidas</mat-button-toggle>
-    <mat-button-toggle value="ATTENDED">Atendidas</mat-button-toggle>
-    <mat-button-toggle value="CLOSED">Cerradas</mat-button-toggle>
+    <mat-button-toggle value="NUEVA">Nuevas</mat-button-toggle>
+    <mat-button-toggle value="RECONOCIDA">Reconocidas</mat-button-toggle>
+    <mat-button-toggle value="ATENDIDA">Atendidas</mat-button-toggle>
+    <mat-button-toggle value="CERRADA">Cerradas</mat-button-toggle>
     <mat-button-toggle value="ALL">Todas</mat-button-toggle>
   </mat-button-toggle-group>
 
@@ -33,19 +33,19 @@
       <ul class="alerts-list">
         @for (a of alerts(); track a.id) {
           <li (click)="open(a)">
-            <span class="severity-pill" [class.warn]="a.severity === 'WARNING'" [class.crit]="a.severity === 'CRITICAL'">
-              {{ a.severity === 'CRITICAL' ? 'Crítico' : 'Alerta' }}
+            <span class="severity-pill" [class.warn]="a.gravedad === 'ALERTA'" [class.crit]="a.gravedad === 'CRITICO'">
+              {{ a.gravedad === 'CRITICO' ? 'Crítico' : 'Alerta' }}
             </span>
             <div class="alert-info">
-              <span class="alert-device">{{ a.devices?.code }} · {{ a.parameters?.name }}</span>
+              <span class="alert-device">{{ a.dispositivos?.codigo }} · {{ a.parametros?.nombre }}</span>
               <span class="alert-date">
-                {{ a.opened_at | date: 'short' }}
-                @if (a.measurements?.value != null) {
-                  · valor: {{ a.measurements?.value }} {{ a.parameters?.unit }}
+                {{ a.abierta_en | date: 'short' }}
+                @if (a.mediciones?.valor != null) {
+                  · valor: {{ a.mediciones?.valor }} {{ a.parametros?.unidad }}
                 }
               </span>
             </div>
-            <span class="status-tag">{{ statusLabel[a.status] }}</span>
+            <span class="status-tag">{{ statusLabel[a.estado] }}</span>
           </li>
         }
       </ul>

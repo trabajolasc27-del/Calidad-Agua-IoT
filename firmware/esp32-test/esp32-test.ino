@@ -112,8 +112,8 @@ bool sendReading() {
   char body[400];
   snprintf(
     body, sizeof(body),
-    "{\"device_id\":\"%s\",\"sequence\":%lu,\"measured_at\":\"%s\","
-    "\"values\":{\"ph\":%.2f,\"dissolved_oxygen\":%.2f,\"turbidity\":%.2f,\"temperature\":%.2f}}",
+    "{\"codigo_dispositivo\":\"%s\",\"secuencia\":%lu,\"medido_en\":\"%s\","
+    "\"valores\":{\"ph\":%.2f,\"oxigeno_disuelto\":%.2f,\"turbidez\":%.2f,\"temperatura\":%.2f}}",
     DEVICE_ID, (unsigned long)nowEpoch, measuredAt, ph, dissolvedOxygen, turbidity, temperature
   );
 

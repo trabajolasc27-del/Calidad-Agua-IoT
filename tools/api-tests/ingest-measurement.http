@@ -11,6 +11,8 @@
 ### > Dispositivos (cada rotacion revoca la anterior). El valor vigente
 ### siempre esta en D:\IOT\.env (SIMULATOR_DEVICE_SECRET) -- si esta
 ### plantilla falla con 401, copia el valor de ahi.
+###
+### Campos del cuerpo en espanol desde D-021 (docs/DECISIONS.md).
 
 @baseUrl = http://localhost:54321/functions/v1/ingest-measurement
 @deviceId = NODO-DEMO-001
@@ -22,31 +24,31 @@ Content-Type: application/json
 Authorization: Bearer {{deviceSecret}}
 
 {
-  "device_id": "{{deviceId}}",
-  "sequence": 100001,
-  "measured_at": "2026-09-01T18:30:00Z",
-  "values": {
+  "codigo_dispositivo": "{{deviceId}}",
+  "secuencia": 100001,
+  "medido_en": "2026-09-01T18:30:00Z",
+  "valores": {
     "ph": 7.12,
-    "dissolved_oxygen": 6.8,
-    "turbidity": 4.2,
-    "temperature": 28.3
+    "oxigeno_disuelto": 6.8,
+    "turbidez": 4.2,
+    "temperatura": 28.3
   }
 }
 
-### 2. Mismo device_id + sequence otra vez -> 409 Conflict
+### 2. Mismo codigo_dispositivo + secuencia otra vez -> 409 Conflict
 POST {{baseUrl}}
 Content-Type: application/json
 Authorization: Bearer {{deviceSecret}}
 
 {
-  "device_id": "{{deviceId}}",
-  "sequence": 100001,
-  "measured_at": "2026-09-01T18:30:00Z",
-  "values": {
+  "codigo_dispositivo": "{{deviceId}}",
+  "secuencia": 100001,
+  "medido_en": "2026-09-01T18:30:00Z",
+  "valores": {
     "ph": 7.12,
-    "dissolved_oxygen": 6.8,
-    "turbidity": 4.2,
-    "temperature": 28.3
+    "oxigeno_disuelto": 6.8,
+    "turbidez": 4.2,
+    "temperatura": 28.3
   }
 }
 
@@ -56,14 +58,14 @@ Content-Type: application/json
 Authorization: Bearer secreto-incorrecto
 
 {
-  "device_id": "{{deviceId}}",
-  "sequence": 100002,
-  "measured_at": "2026-09-01T18:31:00Z",
-  "values": {
+  "codigo_dispositivo": "{{deviceId}}",
+  "secuencia": 100002,
+  "medido_en": "2026-09-01T18:31:00Z",
+  "valores": {
     "ph": 7.12,
-    "dissolved_oxygen": 6.8,
-    "turbidity": 4.2,
-    "temperature": 28.3
+    "oxigeno_disuelto": 6.8,
+    "turbidez": 4.2,
+    "temperatura": 28.3
   }
 }
 
@@ -73,14 +75,14 @@ Content-Type: application/json
 Authorization: Bearer {{deviceSecret}}
 
 {
-  "device_id": "NODO-QUE-NO-EXISTE",
-  "sequence": 1,
-  "measured_at": "2026-09-01T18:31:00Z",
-  "values": {
+  "codigo_dispositivo": "NODO-QUE-NO-EXISTE",
+  "secuencia": 1,
+  "medido_en": "2026-09-01T18:31:00Z",
+  "valores": {
     "ph": 7.12,
-    "dissolved_oxygen": 6.8,
-    "turbidity": 4.2,
-    "temperature": 28.3
+    "oxigeno_disuelto": 6.8,
+    "turbidez": 4.2,
+    "temperatura": 28.3
   }
 }
 
@@ -90,13 +92,13 @@ Content-Type: application/json
 Authorization: Bearer {{deviceSecret}}
 
 {
-  "device_id": "{{deviceId}}",
-  "sequence": 100003,
-  "measured_at": "2026-09-01T18:32:00Z",
-  "values": {
+  "codigo_dispositivo": "{{deviceId}}",
+  "secuencia": 100003,
+  "medido_en": "2026-09-01T18:32:00Z",
+  "valores": {
     "ph": 7.12,
-    "dissolved_oxygen": 6.8,
-    "turbidity": 4.2
+    "oxigeno_disuelto": 6.8,
+    "turbidez": 4.2
   }
 }
 
@@ -106,14 +108,14 @@ Content-Type: application/json
 Authorization: Bearer {{deviceSecret}}
 
 {
-  "device_id": "{{deviceId}}",
-  "sequence": 100004,
-  "measured_at": "2026-09-01T18:33:00Z",
-  "values": {
+  "codigo_dispositivo": "{{deviceId}}",
+  "secuencia": 100004,
+  "medido_en": "2026-09-01T18:33:00Z",
+  "valores": {
     "ph": 999,
-    "dissolved_oxygen": 6.8,
-    "turbidity": 4.2,
-    "temperature": 28.3
+    "oxigeno_disuelto": 6.8,
+    "turbidez": 4.2,
+    "temperatura": 28.3
   }
 }
 
@@ -123,13 +125,13 @@ Content-Type: application/json
 Authorization: Bearer {{deviceSecret}}
 
 {
-  "device_id": "{{deviceId}}",
-  "sequence": 100005,
-  "measured_at": "2026-09-01T18:34:00Z",
-  "values": {
+  "codigo_dispositivo": "{{deviceId}}",
+  "secuencia": 100005,
+  "medido_en": "2026-09-01T18:34:00Z",
+  "valores": {
     "ph": 7.0,
-    "dissolved_oxygen": 6.5,
-    "turbidity": 7.0,
-    "temperature": 27.0
+    "oxigeno_disuelto": 6.5,
+    "turbidez": 7.0,
+    "temperatura": 27.0
   }
 }

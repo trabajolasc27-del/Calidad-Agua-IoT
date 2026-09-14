@@ -1,4 +1,4 @@
-<h2 mat-dialog-title>Nueva versión de umbral — {{ data.entry.parameter.name }}</h2>
+<h2 mat-dialog-title>Nueva versión de umbral — {{ data.entry.parameter.nombre }}</h2>
 
 <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
   <mat-dialog-content class="dialog-content">
@@ -10,29 +10,29 @@
     <div class="limits-grid">
       <mat-form-field appearance="outline">
         <mat-label>Crítico bajo</mat-label>
-        <input matInput type="number" step="any" formControlName="critical_low" />
+        <input matInput type="number" step="any" formControlName="critico_bajo" />
       </mat-form-field>
 
       <mat-form-field appearance="outline">
         <mat-label>Alerta bajo</mat-label>
-        <input matInput type="number" step="any" formControlName="warning_low" />
+        <input matInput type="number" step="any" formControlName="alerta_bajo" />
       </mat-form-field>
 
       <mat-form-field appearance="outline">
         <mat-label>Alerta alto</mat-label>
-        <input matInput type="number" step="any" formControlName="warning_high" />
+        <input matInput type="number" step="any" formControlName="alerta_alto" />
       </mat-form-field>
 
       <mat-form-field appearance="outline">
         <mat-label>Crítico alto</mat-label>
-        <input matInput type="number" step="any" formControlName="critical_high" />
+        <input matInput type="number" step="any" formControlName="critico_alto" />
       </mat-form-field>
     </div>
 
     <mat-form-field appearance="outline">
       <mat-label>Lecturas consecutivas antes de abrir alerta</mat-label>
-      <input matInput type="number" min="1" step="1" formControlName="consecutive_breaches_to_alert" required />
-      @if (form.controls.consecutive_breaches_to_alert.touched && form.controls.consecutive_breaches_to_alert.hasError('min')) {
+      <input matInput type="number" min="1" step="1" formControlName="lecturas_consecutivas_alerta" required />
+      @if (form.controls.lecturas_consecutivas_alerta.touched && form.controls.lecturas_consecutivas_alerta.hasError('min')) {
         <mat-error>Debe ser al menos 1.</mat-error>
       }
     </mat-form-field>

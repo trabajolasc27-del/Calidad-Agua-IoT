@@ -1,20 +1,20 @@
-// Refleja public.profiles y el enum public.user_role
+// Refleja public.perfiles y el enum public.rol_usuario
 // (ver docs/DATABASE_DESIGN.md 3.1 y docs/ROLE_MATRIX.md).
 
-export type UserRole = 'admin' | 'analyst' | 'field_tech';
+export type UserRole = 'administrador' | 'analista' | 'tecnico_campo';
 
 export interface Profile {
   id: string;
-  full_name: string | null;
-  email: string | null;
-  role: UserRole;
+  nombre_completo: string | null;
+  correo: string | null;
+  rol: UserRole;
   is_active: boolean;
   created_at: string;
   updated_at: string;
 }
 
 export const ROLE_LABELS: Record<UserRole, string> = {
-  admin: 'Administrador',
-  analyst: 'Analista ambiental',
-  field_tech: 'Técnico de campo',
+  administrador: 'Administrador',
+  analista: 'Analista ambiental',
+  tecnico_campo: 'Técnico de campo',
 };

@@ -17,9 +17,9 @@ export class ParametersService {
 
   async listParameters(): Promise<Parameter[]> {
     const { data, error } = await this.supabaseService.client
-      .from('parameters')
+      .from('parametros')
       .select('*')
-      .order('name', { ascending: true });
+      .order('nombre', { ascending: true });
 
     if (error) {
       throw new Error(`No se pudo cargar el catálogo de parámetros: ${error.message}`);
@@ -29,9 +29,9 @@ export class ParametersService {
 
   async updateParameter(
     id: string,
-    patch: Partial<Pick<Parameter, 'name' | 'unit' | 'physical_min' | 'physical_max' | 'is_active'>>,
+    patch: Partial<Pick<Parameter, 'nombre' | 'unidad' | 'minimo_fisico' | 'maximo_fisico' | 'is_active'>>,
   ): Promise<ServiceResult> {
-    const { error } = await this.supabaseService.client.from('parameters').update(patch).eq('id', id);
+    const { error } = await this.supabaseService.client.from('parametros').update(patch).eq('id', id);
     if (error) {
       return { ok: false, message: error.message };
     }

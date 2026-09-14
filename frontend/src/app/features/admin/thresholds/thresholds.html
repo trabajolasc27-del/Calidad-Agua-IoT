@@ -25,8 +25,8 @@
           <div class="param-card">
             <div class="param-card-header">
               <div>
-                <h3>{{ entry.parameter.name }}</h3>
-                <span class="unit">{{ entry.parameter.unit }}</span>
+                <h3>{{ entry.parameter.nombre }}</h3>
+                <span class="unit">{{ entry.parameter.unidad }}</span>
               </div>
               <button mat-flat-button color="primary" (click)="openCreateDialog(entry)">Nueva versión</button>
             </div>
@@ -35,11 +35,11 @@
               <div class="limits-summary">
                 <div class="limit-cell crit">
                   <span class="label">Crítico bajo</span>
-                  <span class="value">{{ entry.active.critical_low ?? '—' }}</span>
+                  <span class="value">{{ entry.active.critico_bajo ?? '—' }}</span>
                 </div>
                 <div class="limit-cell warn">
                   <span class="label">Alerta bajo</span>
-                  <span class="value">{{ entry.active.warning_low ?? '—' }}</span>
+                  <span class="value">{{ entry.active.alerta_bajo ?? '—' }}</span>
                 </div>
                 <div class="limit-cell ok">
                   <span class="label">Conforme</span>
@@ -47,11 +47,11 @@
                 </div>
                 <div class="limit-cell warn">
                   <span class="label">Alerta alto</span>
-                  <span class="value">{{ entry.active.warning_high ?? '—' }}</span>
+                  <span class="value">{{ entry.active.alerta_alto ?? '—' }}</span>
                 </div>
                 <div class="limit-cell crit">
                   <span class="label">Crítico alto</span>
-                  <span class="value">{{ entry.active.critical_high ?? '—' }}</span>
+                  <span class="value">{{ entry.active.critico_alto ?? '—' }}</span>
                 </div>
               </div>
               <p class="meta">
@@ -59,7 +59,7 @@
                 @if (entry.active.is_demo) {
                   <span class="demo-flag">demo</span>
                 }
-                · {{ entry.active.consecutive_breaches_to_alert }} lectura(s) consecutiva(s) para abrir alerta
+                · {{ entry.active.lecturas_consecutivas_alerta }} lectura(s) consecutiva(s) para abrir alerta
               </p>
             } @else {
               <p class="state-message">Sin umbral configurado todavía para este parámetro.</p>
@@ -84,10 +84,10 @@
                     @for (h of entry.history; track h.id) {
                       <tr>
                         <td>{{ h.version }}</td>
-                        <td>{{ h.critical_low ?? '—' }}</td>
-                        <td>{{ h.warning_low ?? '—' }}</td>
-                        <td>{{ h.warning_high ?? '—' }}</td>
-                        <td>{{ h.critical_high ?? '—' }}</td>
+                        <td>{{ h.critico_bajo ?? '—' }}</td>
+                        <td>{{ h.alerta_bajo ?? '—' }}</td>
+                        <td>{{ h.alerta_alto ?? '—' }}</td>
+                        <td>{{ h.critico_alto ?? '—' }}</td>
                       </tr>
                     }
                   </tbody>
