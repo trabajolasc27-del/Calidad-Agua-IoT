@@ -28,15 +28,20 @@ Los docentes del usuario pidieron, más adelante en la misma sesión, que los at
 
 **Ejecutado en este orden:**
 1. Migración `20260914120000_spanish_rename.sql` — tipos enumerados, 14 tablas, columnas de negocio, valores del catálogo de parámetros, y (drop + create, porque el cuerpo de una función plpgsql no se reescribe solo) las funciones RLS/de negocio y las ~34 políticas RLS. Aplicada contra el proyecto real vía Management API; verificada con lecturas de solo lectura que confirmaron el esquema nuevo y que los datos reales (dispositivos, umbrales, las 2 alertas ya cerradas) sobrevivieron intactos.
-2. Edge Functions `ingest-measurement` y `admin-create-user` reescritas al nuevo contrato/esquema.
+2. Edge Functions `ingest-measurement` y `admin-create-user` reescritas al nuevo contrato/esquema, y **redesplegadas manualmente vía la Management API** (`POST /functions/deploy?slug=...`, multipart) — se confirmó que `git push` **no** las redespliega solas en este proyecto; el simulador seguía recibiendo el contrato viejo (`device_id`) casi 3 minutos después del push, hasta hacer el deploy manual.
 3. Firmware `esp32-test.ino` y `tools/simulator/simulate.mjs` actualizados al nuevo contrato JSON del ESP32.
 4. Los 7 modelos y 12 servicios de Angular, más todas las plantillas `.html` que leían esos campos.
 5. `supabase/seed.sql` y toda la documentación (`DATABASE_DESIGN.md`, `API_CONTRACT.md`, `ARCHITECTURE.md`, `ROLE_MATRIX.md`, `USE_CASES.md`, `tools/api-tests/ingest-measurement.http`).
 
-**Pruebas ejecutadas:** `tsc --noEmit` limpio; `ng build` (que sí revisa los bindings de plantilla, a diferencia de `tsc` solo) detectó varios usos de nombres viejos en plantillas que `tsc` no había marcado — corregidos hasta build limpio dos veces seguidas. Verificación de esquema y datos reales vía Management API tras aplicar la migración.
+**Pruebas ejecutadas:**
+- `tsc --noEmit` limpio; `ng build` (que sí revisa los bindings de plantilla, a diferencia de `tsc` solo) detectó varios usos de nombres viejos en plantillas que `tsc` no había marcado — corregidos hasta build limpio dos veces seguidas.
+- Esquema y datos reales verificados vía Management API tras aplicar la migración (14 tablas con los nombres nuevos; `dispositivos`, `parametros` y las 2 alertas ya cerradas con sus datos reales intactos).
+- Las consultas exactas que usa el frontend (`perfiles`, `dispositivos` con embed a `ubicaciones`) validadas contra el esquema real vía una petición REST anónima (`200 []`, confirma sintaxis correcta).
+- **Tubería de ingesta verificada de punta a punta con una lectura real:** `node tools/simulator/simulate.mjs --profile=normal` contra la Edge Function ya redesplegada respondió `201` con el contrato nuevo completo (`id_lote`, `resultados.{ph,oxigeno_disuelto,turbidez,temperatura}`).
+- **Pendiente:** la sesión del navegador expiró de nuevo durante la ejecución; no se pudo hacer el recorrido visual (Dashboard, Mapa, Historial, Alertas, Reportes, Administración) porque no corresponde iniciar sesión por el usuario.
 
 ### Cómo continuar en otra sesión
-El hallazgo del valor en Alertas queda cerrado. La traducción al español está aplicada en la base de datos real y compila limpio, pero **falta el recorrido en vivo por el navegador** (login, Dashboard, Mapa, Historial, Alertas, Reportes, las 5 pantallas de Administración) y volver a correr el simulador contra la Edge Function ya redesplegada, antes de dar D-021 por cerrado del todo. Después: seguir con Brevo o con las pruebas del Arduino.
+El hallazgo del valor en Alertas queda cerrado. La traducción al español (D-021) está aplicada en el proyecto real, las Edge Functions redesplegadas, y la tubería de ingesta verificada de punta a punta con datos reales. **Solo falta que el usuario inicie sesión y confirme visualmente** que las pantallas (Dashboard, Mapa, Historial, Alertas, Reportes, las 5 de Administración) muestran todo correctamente antes de dar esto por cerrado del todo. Después: seguir con Brevo o con las pruebas del Arduino (el firmware ya quedó actualizado al nuevo contrato).
 
 ---
 
