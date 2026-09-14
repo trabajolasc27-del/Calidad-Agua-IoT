@@ -4,6 +4,8 @@ export type AlertStatus = 'NEW' | 'ACKNOWLEDGED' | 'ATTENDED' | 'CLOSED';
 export interface DashboardAlert {
   id: string;
   parameter_name: string;
+  value: number | null;
+  unit: string | null;
   severity: AlertSeverity;
   status: AlertStatus;
   opened_at: string;
@@ -25,6 +27,9 @@ export interface Alert {
   follow_up_comment: string | null;
   devices: { code: string; name: string } | null;
   parameters: { name: string; unit: string } | null;
+  // Medicion que origino la alerta (RF-32: la lista/detalle debe mostrar
+  // el valor detectado, no solo el parametro y la gravedad).
+  measurements: { value: number } | null;
 }
 
 export interface AlertHistoryEntry {

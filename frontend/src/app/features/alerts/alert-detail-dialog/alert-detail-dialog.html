@@ -11,6 +11,13 @@
     <span class="device-name">{{ alert().devices?.name }}</span>
   </div>
 
+  @if (alert().measurements?.value != null) {
+    <p class="value-line">
+      Valor detectado: <strong>{{ alert().measurements?.value }} {{ alert().parameters?.unit }}</strong>
+      · fecha: {{ alert().opened_at | date: 'short' }}
+    </p>
+  }
+
   <div class="timeline">
     <span class="section-title">Línea de tiempo</span>
     @if (loadingHistory()) {

@@ -103,7 +103,7 @@ export class DashboardService {
   async getActiveAlerts(deviceId: string): Promise<DashboardAlert[]> {
     const { data, error } = await this.supabaseService.client
       .from('alerts')
-      .select('id, severity, status, opened_at, parameters(name)')
+      .select('id, severity, status, opened_at, parameters(name, unit), measurements!first_measurement_id(value)')
       .eq('device_id', deviceId)
       .neq('status', 'CLOSED')
       .order('opened_at', { ascending: false });
@@ -117,6 +117,8 @@ export class DashboardService {
       status: row['status'] as DashboardAlert['status'],
       opened_at: row['opened_at'] as string,
       parameter_name: (row['parameters'] as { name: string } | null)?.name ?? '—',
+      unit: (row['parameters'] as { unit: string } | null)?.unit ?? null,
+      value: (row['measurements'] as { value: number } | null)?.value ?? null,
     }));
   }
 

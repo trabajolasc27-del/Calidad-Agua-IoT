@@ -38,7 +38,12 @@
             </span>
             <div class="alert-info">
               <span class="alert-device">{{ a.devices?.code }} · {{ a.parameters?.name }}</span>
-              <span class="alert-date">{{ a.opened_at | date: 'short' }}</span>
+              <span class="alert-date">
+                {{ a.opened_at | date: 'short' }}
+                @if (a.measurements?.value != null) {
+                  · valor: {{ a.measurements?.value }} {{ a.parameters?.unit }}
+                }
+              </span>
             </div>
             <span class="status-tag">{{ statusLabel[a.status] }}</span>
           </li>

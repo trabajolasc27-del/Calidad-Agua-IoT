@@ -99,7 +99,12 @@
                   <span class="alert-pill" [class.warn]="a.severity === 'WARNING'" [class.crit]="a.severity === 'CRITICAL'">
                     {{ a.severity === 'CRITICAL' ? 'Crítico' : 'Alerta' }}
                   </span>
-                  <span class="alert-param">{{ a.parameter_name }}</span>
+                  <span class="alert-param">
+                    {{ a.parameter_name }}
+                    @if (a.value != null) {
+                      · {{ a.value }} {{ a.unit }}
+                    }
+                  </span>
                   <span class="alert-status">{{ a.status }}</span>
                 </li>
               }

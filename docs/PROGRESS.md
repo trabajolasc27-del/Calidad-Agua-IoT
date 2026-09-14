@@ -1,5 +1,23 @@
 # Registro de Progreso
 
+## Sesión 4 — 2026-09-14
+
+### Motivo de la sesión
+El docente indicó al usuario que las pantallas no muestran todo lo que deben mostrar según lo planteado. El usuario compartió 3 documentos oficiales para comparar contra el estado real del proyecto: `Proyecto Residencia Software 2026-2.docx`, el protocolo institucional CI-02/2026 (PDF, propuesta de investigación de 11 meses, más amplia que la residencia) y `ITVH-RP-012848-Proyecto.pdf` ("Reporte preliminar de residencia profesional" — el documento de 16 semanas / 4 etapas que efectivamente rige esta residencia).
+
+### Hallazgo y corrección
+Comparando los 3 documentos contra cada pantalla ya construida se confirmó una sola discrepancia real y concreta: **Alertas nunca mostraba el valor de la medición que originó la alerta** (ni en el listado, ni en el detalle, ni en el panel de "alertas activas" del Dashboard) — solo parámetro, severidad, estado y fecha. Esto contradice tanto `ITVH-RP-012848-Proyecto.pdf` §3.2 como el propio RF-32 de [REQUIREMENTS.md](REQUIREMENTS.md), que piden explícitamente mostrar el valor detectado. El dato ya existía en la base de datos (`alerts.first_measurement_id → measurements.value`), solo no se consultaba. Corregido en `alerts.service.ts`, `dashboard.service.ts`, `alert.model.ts`, `alerts.html`, `alert-detail-dialog.html` y `dashboard.html` — ver [DECISIONS.md](DECISIONS.md) D-020 para el detalle completo.
+
+El resto de la comparación (4 parámetros oficiales, 3 roles, plan de 16 semanas/4 etapas, wireframes, motor de evaluación, historial, reportes) no encontró otras discrepancias de alcance contra los documentos oficiales.
+
+### Pruebas ejecutadas
+`tsc --noEmit` y `ng build` limpios tras el cambio. La consulta con el nuevo embed (`measurements!first_measurement_id(value)`) se validó contra el esquema real del proyecto vía una petición REST anónima (`200 []`, confirma sintaxis correcta; el arreglo vacío es RLS negando a `anon`, no un error). **No se pudo verificar visualmente con una sesión autenticada real**: la sesión de navegador de la sesión anterior había expirado y no corresponde iniciar sesión escribiendo la contraseña del usuario en su nombre. Queda pendiente una verificación visual en vivo la próxima vez que haya una sesión autenticada abierta.
+
+### Cómo continuar en otra sesión
+Abrir el navegador ya autenticado como admin (o que el usuario inicie sesión) y confirmar visualmente que Alertas y el Dashboard muestran el valor junto a cada alerta antes de dar este hallazgo por cerrado del todo.
+
+---
+
 ## Sesión 3 — 2026-09-09
 
 ### Fase actual

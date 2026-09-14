@@ -21,7 +21,7 @@ export class AlertsService {
   async listAlerts(status: AlertStatus | 'ALL'): Promise<Alert[]> {
     let query = this.supabaseService.client
       .from('alerts')
-      .select('*, devices(code, name), parameters(name, unit)')
+      .select('*, devices(code, name), parameters(name, unit), measurements!first_measurement_id(value)')
       .order('opened_at', { ascending: false });
 
     if (status !== 'ALL') {
