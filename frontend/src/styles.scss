@@ -1,39 +1,113 @@
-// Include theming for Angular Material with `mat.theme()`.
-// This Sass mixin will define CSS variables that are used for styling Angular Material
-// components according to the Material 3 design spec.
-// Learn more about theming and how to use it for your application's
-// custom components at https://material.angular.dev/guide/theming
+// Estilos globales de la aplicacion.
+//
+// Identidad visual propia (D-022): en vez del tema Material 3 azul de
+// fabrica, se genera una paleta tonal completa a partir de los colores ya
+// usados de forma informal en Reportes/Wireframes/Bitacora de este mismo
+// proyecto (teal #0f7d72 como color "agua", ambar #9c6d0a como acento de
+// alerta, rojo #b23b3b como critico) -- ver src/theme-colors.scss, generado
+// con `ng generate @angular/material:m3-theme`. Asi el tema de Angular
+// Material y los estilos a mano de cada pantalla comparten un solo origen
+// de verdad en vez de dos paletas distintas por accidente.
 @use '@angular/material' as mat;
+@use './theme-colors' as theme;
 
 html {
   height: 100%;
   @include mat.theme(
     (
       color: (
-        primary: mat.$azure-palette,
-        tertiary: mat.$blue-palette,
+        theme-type: light,
+        primary: theme.$primary-palette,
+        tertiary: theme.$tertiary-palette,
       ),
-      typography: Roboto,
+      // IBM Plex Sans es la tipografia de marca (ver index.html); Roboto
+      // queda como respaldo para textos internos de Angular Material que
+      // no se tocan uno por uno.
+      typography: (
+        plain-family: 'IBM Plex Sans, Roboto, system-ui, sans-serif',
+        brand-family: 'IBM Plex Sans, Roboto, system-ui, sans-serif',
+      ),
       density: 0,
     )
   );
 }
 
 body {
-  // Default the application to a light color theme. This can be changed to
-  // `dark` to enable the dark color theme, or to `light dark` to defer to the
-  // user's system settings.
   color-scheme: light;
-
-  // Set a default background, font and text colors for the application using
-  // Angular Material's system-level CSS variables. Learn more about these
-  // variables at https://material.angular.dev/guide/system-variables
   background-color: var(--mat-sys-surface);
   color: var(--mat-sys-on-surface);
   font: var(--mat-sys-body-medium);
-
-  // Reset the user agent margin.
   margin: 0;
   height: 100%;
 }
-/* You can add global styles to this file, and also import other style files */
+
+// ---------------------------------------------------------------------
+// Tokens semanticos compartidos por toda la app.
+//
+// Por que variables CSS aparte del tema de Material: los 3 colores de
+// evaluacion (conforme/alerta/critico) y sus fondos de pildora se repetian
+// como valores hexadecimales sueltos en cada archivo *.scss de cada
+// pantalla (alerts.scss, history.scss, dashboard.scss, etc.) -- un solo
+// lugar evita que una pantalla quede con un verde/ambar/rojo ligeramente
+// distinto a las demas por copiar-pegar.
+// ---------------------------------------------------------------------
+:root {
+  --wq-ok: #2f8f4e;
+  --wq-ok-soft: #e3f3e6;
+  --wq-warn: #9c6d0a;
+  --wq-warn-soft: #f8ecd2;
+  --wq-crit: #b23b3b;
+  --wq-crit-soft: #fbe3e1;
+  --wq-neutral-soft: var(--mat-sys-surface-container-low, #eef2ef);
+}
+
+// Titulo de pantalla reutilizable. Antes cada pantalla ponia su nombre
+// dentro de la barra de navegacion que ahora vive en AppShell; se usa este
+// titulo dentro del propio contenido en su lugar, consistente en las 6
+// pantallas principales.
+.page-title {
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 1.35rem;
+  font-weight: 700;
+  margin: 1.25rem 0 0;
+  color: var(--mat-sys-on-surface);
+}
+
+// Codigos de dispositivo, valores numericos tabulares y otros datos "en
+// crudo" usan la tipografia monoespaciada de marca en vez de la tipografia
+// de texto normal, para distinguir visualmente un dato de una etiqueta.
+.mono {
+  font-family: 'IBM Plex Mono', ui-monospace, 'Courier New', monospace;
+  font-variant-numeric: tabular-nums;
+}
+
+// Pildora de estado reutilizable (conforme/alerta/critico). Las pantallas
+// que ya tenian su propia version local (.status-pill, .severity-pill) se
+// migran a esta a medida que se rediseñan.
+.wq-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.15rem 0.6rem;
+  border-radius: 999px;
+  white-space: nowrap;
+
+  &.ok {
+    background: var(--wq-ok-soft);
+    color: var(--wq-ok);
+  }
+  &.warn {
+    background: var(--wq-warn-soft);
+    color: var(--wq-warn);
+  }
+  &.crit {
+    background: var(--wq-crit-soft);
+    color: var(--wq-crit);
+  }
+  &.neutral {
+    background: var(--wq-neutral-soft);
+    color: var(--mat-sys-on-surface-variant, #666);
+  }
+}

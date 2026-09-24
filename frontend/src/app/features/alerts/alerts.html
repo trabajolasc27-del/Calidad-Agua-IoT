@@ -1,9 +1,6 @@
-<mat-toolbar color="primary">
-  <a mat-button routerLink="/panel">← Panel</a>
-  <span class="toolbar-title">Alertas</span>
-</mat-toolbar>
-
 <main class="alerts-page">
+  <h1 class="page-title">Alertas</h1>
+
   <mat-button-toggle-group [value]="filter()" (change)="setFilter($event.value)" class="status-filter">
     <mat-button-toggle value="NUEVA">Nuevas</mat-button-toggle>
     <mat-button-toggle value="RECONOCIDA">Reconocidas</mat-button-toggle>

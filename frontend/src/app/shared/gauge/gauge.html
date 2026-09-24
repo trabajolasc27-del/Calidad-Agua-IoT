@@ -1,0 +1,35 @@
+<div class="gauge">
+  <svg viewBox="0 0 220 150" class="gauge-svg" role="img" [attr.aria-label]="statusMeta().label + ': ' + (valor() ?? '—') + ' ' + unidad()">
+    <!-- Pista de fondo: rango físico completo, para que las bandas de color siempre lean sobre una referencia visible. -->
+    <path class="track" d="M 22 112 A 88 88 0 0 0 198 112" fill="none" />
+
+    <!-- Bandas reales del umbral activo (crítico/alerta/conforme). -->
+    @for (band of bands(); track band.cls + band.d) {
+      <path class="band" [class]="band.cls" [attr.d]="band.d" fill="none" />
+    }
+
+    <!-- Aguja: del centro hacia el valor actual interpolado en el rango. -->
+    <line
+      class="needle"
+      [attr.x1]="center.x"
+      [attr.y1]="center.y"
+      [attr.x2]="needlePoint().x"
+      [attr.y2]="needlePoint().y"
+    />
+    <circle class="needle-hub" [attr.cx]="center.x" [attr.cy]="center.y" r="5" />
+
+    <!-- Escala: límites físicos del parámetro, para que la carátula sea legible sin adivinar el rango. -->
+    <text class="scale-label" x="22" y="128" text-anchor="start">{{ minimo() }}</text>
+    <text class="scale-label" x="198" y="128" text-anchor="end">{{ maximo() }}</text>
+
+    <text class="value-text" x="110" y="132" text-anchor="middle">
+      {{ valor() !== null ? valor() : '—' }}
+    </text>
+    <text class="unit-text" x="110" y="148" text-anchor="middle">{{ unidad() }}</text>
+  </svg>
+
+  <span class="wq-status-pill" [class]="statusMeta().cls">
+    <span class="material-icons" aria-hidden="true">{{ statusMeta().icon }}</span>
+    {{ statusMeta().label }}
+  </span>
+</div>

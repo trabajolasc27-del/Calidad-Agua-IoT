@@ -1,42 +1,5 @@
-mat-toolbar {
-  gap: 0.35rem;
-}
-
-// mat-toolbar es un flex container; sus hijos por defecto no pueden
-// encogerse mas alla de su contenido (min-width:auto), lo que en
-// pantallas angostas hace que el titulo se encime con el correo del
-// usuario en vez de truncarse. min-width:0 habilita el encogimiento.
-.toolbar-title {
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.spacer {
-  flex: 1 1 auto;
-  min-width: 0.5rem;
-}
-
-.user-chip {
-  min-width: 0;
-  font-size: 0.85rem;
-  margin-right: 0.75rem;
-  text-transform: capitalize;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  max-width: 220px;
-}
-
-@media (max-width: 520px) {
-  .user-chip {
-    display: none;
-  }
-}
-
 .dashboard {
-  max-width: 900px;
+  max-width: 1000px;
   margin: 1.5rem auto 3rem;
   padding: 0 1.5rem;
   display: flex;
@@ -70,13 +33,13 @@ mat-toolbar {
   }
 
   &.live {
-    color: #2f8f4e;
+    color: var(--wq-ok);
   }
 }
 
 .cards-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 0.85rem;
 }
 
@@ -124,12 +87,12 @@ mat-toolbar {
 }
 
 .status-pill.ok {
-  background: #e3f3e6;
-  color: #2f8f4e;
+  background: var(--wq-ok-soft);
+  color: var(--wq-ok);
 }
 .status-pill.inactive {
-  background: #fbe3e1;
-  color: #b23b3b;
+  background: var(--wq-crit-soft);
+  color: var(--wq-crit);
 }
 
 .alerts-list {
@@ -149,12 +112,12 @@ mat-toolbar {
 }
 
 .alert-pill.warn {
-  background: #f8ecd2;
-  color: #9c6d0a;
+  background: var(--wq-warn-soft);
+  color: var(--wq-warn);
 }
 .alert-pill.crit {
-  background: #fbe3e1;
-  color: #b23b3b;
+  background: var(--wq-crit-soft);
+  color: var(--wq-crit);
 }
 
 .alert-status {
@@ -177,8 +140,38 @@ mat-toolbar {
   font-size: 0.9rem;
 
   &.error {
-    color: #b23b3b;
+    color: var(--wq-crit);
   }
+}
+
+.trend-section {
+  border: 1px solid var(--mat-sys-outline-variant, #dde3e2);
+  border-radius: 10px;
+  padding: 0.85rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.trend-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 0.75rem;
+}
+
+.trend-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.trend-label {
+  font-size: 0.72rem;
+  color: var(--mat-sys-on-surface-variant, #666);
+}
+
+.trend-item canvas {
+  height: 60px;
 }
 
 @media (max-width: 640px) {

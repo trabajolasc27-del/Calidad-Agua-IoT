@@ -1,9 +1,6 @@
-<mat-toolbar color="primary">
-  <a mat-button routerLink="/panel">← Panel</a>
-  <span class="toolbar-title">Reportes</span>
-</mat-toolbar>
-
 <main class="reports-page">
+  <h1 class="page-title">Reportes</h1>
+
   <form [formGroup]="filtersForm" class="filters" (ngSubmit)="generate()">
     <mat-form-field appearance="outline">
       <mat-label>Dispositivo</mat-label>
@@ -79,6 +76,17 @@
                 <h3>{{ s.nombre }}</h3>
                 <span class="unit">{{ s.unidad }}</span>
               </header>
+              <wq-gauge
+                [valor]="s.avg"
+                [unidad]="s.unidad"
+                [minimo]="s.minimoFisico ?? 0"
+                [maximo]="s.maximoFisico ?? 100"
+                [criticoBajo]="s.umbral?.critico_bajo ?? null"
+                [alertaBajo]="s.umbral?.alerta_bajo ?? null"
+                [alertaAlto]="s.umbral?.alerta_alto ?? null"
+                [criticoAlto]="s.umbral?.critico_alto ?? null"
+                [resultado]="s.resultadoPeriodo"
+              />
               <div class="stat-grid">
                 <div><span class="label">Mín</span><span class="value">{{ s.min ?? '—' }}</span></div>
                 <div><span class="label">Máx</span><span class="value">{{ s.max ?? '—' }}</span></div>

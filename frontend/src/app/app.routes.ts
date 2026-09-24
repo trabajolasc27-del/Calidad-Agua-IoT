@@ -3,6 +3,12 @@ import { Routes } from '@angular/router';
 import { authGuard } from './core/guards/auth.guard';
 import { roleGuard } from './core/guards/role.guard';
 
+// authGuard se aplica una sola vez en la ruta padre que carga AppShell y
+// protege todo el subarbol de pantallas autenticadas; roleGuard sigue
+// declarado por ruta hija donde aplica (reportes, administracion), igual
+// que antes de introducir el shell -- ni las URLs ni el comportamiento de
+// los guards cambiaron, solo se dejo de duplicar la barra de navegacion
+// en cada pantalla.
 export const routes: Routes = [
   { path: '', pathMatch: 'full', redirectTo: 'panel' },
   {
@@ -18,55 +24,58 @@ export const routes: Routes = [
     loadComponent: () => import('./features/auth/set-password/set-password').then((m) => m.SetPassword),
   },
   {
-    path: 'panel',
+    path: '',
     canActivate: [authGuard],
-    loadComponent: () => import('./features/dashboard/dashboard').then((m) => m.Dashboard),
-  },
-  {
-    path: 'mapa',
-    canActivate: [authGuard],
-    loadComponent: () => import('./features/map/map-view').then((m) => m.MapView),
-  },
-  {
-    path: 'alertas',
-    canActivate: [authGuard],
-    loadComponent: () => import('./features/alerts/alerts').then((m) => m.Alerts),
-  },
-  {
-    path: 'historial',
-    canActivate: [authGuard],
-    loadComponent: () => import('./features/history/history').then((m) => m.History),
-  },
-  {
-    path: 'reportes',
-    canActivate: [roleGuard(['administrador', 'analista'])],
-    loadComponent: () => import('./features/reports/reports').then((m) => m.Reports),
-  },
-  {
-    path: 'administracion',
-    canActivate: [roleGuard(['administrador'])],
-    loadComponent: () => import('./features/admin/admin').then((m) => m.Admin),
+    loadComponent: () => import('./core/shell/app-shell').then((m) => m.AppShell),
     children: [
-      { path: '', pathMatch: 'full', redirectTo: 'usuarios' },
       {
-        path: 'usuarios',
-        loadComponent: () => import('./features/admin/users/users').then((m) => m.Users),
+        path: 'panel',
+        loadComponent: () => import('./features/dashboard/dashboard').then((m) => m.Dashboard),
       },
       {
-        path: 'dispositivos',
-        loadComponent: () => import('./features/admin/devices/devices').then((m) => m.Devices),
+        path: 'mapa',
+        loadComponent: () => import('./features/map/map-view').then((m) => m.MapView),
       },
       {
-        path: 'ubicaciones',
-        loadComponent: () => import('./features/admin/locations/locations').then((m) => m.Locations),
+        path: 'alertas',
+        loadComponent: () => import('./features/alerts/alerts').then((m) => m.Alerts),
       },
       {
-        path: 'parametros',
-        loadComponent: () => import('./features/admin/parameters/parameters').then((m) => m.Parameters),
+        path: 'historial',
+        loadComponent: () => import('./features/history/history').then((m) => m.History),
       },
       {
-        path: 'umbrales',
-        loadComponent: () => import('./features/admin/thresholds/thresholds').then((m) => m.Thresholds),
+        path: 'reportes',
+        canActivate: [roleGuard(['administrador', 'analista'])],
+        loadComponent: () => import('./features/reports/reports').then((m) => m.Reports),
+      },
+      {
+        path: 'administracion',
+        canActivate: [roleGuard(['administrador'])],
+        loadComponent: () => import('./features/admin/admin').then((m) => m.Admin),
+        children: [
+          { path: '', pathMatch: 'full', redirectTo: 'usuarios' },
+          {
+            path: 'usuarios',
+            loadComponent: () => import('./features/admin/users/users').then((m) => m.Users),
+          },
+          {
+            path: 'dispositivos',
+            loadComponent: () => import('./features/admin/devices/devices').then((m) => m.Devices),
+          },
+          {
+            path: 'ubicaciones',
+            loadComponent: () => import('./features/admin/locations/locations').then((m) => m.Locations),
+          },
+          {
+            path: 'parametros',
+            loadComponent: () => import('./features/admin/parameters/parameters').then((m) => m.Parameters),
+          },
+          {
+            path: 'umbrales',
+            loadComponent: () => import('./features/admin/thresholds/thresholds').then((m) => m.Thresholds),
+          },
+        ],
       },
     ],
   },

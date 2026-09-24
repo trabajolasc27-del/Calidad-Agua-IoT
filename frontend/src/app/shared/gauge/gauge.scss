@@ -1,0 +1,67 @@
+.gauge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.gauge-svg {
+  width: 100%;
+  max-width: 220px;
+  height: auto;
+}
+
+.track {
+  stroke: var(--mat-sys-surface-container-high, #dfe3e1);
+  stroke-width: 14;
+  stroke-linecap: round;
+}
+
+.band {
+  stroke-width: 14;
+  fill: none;
+
+  &.ok {
+    stroke: var(--wq-ok);
+  }
+  &.warn {
+    stroke: var(--wq-warn);
+  }
+  &.crit {
+    stroke: var(--wq-crit);
+  }
+}
+
+.needle {
+  stroke: var(--mat-sys-on-surface, #16262a);
+  stroke-width: 3;
+  stroke-linecap: round;
+}
+
+.needle-hub {
+  fill: var(--mat-sys-on-surface, #16262a);
+}
+
+.scale-label {
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: 9px;
+  fill: var(--mat-sys-on-surface-variant, #666);
+}
+
+.value-text {
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-weight: 700;
+  font-size: 26px;
+  fill: var(--mat-sys-on-surface, #16262a);
+}
+
+.unit-text {
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 11px;
+  fill: var(--mat-sys-on-surface-variant, #666);
+}
+
+.material-icons {
+  font-size: 16px;
+  line-height: 1;
+}

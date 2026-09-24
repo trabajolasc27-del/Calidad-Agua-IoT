@@ -1,5 +1,30 @@
 # Registro de Progreso
 
+## Sesión 5 — 2026-09-24
+
+### Motivo de la sesión
+El asesor externo del usuario pidió, viendo un panel IoT de referencia (Laravel, sensores de gas/UV, tema oscuro con velocímetros circulares), que la plataforma tuviera una interfaz con identidad propia (no el Material 3 azul de fábrica), acorde a los 4 parámetros reales del proyecto, intuitiva y sin saturar. También pidió documentar el código y, al terminar, probar cada pantalla y botón.
+
+### Qué se hizo
+Rediseño visual completo — ver [DECISIONS.md](DECISIONS.md) D-022 para el detalle técnico completo. En resumen:
+- Paleta e identidad propia (teal + IBM Plex), generada formalmente con el schematic de Angular Material a partir de colores que ya se venían usando de forma suelta en Reportes/Wireframes/Bitácora.
+- Componente `wq-gauge` nuevo (carátula tipo velocímetro, SVG propio) para los 4 parámetros del Dashboard y para Reportes, con bandas de color según el umbral real de cada parámetro.
+- Shell de navegación compartido (`AppShell`) que no existía antes — se corrigió de paso que las sub-pantallas solo podían volver a "Panel" sin poder saltar directo a otra sección.
+- Auditoría de texto de interfaz en español: **no se encontró texto en inglés** en ninguna plantilla; la app ya estaba en español desde que se construyó.
+- Documentación de código ampliada en los archivos nuevos/tocados.
+
+### Pruebas ejecutadas
+`tsc --noEmit` y `ng build` limpios en cada bloque grande de cambios (tema, gauge, shell, integración en Reportes, sweep de colores). **No se pudo verificar visualmente con sesión autenticada** (la sesión del navegador no estaba disponible durante el trabajo) — se verificó únicamente la pantalla de login sin autenticar, donde la paleta nueva ya se ve aplicada correctamente.
+
+### Errores conocidos (no bloqueantes)
+- Falta el recorrido visual en vivo de las ~9 pantallas con datos reales (Dashboard con gauges reales, navegación del shell, Reportes con gauges en las tarjetas de estadística, etc.) — pedido explícito del usuario, pendiente de sesión autenticada.
+- La pasada de documentación de código no cubrió los ~40 archivos del proyecto completo en este bloque, solo los nuevos/tocados; el resto ya tenía comentarios razonables de sesiones anteriores.
+
+### Cómo continuar en otra sesión
+Con el usuario con sesión iniciada: recorrer Dashboard (confirmar que los 4 gauges muestran bandas de color correctas contra los umbrales reales y que "Tendencia reciente" sigue mostrando las mini-gráficas), Mapa, Historial, Alertas, Reportes (gauges en las tarjetas), y las 5 pantallas de Administración — confirmando que el shell de navegación (barra superior nueva con logo, enlaces y menú de usuario) funciona en todas, sin errores de consola. Corregir lo que se encuentre, según lo pedido explícitamente por el usuario.
+
+---
+
 ## Sesión 4 — 2026-09-14
 
 ### Motivo de la sesión

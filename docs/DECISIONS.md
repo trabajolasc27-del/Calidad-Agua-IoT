@@ -280,3 +280,29 @@ Alcance confirmado por el usuario entre dos preguntas de alcance:
 **Qué falta (no bloqueante):** la sesión del navegador expiró de nuevo durante la ejecución y no corresponde iniciar sesión por el usuario, así que el recorrido visual completo (Dashboard, Mapa, Historial, Alertas, Reportes, Administración) quedó pendiente de que el usuario confirme con sesión propia. Todo lo demás sí quedó verificado en vivo: el esquema real (consultas de solo lectura), los datos reales sobreviviendo el rename, las consultas exactas que usa el frontend (`perfiles`, `dispositivos` con embed a `ubicaciones`) validadas contra el esquema real vía REST anónimo, y la tubería completa de ingesta (simulador → Edge Function redesplegada → RPC → tablas nuevas) con una lectura real respondiendo `201`.
 
 **Cómo aplicar:** cualquier trabajo futuro sobre la base de datos debe usar los nombres en español de aquí en adelante. Si se agrega una tabla o columna nueva, seguir el mismo criterio: vocabulario de negocio en español, campos técnicos universales en inglés.
+
+## D-022 — Rediseño visual completo (identidad propia + carátulas tipo velocímetro + shell de navegación)
+
+**Fecha:** 2026-09-24
+**Estado:** Confirmado, en progreso (falta verificación visual en vivo)
+
+El asesor externo del usuario comparó la app (tema Material 3 azul de fábrica, sin identidad propia) contra un panel IoT de referencia (Laravel, sensores de gas/UV, tema oscuro con carátulas circulares tipo velocímetro por sensor) y pidió una interfaz "similar en calidad pero propia y única", acorde a los 4 parámetros reales del proyecto, intuitiva y sin saturar de colores/información. También pidió documentar el código y probar cada pantalla al terminar.
+
+Decisiones de dirección confirmadas con el usuario antes de ejecutar (dos preguntas, ver el plan de la sesión):
+1. **Paleta clara, identidad propia "color agua"**, no el tema oscuro de la referencia — se formalizó el teal `#0f7d72` (ya usado de forma suelta en Reportes/Wireframes/Bitácora de sesiones previas) generando una paleta tonal M3 completa con `ng generate @angular/material:m3-theme` en vez de inventar colores nuevos sin relación con lo ya construido. Tipografía IBM Plex Sans/Mono (idem, ya establecida informalmente).
+2. **Carátulas tipo velocímetro (gauge circular, SVG propio)** para los 4 parámetros del Dashboard y para Reportes, reemplazando la tarjeta de solo-número. El requisito RF-24 (tendencia reciente) que antes cubría la mini-gráfica dentro de cada tarjeta se movió a una sección aparte "Tendencia reciente" con una mini-gráfica por parámetro cada una en su propia escala (mezclarlas en un solo eje las volvería ilegibles — pH 0-14 vs. turbidez hasta miles de NTU).
+
+**Qué se hizo:**
+- `frontend/src/theme-colors.scss` (generado) + `frontend/src/styles.scss`: paleta M3 propia, tipografía de marca, y tokens CSS semánticos compartidos (`--wq-ok/--wq-warn/--wq-crit` + variantes `-soft`) que reemplazan los valores hexadecimales sueltos que cada pantalla repetía por su cuenta.
+- `frontend/src/app/shared/gauge/`: componente `wq-gauge` nuevo, arco SVG a mano (sin librería) que pinta bandas de color según el umbral activo real de cada parámetro (mismo criterio que `evaluar_valor_medicion`, D-021), no colores genéricos.
+- `frontend/src/app/core/shell/app-shell.ts`: shell de navegación que antes no existía — cada pantalla traía su propia `<mat-toolbar>` y las sub-pantallas solo podían volver a "Panel", no saltar directo a otra sección. `app.routes.ts` anida las rutas autenticadas bajo una ruta padre que carga el shell; `authGuard` se declara una sola vez ahí (protege todo el subárbol igual que antes) y `roleGuard` sigue en cada hija que lo necesita.
+- `dashboard.service.ts` gana `listActiveThresholds()` y `reports.service.ts` trae también parámetros/umbrales, ambos solo para alimentar las bandas del gauge — no cambia ninguna regla de evaluación real.
+- Auditoría de texto de interfaz en español: se revisaron todas las plantillas `.html` buscando palabras de UI en inglés (Login/Save/Cancel/etc.) — **no se encontró ninguna**, la app ya estaba en español desde que se construyó; los únicos resultados del grep eran nombres de íconos de Material (`logout`, `warning`, ligaduras de fuente, no texto visible) y identificadores de código (`.invalid`, `.invalidateSize()`).
+- Documentación de código: se ampliaron los comentarios de cabecera de los archivos nuevos/tocados (`gauge.ts`, `app-shell.ts`, `dashboard.ts`, `auth.guard.ts`, `reports.service.ts`) explicando qué hacen, cómo funcionan y por qué se decidieron así — no se tocó cada uno de los ~40 archivos del proyecto en esta sesión, ver "Qué falta" abajo.
+
+**Qué falta (no bloqueante, ver PROGRESS.md):**
+- Verificación visual en vivo de las ~9 pantallas y sus diálogos con una sesión autenticada real (los gauges con datos y umbrales reales, la navegación del shell, etc.) — la sesión del navegador no estaba disponible durante esta tanda de cambios.
+- Pasada de documentación de código sobre el resto de servicios/componentes que no se tocaron en este bloque (las pantallas de Administración y sus diálogos ya tenían comentarios razonables de una sesión anterior; se ampliarán si hace falta al hacer la verificación visual).
+- Prueba manual de cada botón/diálogo pedida explícitamente por el usuario.
+
+**Cómo aplicar:** cualquier pantalla nueva debe usar los tokens de `styles.scss` (`--wq-*`, `.mono`, `.page-title`, `.wq-status-pill`) y vivir dentro del shell (`app.routes.ts`, como hija de la ruta que carga `AppShell`) en vez de traer su propia barra de navegación.

@@ -3,6 +3,7 @@ import type { RealtimeChannel } from '@supabase/supabase-js';
 
 import { SupabaseService } from '../../core/supabase.service';
 import type { Parameter } from '../../core/models/parameter.model';
+import type { Threshold } from '../../core/models/threshold.model';
 import type { LatestMeasurement, EvaluationResult } from '../../core/models/measurement.model';
 import type { DashboardAlert } from '../../core/models/alert.model';
 
@@ -82,8 +83,27 @@ export class DashboardService {
     return (data ?? []) as unknown as MeasurementRow[];
   }
 
-  /** Combina el catalogo de parametros con la ultima lectura + tendencia de cada uno. */
-  buildLatestMeasurements(parameters: Parameter[], rows: MeasurementRow[]): LatestMeasurement[] {
+  /**
+   * Umbrales activos de todos los parámetros (uno por parámetro, el que
+   * tenga is_active = true). Se usan solo para dibujar las bandas de la
+   * carátula (wq-gauge) en el Dashboard -- la evaluación real de cada
+   * lectura ya viene resuelta desde la base de datos, esto es puramente
+   * visual.
+   */
+  async listActiveThresholds(): Promise<Threshold[]> {
+    const { data, error } = await this.supabaseService.client
+      .from('umbrales')
+      .select('*')
+      .eq('is_active', true);
+
+    if (error) {
+      throw new Error(`No se pudo cargar los umbrales: ${error.message}`);
+    }
+    return (data ?? []) as Threshold[];
+  }
+
+  /** Combina el catalogo de parametros con la ultima lectura + tendencia + umbral activo de cada uno. */
+  buildLatestMeasurements(parameters: Parameter[], rows: MeasurementRow[], thresholds: Threshold[]): LatestMeasurement[] {
     return parameters.map((parameter) => {
       const rowsForParam = rows.filter((r) => r.parametros?.codigo === parameter.codigo);
       const latest = rowsForParam[0];
@@ -96,6 +116,7 @@ export class DashboardService {
           .slice(0, 12)
           .map((r) => r.valor)
           .reverse(),
+        threshold: thresholds.find((t) => t.parametro_id === parameter.id) ?? null,
       };
     });
   }

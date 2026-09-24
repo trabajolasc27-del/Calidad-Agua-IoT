@@ -1,7 +1,5 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
-import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -27,15 +25,7 @@ const STATUS_LABEL: Record<string, string> = {
 @Component({
   selector: 'wq-alerts',
   standalone: true,
-  imports: [
-    CommonModule,
-    RouterLink,
-    MatToolbarModule,
-    MatButtonModule,
-    MatButtonToggleModule,
-    MatProgressSpinnerModule,
-    MatDialogModule,
-  ],
+  imports: [CommonModule, MatButtonModule, MatButtonToggleModule, MatProgressSpinnerModule, MatDialogModule],
   templateUrl: './alerts.html',
   styleUrl: './alerts.scss',
 })

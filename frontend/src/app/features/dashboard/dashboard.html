@@ -1,22 +1,3 @@
-<mat-toolbar color="primary">
-  <span class="toolbar-title">Plataforma IoT de Calidad del Agua</span>
-  <span class="spacer"></span>
-  <span class="user-chip">
-    {{ authService.profile()?.nombre_completo || authService.session()?.user?.email }}
-    · {{ authService.role() }}
-  </span>
-  <a mat-button routerLink="/mapa">Mapa</a>
-  <a mat-button routerLink="/historial">Historial</a>
-  <a mat-button routerLink="/alertas">Alertas</a>
-  @if (authService.role() === 'administrador' || authService.role() === 'analista') {
-    <a mat-button routerLink="/reportes">Reportes</a>
-  }
-  @if (authService.role() === 'administrador') {
-    <a mat-button routerLink="/administracion">Administración</a>
-  }
-  <button mat-button (click)="logout()">Cerrar sesión</button>
-</mat-toolbar>
-
 <main class="dashboard">
   <div class="toolbar-row">
     @switch (devicesState()) {
@@ -109,6 +90,23 @@
                 </li>
               }
             </ul>
+          }
+        </div>
+      </section>
+
+      <!-- Tendencia reciente (RF-24): un mini-grafica por parametro, cada
+           una en su propia escala -- pH, OD, turbidez y temperatura tienen
+           rangos numericos muy distintos, mezclarlas en un solo eje las
+           haria ilegibles (misma razon por la que Historial y Reportes
+           solo grafican un parametro fijo a la vez). -->
+      <section class="trend-section">
+        <span class="panel-title">Tendencia reciente</span>
+        <div class="trend-grid">
+          @for (m of measurements(); track m.parameter.id) {
+            <div class="trend-item">
+              <span class="trend-label">{{ m.parameter.nombre }}</span>
+              <canvas #trendCanvas></canvas>
+            </div>
           }
         </div>
       </section>

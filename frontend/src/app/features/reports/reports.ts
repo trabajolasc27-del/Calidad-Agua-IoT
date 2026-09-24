@@ -1,8 +1,6 @@
 import { AfterViewInit, Component, ElementRef, OnDestroy, ViewChild, ViewChildren, type QueryList, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { RouterLink } from '@angular/router';
-import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
@@ -16,6 +14,7 @@ import ExcelJS from 'exceljs';
 
 import { ReportsService, type ReportData } from './reports.service';
 import type { DashboardDevice } from '../dashboard/dashboard.service';
+import { Gauge } from '../../shared/gauge/gauge';
 
 const pdfMake = pdfMakeModule as unknown as { vfs: unknown; createPdf: (doc: TDocumentDefinitions) => { download: (fileName?: string) => void } };
 pdfMake.vfs = pdfFontsModule;
@@ -28,17 +27,7 @@ type ViewState = 'idle' | 'loading' | 'data' | 'empty' | 'error';
 @Component({
   selector: 'wq-reports',
   standalone: true,
-  imports: [
-    CommonModule,
-    RouterLink,
-    ReactiveFormsModule,
-    MatToolbarModule,
-    MatButtonModule,
-    MatFormFieldModule,
-    MatSelectModule,
-    MatInputModule,
-    MatProgressSpinnerModule,
-  ],
+  imports: [CommonModule, ReactiveFormsModule, MatButtonModule, MatFormFieldModule, MatSelectModule, MatInputModule, MatProgressSpinnerModule, Gauge],
   templateUrl: './reports.html',
   styleUrl: './reports.scss',
 })

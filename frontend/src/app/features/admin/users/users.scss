@@ -36,7 +36,7 @@
   font-size: 0.9rem;
 
   &.error {
-    color: #b23b3b;
+    color: var(--wq-crit);
   }
 }
 
@@ -47,12 +47,12 @@
   border-radius: 999px;
 
   &.ok {
-    background: #e3f3e6;
-    color: #2f8f4e;
+    background: var(--wq-ok-soft);
+    color: var(--wq-ok);
   }
 
   &.inactive {
-    background: #fbe3e1;
-    color: #b23b3b;
+    background: var(--wq-crit-soft);
+    color: var(--wq-crit);
   }
 }

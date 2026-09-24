@@ -1,11 +1,8 @@
 import { AfterViewInit, Component, ElementRef, OnDestroy, ViewChild, signal } from '@angular/core';
-import { RouterLink } from '@angular/router';
-import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import * as L from 'leaflet';
 
-import { AuthService } from '../../core/auth.service';
 import { MapService, type MapLocation } from './map.service';
 import { fixLeafletDefaultIcon } from '../../core/leaflet-icon-fix';
 
@@ -17,7 +14,7 @@ type ViewState = 'loading' | 'data' | 'empty' | 'error';
 @Component({
   selector: 'wq-map-view',
   standalone: true,
-  imports: [RouterLink, MatToolbarModule, MatButtonModule, MatProgressSpinnerModule],
+  imports: [MatButtonModule, MatProgressSpinnerModule],
   templateUrl: './map-view.html',
   styleUrl: './map-view.scss',
 })
@@ -30,10 +27,7 @@ export class MapView implements AfterViewInit, OnDestroy {
 
   private map?: L.Map;
 
-  constructor(
-    protected readonly authService: AuthService,
-    private readonly mapService: MapService,
-  ) {}
+  constructor(private readonly mapService: MapService) {}
 
   ngAfterViewInit(): void {
     fixLeafletDefaultIcon();

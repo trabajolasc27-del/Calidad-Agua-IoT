@@ -1,7 +1,5 @@
 import { Component } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
-import { MatToolbarModule } from '@angular/material/toolbar';
-import { MatButtonModule } from '@angular/material/button';
 
 // Shell de Administracion, protegido por roleGuard(['administrador']). Cada
 // pestana es una ruta hija.
@@ -13,7 +11,7 @@ interface AdminTab {
 @Component({
   selector: 'wq-admin',
   standalone: true,
-  imports: [RouterLink, RouterLinkActive, RouterOutlet, MatToolbarModule, MatButtonModule],
+  imports: [RouterLink, RouterLinkActive, RouterOutlet],
   templateUrl: './admin.html',
   styleUrl: './admin.scss',
 })

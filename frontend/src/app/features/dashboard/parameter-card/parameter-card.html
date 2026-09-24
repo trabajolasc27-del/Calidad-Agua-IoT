@@ -1,22 +1,15 @@
-<div class="card" [class]="statusMeta.cls">
-  <div class="card-top">
-    <span class="param-name">{{ measurement.parameter.nombre }}</span>
-    <span class="status-pill">
-      <mat-icon aria-hidden="true">{{ statusMeta.icon }}</mat-icon>
-      {{ statusMeta.label }}
-    </span>
-  </div>
+<div class="card">
+  <span class="param-name">{{ measurement.parameter.nombre }}</span>
 
-  <div class="value-row">
-    @if (measurement.value !== null) {
-      <span class="value">{{ measurement.value }}</span>
-      <span class="unit">{{ measurement.parameter.unidad }}</span>
-    } @else {
-      <span class="value muted">Sin lecturas</span>
-    }
-  </div>
-
-  <div class="sparkline-box">
-    <canvas #sparkline></canvas>
-  </div>
+  <wq-gauge
+    [valor]="measurement.value"
+    [unidad]="measurement.parameter.unidad"
+    [minimo]="measurement.parameter.minimo_fisico ?? 0"
+    [maximo]="measurement.parameter.maximo_fisico ?? 100"
+    [criticoBajo]="measurement.threshold?.critico_bajo ?? null"
+    [alertaBajo]="measurement.threshold?.alerta_bajo ?? null"
+    [alertaAlto]="measurement.threshold?.alerta_alto ?? null"
+    [criticoAlto]="measurement.threshold?.critico_alto ?? null"
+    [resultado]="measurement.evaluation_result"
+  />
 </div>

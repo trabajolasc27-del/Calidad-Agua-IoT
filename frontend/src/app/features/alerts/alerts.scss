@@ -52,12 +52,12 @@
   flex: none;
 
   &.warn {
-    background: #f8ecd2;
-    color: #9c6d0a;
+    background: var(--wq-warn-soft);
+    color: var(--wq-warn);
   }
   &.crit {
-    background: #fbe3e1;
-    color: #b23b3b;
+    background: var(--wq-crit-soft);
+    color: var(--wq-crit);
   }
 }
 
@@ -102,6 +102,6 @@
   font-size: 0.9rem;
 
   &.error {
-    color: #b23b3b;
+    color: var(--wq-crit);
   }
 }

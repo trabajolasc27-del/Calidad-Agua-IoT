@@ -43,10 +43,10 @@
   font-size: 0.9rem;
 
   &.error {
-    color: #b23b3b;
+    color: var(--wq-crit);
   }
   &.warn {
-    color: #9c6d0a;
+    color: var(--wq-warn);
   }
 }
 

@@ -1,0 +1,44 @@
+<mat-toolbar color="primary" class="shell-toolbar">
+  <a routerLink="/panel" class="brand">
+    <!-- Marca propia: gota estilizada. Reemplaza el icono generico de Material que traia la app antes del rediseño. -->
+    <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" class="brand-mark">
+      <path
+        fill="currentColor"
+        d="M12 2C8.5 7 5 11.2 5 15a7 7 0 0 0 14 0c0-3.8-3.5-8-7-13Z"
+      />
+    </svg>
+    <span class="brand-text">Calidad del Agua</span>
+  </a>
+
+  <nav class="shell-nav">
+    <a mat-button routerLink="/panel" routerLinkActive="active">Panel</a>
+    <a mat-button routerLink="/mapa" routerLinkActive="active">Mapa</a>
+    <a mat-button routerLink="/historial" routerLinkActive="active">Historial</a>
+    <a mat-button routerLink="/alertas" routerLinkActive="active">Alertas</a>
+    @if (authService.role() === 'administrador' || authService.role() === 'analista') {
+      <a mat-button routerLink="/reportes" routerLinkActive="active">Reportes</a>
+    }
+    @if (authService.role() === 'administrador') {
+      <a mat-button routerLink="/administracion" routerLinkActive="active">Administración</a>
+    }
+  </nav>
+
+  <span class="spacer"></span>
+
+  <button mat-button [matMenuTriggerFor]="userMenu" class="user-trigger">
+    <span class="user-name">{{ authService.profile()?.nombre_completo || authService.session()?.user?.email }}</span>
+    <mat-icon aria-hidden="true">expand_more</mat-icon>
+  </button>
+  <mat-menu #userMenu="matMenu">
+    <div class="user-menu-header">
+      <span class="user-menu-name">{{ authService.profile()?.nombre_completo || authService.session()?.user?.email }}</span>
+      <span class="user-menu-role">{{ authService.role() }}</span>
+    </div>
+    <button mat-menu-item (click)="logout()">
+      <mat-icon aria-hidden="true">logout</mat-icon>
+      Cerrar sesión
+    </button>
+  </mat-menu>
+</mat-toolbar>
+
+<router-outlet />
