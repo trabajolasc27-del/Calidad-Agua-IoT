@@ -284,7 +284,7 @@ Alcance confirmado por el usuario entre dos preguntas de alcance:
 ## D-022 — Rediseño visual completo (identidad propia + carátulas tipo velocímetro + shell de navegación)
 
 **Fecha:** 2026-09-24
-**Estado:** Confirmado, en progreso (falta verificación visual en vivo)
+**Estado:** Confirmado y verificado en vivo
 
 El asesor externo del usuario comparó la app (tema Material 3 azul de fábrica, sin identidad propia) contra un panel IoT de referencia (Laravel, sensores de gas/UV, tema oscuro con carátulas circulares tipo velocímetro por sensor) y pidió una interfaz "similar en calidad pero propia y única", acorde a los 4 parámetros reales del proyecto, intuitiva y sin saturar de colores/información. También pidió documentar el código y probar cada pantalla al terminar.
 
@@ -300,9 +300,15 @@ Decisiones de dirección confirmadas con el usuario antes de ejecutar (dos pregu
 - Auditoría de texto de interfaz en español: se revisaron todas las plantillas `.html` buscando palabras de UI en inglés (Login/Save/Cancel/etc.) — **no se encontró ninguna**, la app ya estaba en español desde que se construyó; los únicos resultados del grep eran nombres de íconos de Material (`logout`, `warning`, ligaduras de fuente, no texto visible) y identificadores de código (`.invalid`, `.invalidateSize()`).
 - Documentación de código: se ampliaron los comentarios de cabecera de los archivos nuevos/tocados (`gauge.ts`, `app-shell.ts`, `dashboard.ts`, `auth.guard.ts`, `reports.service.ts`) explicando qué hacen, cómo funcionan y por qué se decidieron así — no se tocó cada uno de los ~40 archivos del proyecto en esta sesión, ver "Qué falta" abajo.
 
-**Qué falta (no bloqueante, ver PROGRESS.md):**
-- Verificación visual en vivo de las ~9 pantallas y sus diálogos con una sesión autenticada real (los gauges con datos y umbrales reales, la navegación del shell, etc.) — la sesión del navegador no estaba disponible durante esta tanda de cambios.
-- Pasada de documentación de código sobre el resto de servicios/componentes que no se tocaron en este bloque (las pantallas de Administración y sus diálogos ya tenían comentarios razonables de una sesión anterior; se ampliarán si hace falta al hacer la verificación visual).
-- Prueba manual de cada botón/diálogo pedida explícitamente por el usuario.
+**Verificación visual en vivo (2026-09-24, sesión real autenticada):** se recorrieron Panel (con `NODO-DEMO-001`, que tiene datos históricos reales), Mapa, Historial, Alertas (listado + diálogo de detalle con línea de tiempo), Reportes (formulario + gauges de estadísticas) y las 5 subpantallas de Administración (Usuarios + diálogo "Nuevo usuario", Dispositivos, Ubicaciones, Parámetros, Umbrales) más el menú de usuario. Se encontraron y corrigieron dos errores reales de layout que solo aparecían con la interfaz ya renderizada (no los hubiera detectado `ng build`):
 
-**Cómo aplicar:** cualquier pantalla nueva debe usar los tokens de `styles.scss` (`--wq-*`, `.mono`, `.page-title`, `.wq-status-pill`) y vivir dentro del shell (`app.routes.ts`, como hija de la ruta que carga `AppShell`) en vez de traer su propia barra de navegación.
+1. **Enlaces de navegación superpuestos** ("Reportes"/"Administración" se veían fusionados en un viewport angosto): Angular Material aplica `min-width: 64px` por defecto a todo `mat-button`, pensado para etiquetas cortas tipo "OK"/"Cancelar". Con etiquetas más largas, el texto se desbordaba sobre el enlace vecino en vez de que el contenedor (`overflow-x: auto`, ya configurado correctamente) hiciera scroll — el contenedor nunca llegaba a necesitar ese scroll porque cada botón individual no respetaba su propio ancho de contenido. Corregido en `app-shell.scss` con `a { min-width: 0; padding: 0 0.6rem; white-space: nowrap; flex: none; }` dentro de `.shell-nav`.
+2. **Mini-gráficas de "Tendencia reciente" deformes** (picos gigantes fuera de proporción, ocupando toda la pantalla): Chart.js con `responsive: true` + `maintainAspectRatio: false` necesita que su contenedor **inmediato** tenga una altura explícita en CSS. La altura se le había puesto al propio `<canvas>` (`.trend-item canvas { height: 60px }`), pero Chart.js la sobreescribe en cada ciclo de resize según el tamaño de su padre — y como `.trend-item` es `flex` sin altura fija, el padre crecía para ajustarse al canvas y el canvas crecía para ajustarse al padre: un bucle de crecimiento infinito. Corregido envolviendo cada `<canvas>` en un `<div class="trend-canvas-wrap">` con `position: relative; height: 60px;` en `dashboard.html`/`dashboard.scss`, moviendo la altura fija a ese contenedor en vez del canvas.
+
+No se encontraron errores de consola nuevos (solo peticiones de Google Fonts sin resolver, propias del sandbox del navegador sin acceso a internet — no ocurren en un despliegue real con internet). `npx ng build` quedó limpio tras ambas correcciones.
+
+**Qué falta (no bloqueante, ver PROGRESS.md):**
+- Confirmar el comportamiento del nav en viewports más anchos que los ~800px probados, y decidir si hace falta un menú hamburguesa para viewports muy angostos en vez de depender solo del scroll horizontal.
+- Pasada de documentación de código sobre el resto de servicios/componentes que no se tocaron en este bloque (las pantallas de Administración y sus diálogos ya tenían comentarios razonables de una sesión anterior).
+
+**Cómo aplicar:** cualquier pantalla nueva debe usar los tokens de `styles.scss` (`--wq-*`, `.mono`, `.page-title`, `.wq-status-pill`) y vivir dentro del shell (`app.routes.ts`, como hija de la ruta que carga `AppShell`) en vez de traer su propia barra de navegación. Cualquier nuevo uso de Chart.js con `maintainAspectRatio: false` debe darle la altura fija a un `<div>` contenedor dedicado, nunca al `<canvas>` ni a un padre `flex`/`grid` sin altura propia — mismo tipo de trampa de "ancho/alto por defecto oculto" que el `min-width: 64px` de `mat-button`.

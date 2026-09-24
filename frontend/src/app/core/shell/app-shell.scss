@@ -32,6 +32,7 @@
 
 .shell-nav {
   display: flex;
+  align-items: center;
   gap: 0.15rem;
   min-width: 0;
   overflow-x: auto;
@@ -39,6 +40,20 @@
 
   &::-webkit-scrollbar {
     display: none;
+  }
+
+  // mat-button trae min-width: 64px de Material (pensado para etiquetas
+  // cortas como "OK"/"Cancelar"). "Administración" y "Reportes" no caben
+  // ahi, y como un boton no recorta su contenido por defecto, el texto se
+  // desbordaba visualmente sobre el siguiente enlace en vez de ajustarse
+  // -- el mismo tipo de problema de flex-shrink que ya se habia visto
+  // antes en mat-toolbar (ver historial de PROGRESS.md), esta vez con
+  // min-width de boton en vez de min-width de flex item.
+  a {
+    min-width: 0;
+    padding: 0 0.6rem;
+    white-space: nowrap;
+    flex: none;
   }
 
   a.active {

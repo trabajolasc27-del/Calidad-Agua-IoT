@@ -170,7 +170,15 @@
   color: var(--mat-sys-on-surface-variant, #666);
 }
 
-.trend-item canvas {
+// Chart.js con responsive:true + maintainAspectRatio:false necesita que su
+// contenedor INMEDIATO tenga una altura explicita en CSS -- si se la damos
+// solo al <canvas> (como antes), Chart.js la sobreescribe en cada resize
+// segun el tamaño de su padre, y como .trend-item es flex sin altura fija,
+// el padre crece para ajustarse al canvas y el canvas crece para ajustarse
+// al padre: un bucle de crecimiento infinito (esto es lo que se veia roto
+// en la verificacion en vivo -- graficas deformes ocupando toda la pantalla).
+.trend-canvas-wrap {
+  position: relative;
   height: 60px;
 }
 

@@ -105,7 +105,9 @@
           @for (m of measurements(); track m.parameter.id) {
             <div class="trend-item">
               <span class="trend-label">{{ m.parameter.nombre }}</span>
-              <canvas #trendCanvas></canvas>
+              <div class="trend-canvas-wrap">
+                <canvas #trendCanvas></canvas>
+              </div>
             </div>
           }
         </div>

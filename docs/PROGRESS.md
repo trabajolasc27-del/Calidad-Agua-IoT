@@ -14,14 +14,20 @@ Rediseño visual completo — ver [DECISIONS.md](DECISIONS.md) D-022 para el det
 - Documentación de código ampliada en los archivos nuevos/tocados.
 
 ### Pruebas ejecutadas
-`tsc --noEmit` y `ng build` limpios en cada bloque grande de cambios (tema, gauge, shell, integración en Reportes, sweep de colores). **No se pudo verificar visualmente con sesión autenticada** (la sesión del navegador no estaba disponible durante el trabajo) — se verificó únicamente la pantalla de login sin autenticar, donde la paleta nueva ya se ve aplicada correctamente.
+`tsc --noEmit` y `ng build` limpios en cada bloque grande de cambios (tema, gauge, shell, integración en Reportes, sweep de colores), y de nuevo tras las dos correcciones del recorrido en vivo (ver abajo).
+
+**Recorrido visual en vivo (misma sesión, ya con el usuario autenticado):** Panel (con `NODO-DEMO-001`, que tiene datos históricos reales — los 4 gauges mostraron valores, bandas de color y píldoras de estado correctas, y la sección "Tendencia reciente" con sus 4 mini-gráficas), Mapa (marcadores y lista de ubicaciones), Historial (tabla y filtros), Alertas (listado "Todas" con las 2 alertas cerradas de la Sesión 4, diálogo de detalle con línea de tiempo completa), Reportes (formulario + gauges de estadística con mín/máx/promedio/lecturas/alertas por parámetro), y las 5 subpantallas de Administración (Usuarios + diálogo "Nuevo usuario", Dispositivos, Ubicaciones, Parámetros, Umbrales) más el menú de usuario. Sin errores de consola nuevos (solo peticiones de Google Fonts sin resolver, propias del sandbox sin acceso a internet).
+
+Se encontraron y corrigieron **dos errores reales** durante este recorrido — ver [DECISIONS.md](DECISIONS.md) D-022 para el detalle técnico:
+1. Enlaces del shell de navegación superpuestos en viewport angosto (`min-width: 64px` por defecto de `mat-button` de Angular Material).
+2. Mini-gráficas de "Tendencia reciente" deformes por un bucle de crecimiento infinito de Chart.js (altura fija puesta en el `<canvas>` en vez de en su contenedor inmediato).
 
 ### Errores conocidos (no bloqueantes)
-- Falta el recorrido visual en vivo de las ~9 pantallas con datos reales (Dashboard con gauges reales, navegación del shell, Reportes con gauges en las tarjetas de estadística, etc.) — pedido explícito del usuario, pendiente de sesión autenticada.
 - La pasada de documentación de código no cubrió los ~40 archivos del proyecto completo en este bloque, solo los nuevos/tocados; el resto ya tenía comentarios razonables de sesiones anteriores.
+- No se confirmó el comportamiento del nav en viewports más anchos que los ~800px probados en este recorrido.
 
 ### Cómo continuar en otra sesión
-Con el usuario con sesión iniciada: recorrer Dashboard (confirmar que los 4 gauges muestran bandas de color correctas contra los umbrales reales y que "Tendencia reciente" sigue mostrando las mini-gráficas), Mapa, Historial, Alertas, Reportes (gauges en las tarjetas), y las 5 pantallas de Administración — confirmando que el shell de navegación (barra superior nueva con logo, enlaces y menú de usuario) funciona en todas, sin errores de consola. Corregir lo que se encuentre, según lo pedido explícitamente por el usuario.
+El rediseño visual queda cerrado y verificado en vivo. Commit + push de las dos correcciones de este recorrido pendiente. Después: retomar Brevo o las pruebas físicas de Arduino/ESP32 (firmware ya actualizado al contrato en español, D-021).
 
 ---
 
