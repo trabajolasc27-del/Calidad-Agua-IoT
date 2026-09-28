@@ -11,6 +11,8 @@ import { AuthService } from '../../../core/auth.service';
 import type { Profile, UserRole } from '../../../core/models/profile.model';
 import { ROLE_LABELS } from '../../../core/models/profile.model';
 import { UserFormDialog, type UserFormDialogData } from './user-form-dialog/user-form-dialog';
+import { EmptyState } from '../../../shared/empty-state/empty-state';
+import { StatusBadge } from '../../../shared/status-badge/status-badge';
 
 type ViewState = 'loading' | 'data' | 'empty' | 'error';
 
@@ -18,7 +20,7 @@ type ViewState = 'loading' | 'data' | 'empty' | 'error';
 @Component({
   selector: 'wq-users',
   standalone: true,
-  imports: [MatTableModule, MatButtonModule, MatIconModule, MatChipsModule, MatProgressSpinnerModule, MatDialogModule],
+  imports: [MatTableModule, MatButtonModule, MatIconModule, MatChipsModule, MatProgressSpinnerModule, MatDialogModule, EmptyState, StatusBadge],
   templateUrl: './users.html',
   styleUrl: './users.scss',
 })

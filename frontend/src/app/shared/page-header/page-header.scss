@@ -1,0 +1,61 @@
+:host {
+  display: block;
+  margin-bottom: 1.25rem;
+}
+
+.crumbs {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.78rem;
+  color: var(--wq-text-soft);
+  margin-bottom: 0.4rem;
+
+  a {
+    color: var(--wq-text-soft);
+    text-decoration: none;
+
+    &:hover {
+      color: var(--wq-primary);
+      text-decoration: underline;
+    }
+  }
+
+  .current {
+    color: var(--wq-text);
+    font-weight: 600;
+  }
+}
+
+.header-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.titles {
+  min-width: 0;
+
+  h1 {
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 0;
+    color: var(--wq-text);
+  }
+}
+
+.subtitle {
+  margin: 0.2rem 0 0;
+  font-size: 0.9rem;
+  color: var(--wq-text-soft);
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}

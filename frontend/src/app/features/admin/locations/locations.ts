@@ -10,6 +10,8 @@ import { LocationsService } from './locations.service';
 import { fixLeafletDefaultIcon } from '../../../core/leaflet-icon-fix';
 import type { Location } from '../../../core/models/location.model';
 import { LocationFormDialog, type LocationFormDialogData } from './location-form-dialog/location-form-dialog';
+import { EmptyState } from '../../../shared/empty-state/empty-state';
+import { ConfirmService } from '../../../shared/confirm-dialog/confirm.service';
 
 type ViewState = 'loading' | 'data' | 'empty' | 'error';
 
@@ -19,7 +21,7 @@ type ViewState = 'loading' | 'data' | 'empty' | 'error';
 @Component({
   selector: 'wq-locations',
   standalone: true,
-  imports: [MatTableModule, MatButtonModule, MatIconModule, MatProgressSpinnerModule, MatDialogModule],
+  imports: [MatTableModule, MatButtonModule, MatIconModule, MatProgressSpinnerModule, MatDialogModule, EmptyState],
   templateUrl: './locations.html',
   styleUrl: './locations.scss',
 })
@@ -38,6 +40,7 @@ export class Locations implements AfterViewInit, OnDestroy {
   constructor(
     private readonly locationsService: LocationsService,
     private readonly dialog: MatDialog,
+    private readonly confirmService: ConfirmService,
   ) {}
 
   ngAfterViewInit(): void {
@@ -105,9 +108,15 @@ export class Locations implements AfterViewInit, OnDestroy {
     const deviceCount = this.deviceCount(location);
     const message =
       deviceCount > 0
-        ? `"${location.nombre}" tiene ${deviceCount} dispositivo(s) asignados; se quedarán sin ubicación. ¿Eliminar de todas formas?`
-        : `¿Eliminar "${location.nombre}"?`;
-    if (!confirm(message)) return;
+        ? `"${location.nombre}" tiene ${deviceCount} dispositivo(s) asignados; se quedarán sin ubicación.`
+        : `Esta acción no se puede deshacer.`;
+    const confirmed = await this.confirmService.ask({
+      title: `Eliminar "${location.nombre}"`,
+      message,
+      confirmLabel: 'Eliminar',
+      tone: 'danger',
+    });
+    if (!confirmed) return;
 
     const result = await this.locationsService.deleteLocation(location.id);
     if (result.ok) {

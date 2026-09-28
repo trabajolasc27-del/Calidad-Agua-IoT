@@ -10,13 +10,10 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { AuthService } from '../../../core/auth.service';
 import { AlertsService } from '../alerts.service';
 import type { Alert, AlertHistoryEntry } from '../../../core/models/alert.model';
-
-const STATUS_LABEL: Record<string, string> = {
-  NUEVA: 'Nueva',
-  RECONOCIDA: 'Reconocida',
-  ATENDIDA: 'Atendida',
-  CERRADA: 'Cerrada',
-};
+import { MatIconModule } from '@angular/material/icon';
+import { StatusBadge } from '../../../shared/status-badge/status-badge';
+import { alertSeverityStatus, alertStatusMeta } from '../../../shared/status.util';
+import { ConfirmService } from '../../../shared/confirm-dialog/confirm.service';
 
 // Detalle de una alerta: linea de tiempo completa y, si el rol lo
 // permite (D-007: solo admin/analista), el boton para avanzar al
@@ -33,12 +30,15 @@ const STATUS_LABEL: Record<string, string> = {
     MatFormFieldModule,
     MatInputModule,
     MatProgressSpinnerModule,
+    MatIconModule,
+    StatusBadge,
   ],
   templateUrl: './alert-detail-dialog.html',
   styleUrl: './alert-detail-dialog.scss',
 })
 export class AlertDetailDialog implements OnInit {
-  readonly statusLabel = STATUS_LABEL;
+  readonly alertSeverityStatus = alertSeverityStatus;
+  readonly alertStatusMeta = alertStatusMeta;
   readonly commentControl = new FormControl('', { nonNullable: true });
 
   readonly alert: WritableSignal<Alert>;
@@ -51,6 +51,7 @@ export class AlertDetailDialog implements OnInit {
   constructor(
     private readonly dialogRef: MatDialogRef<AlertDetailDialog, boolean>,
     private readonly alertsService: AlertsService,
+    private readonly confirmService: ConfirmService,
     protected readonly authService: AuthService,
     @Inject(MAT_DIALOG_DATA) public readonly data: { alert: Alert },
   ) {
@@ -89,6 +90,13 @@ export class AlertDetailDialog implements OnInit {
   }
 
   async close(): Promise<void> {
+    const confirmed = await this.confirmService.ask({
+      title: 'Cerrar alerta',
+      message: 'Una vez cerrada, la alerta queda marcada como resuelta en su línea de tiempo. Puedes seguir consultándola en el historial.',
+      confirmLabel: 'Cerrar alerta',
+    });
+    if (!confirmed) return;
+
     await this.runAction(() => this.alertsService.close(this.alert().id, this.commentControl.value || null));
   }
 

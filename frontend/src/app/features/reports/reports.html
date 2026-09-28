@@ -1,48 +1,58 @@
-<main class="reports-page">
-  <h1 class="page-title">Reportes</h1>
+<wq-page-header title="Reportes" subtitle="Estadísticas y exportación por dispositivo y periodo." />
 
-  <form [formGroup]="filtersForm" class="filters" (ngSubmit)="generate()">
-    <mat-form-field appearance="outline">
-      <mat-label>Dispositivo</mat-label>
-      <mat-select formControlName="deviceId">
-        @for (d of devices(); track d.id) {
-          <mat-option [value]="d.id">{{ d.codigo }} — {{ d.nombre }}</mat-option>
-        }
-      </mat-select>
-    </mat-form-field>
-
-    <mat-form-field appearance="outline">
-      <mat-label>Desde</mat-label>
-      <input matInput type="date" formControlName="dateFrom" />
-    </mat-form-field>
-
-    <mat-form-field appearance="outline">
-      <mat-label>Hasta</mat-label>
-      <input matInput type="date" formControlName="dateTo" />
-    </mat-form-field>
-
-    <button mat-flat-button color="primary" type="submit">Generar reporte</button>
-  </form>
-
-  @switch (state()) {
-    @case ('loading') {
-      <div class="state-panel">
-        <mat-spinner diameter="32" />
-      </div>
+<form [formGroup]="filtersForm" class="filters" (ngSubmit)="generate()">
+  <mat-form-field appearance="outline">
+    <mat-label>Dispositivo</mat-label>
+    <mat-select formControlName="deviceId">
+      @for (d of devices(); track d.id) {
+        <mat-option [value]="d.id">{{ d.codigo }} — {{ d.nombre }}</mat-option>
+      }
+    </mat-select>
+    @if (filtersForm.controls.deviceId.touched && filtersForm.controls.deviceId.hasError('required')) {
+      <mat-error>Selecciona un dispositivo.</mat-error>
     }
-    @case ('error') {
-      <div class="state-panel">
-        <p class="state-message error">{{ errorMessage() }}</p>
-      </div>
+  </mat-form-field>
+
+  <mat-form-field appearance="outline">
+    <mat-label>Desde</mat-label>
+    <input matInput type="date" formControlName="dateFrom" />
+    @if (filtersForm.controls.dateFrom.touched && filtersForm.controls.dateFrom.hasError('required')) {
+      <mat-error>Obligatorio.</mat-error>
     }
-    @case ('empty') {
-      <div class="state-panel">
-        <p class="state-message">No hay mediciones para este dispositivo en el periodo seleccionado.</p>
-      </div>
+  </mat-form-field>
+
+  <mat-form-field appearance="outline">
+    <mat-label>Hasta</mat-label>
+    <input matInput type="date" formControlName="dateTo" />
+    @if (filtersForm.controls.dateTo.touched && filtersForm.controls.dateTo.hasError('required')) {
+      <mat-error>Obligatorio.</mat-error>
     }
+  </mat-form-field>
+
+  <button mat-flat-button color="primary" type="submit" [disabled]="filtersForm.invalid || state() === 'loading'">
+    @if (state() === 'loading') {
+      <mat-spinner diameter="18" />
+    } @else {
+      Generar reporte
+    }
+  </button>
+</form>
+
+@switch (state()) {
+  @case ('loading') {
+    <div class="state-panel">
+      <mat-spinner diameter="32" />
+    </div>
+  }
+  @case ('error') {
+    <wq-empty-state icon="error_outline" tone="error" [message]="errorMessage() ?? 'Error al generar el reporte.'" />
+  }
+  @case ('empty') {
+    <wq-empty-state icon="bar_chart" message="No hay mediciones para este dispositivo en el periodo seleccionado." />
+  }
     @case ('data') {
       @if (report(); as r) {
-        <section class="summary">
+        <section class="wq-card summary">
           <div class="summary-item">
             <span class="summary-label">Dispositivo</span>
             <span class="summary-value">{{ r.device.codigo }} — {{ r.device.nombre }}</span>
@@ -65,13 +75,27 @@
         }
 
         <div class="export-actions">
-          <button mat-stroked-button [disabled]="exporting()" (click)="exportPdf()">Exportar PDF</button>
-          <button mat-stroked-button [disabled]="exporting()" (click)="exportExcel()">Exportar Excel</button>
+          <button mat-stroked-button [disabled]="exporting()" (click)="exportPdf()">
+            @if (exporting()) {
+              <mat-spinner diameter="16" />
+            } @else {
+              <mat-icon aria-hidden="true">picture_as_pdf</mat-icon>
+            }
+            Exportar PDF
+          </button>
+          <button mat-stroked-button [disabled]="exporting()" (click)="exportExcel()">
+            @if (exporting()) {
+              <mat-spinner diameter="16" />
+            } @else {
+              <mat-icon aria-hidden="true">table_view</mat-icon>
+            }
+            Exportar Excel
+          </button>
         </div>
 
         <section class="parameter-stats">
           @for (s of r.parameterStats; track s.codigo) {
-            <article class="stat-card">
+            <article class="wq-card stat-card">
               <header>
                 <h3>{{ s.nombre }}</h3>
                 <span class="unit">{{ s.unidad }}</span>
@@ -104,4 +128,3 @@
       }
     }
   }
-</main>

@@ -20,15 +20,12 @@
       </div>
     }
     @case ('error') {
-      <div class="state-panel">
-        <p class="state-message error">{{ errorMessage() }}</p>
+      <wq-empty-state icon="error_outline" tone="error" [message]="errorMessage() ?? 'Error al cargar las ubicaciones.'">
         <button mat-stroked-button (click)="load()">Reintentar</button>
-      </div>
+      </wq-empty-state>
     }
     @case ('empty') {
-      <div class="state-panel">
-        <p class="state-message">Todavía no hay ubicaciones registradas.</p>
-      </div>
+      <wq-empty-state icon="location_off" message="Todavía no hay ubicaciones registradas." />
     }
     @case ('data') {
       <table mat-table [dataSource]="locations()" class="locations-table">

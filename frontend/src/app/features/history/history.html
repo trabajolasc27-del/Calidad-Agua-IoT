@@ -1,7 +1,6 @@
-<main class="history-page">
-  <h1 class="page-title">Historial</h1>
+<wq-page-header title="Historial" subtitle="Consulta de mediciones registradas." />
 
-  <form [formGroup]="filtersForm" class="filters">
+<form [formGroup]="filtersForm" class="filters">
     <mat-form-field appearance="outline">
       <mat-label>Dispositivo</mat-label>
       <mat-select formControlName="deviceId">
@@ -68,15 +67,12 @@
       </div>
     }
     @case ('error') {
-      <div class="state-panel">
-        <p class="state-message error">{{ errorMessage() }}</p>
+      <wq-empty-state icon="error_outline" tone="error" [message]="errorMessage() ?? 'Error al cargar el historial.'">
         <button mat-stroked-button (click)="load()">Reintentar</button>
-      </div>
+      </wq-empty-state>
     }
     @case ('empty') {
-      <div class="state-panel">
-        <p class="state-message">No hay mediciones con estos filtros.</p>
-      </div>
+      <wq-empty-state icon="manage_search" message="No hay mediciones con estos filtros." />
     }
     @case ('data') {
       <table mat-table [dataSource]="rows()" class="history-table">
@@ -103,15 +99,7 @@
         <ng-container matColumnDef="status">
           <th mat-header-cell *matHeaderCellDef>Estado</th>
           <td mat-cell *matCellDef="let r">
-            @if (r.resultado_evaluacion === 'CONFORME') {
-              <span class="status-pill ok">Conforme</span>
-            } @else if (r.resultado_evaluacion === 'ALERTA') {
-              <span class="status-pill warn">Alerta</span>
-            } @else if (r.resultado_evaluacion === 'CRITICO') {
-              <span class="status-pill crit">Crítico</span>
-            } @else {
-              <span class="status-pill neutral">Sin evaluar</span>
-            }
+            <wq-status-badge [tone]="evaluationStatus(r.resultado_evaluacion).tone" [label]="evaluationStatus(r.resultado_evaluacion).label" [icon]="evaluationStatus(r.resultado_evaluacion).icon" />
           </td>
         </ng-container>
 
@@ -128,4 +116,3 @@
       />
     }
   }
-</main>

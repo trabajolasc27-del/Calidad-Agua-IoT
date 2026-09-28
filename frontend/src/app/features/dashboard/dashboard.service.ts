@@ -13,6 +13,7 @@ export interface DashboardDevice {
   nombre: string;
   estado: 'activo' | 'inactivo';
   ultima_comunicacion: string | null;
+  ubicaciones?: { nombre: string } | null;
 }
 
 interface MeasurementRow {
@@ -33,26 +34,26 @@ export class DashboardService {
   async listDevices(): Promise<DashboardDevice[]> {
     const { data, error } = await this.supabaseService.client
       .from('dispositivos')
-      .select('id, codigo, nombre, estado, ultima_comunicacion')
+      .select('id, codigo, nombre, estado, ultima_comunicacion, ubicaciones(nombre)')
       .order('codigo', { ascending: true });
 
     if (error) {
       throw new Error(`No se pudo cargar la lista de dispositivos: ${error.message}`);
     }
-    return (data ?? []) as DashboardDevice[];
+    return (data ?? []) as unknown as DashboardDevice[];
   }
 
   async getDevice(deviceId: string): Promise<DashboardDevice | null> {
     const { data, error } = await this.supabaseService.client
       .from('dispositivos')
-      .select('id, codigo, nombre, estado, ultima_comunicacion')
+      .select('id, codigo, nombre, estado, ultima_comunicacion, ubicaciones(nombre)')
       .eq('id', deviceId)
       .maybeSingle();
 
     if (error) {
       throw new Error(`No se pudo cargar el dispositivo: ${error.message}`);
     }
-    return data as DashboardDevice | null;
+    return data as unknown as DashboardDevice | null;
   }
 
   async listParameters(): Promise<Parameter[]> {

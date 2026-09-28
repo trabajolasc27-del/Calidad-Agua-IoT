@@ -6,6 +6,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatIconModule } from '@angular/material/icon';
 import { Chart } from 'chart.js/auto';
 import * as pdfMakeModule from 'pdfmake/build/pdfmake';
 import * as pdfFontsModule from 'pdfmake/build/vfs_fonts';
@@ -15,6 +16,8 @@ import ExcelJS from 'exceljs';
 import { ReportsService, type ReportData } from './reports.service';
 import type { DashboardDevice } from '../dashboard/dashboard.service';
 import { Gauge } from '../../shared/gauge/gauge';
+import { PageHeader } from '../../shared/page-header/page-header';
+import { EmptyState } from '../../shared/empty-state/empty-state';
 
 const pdfMake = pdfMakeModule as unknown as { vfs: unknown; createPdf: (doc: TDocumentDefinitions) => { download: (fileName?: string) => void } };
 pdfMake.vfs = pdfFontsModule;
@@ -27,7 +30,19 @@ type ViewState = 'idle' | 'loading' | 'data' | 'empty' | 'error';
 @Component({
   selector: 'wq-reports',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, MatButtonModule, MatFormFieldModule, MatSelectModule, MatInputModule, MatProgressSpinnerModule, Gauge],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    MatButtonModule,
+    MatFormFieldModule,
+    MatSelectModule,
+    MatInputModule,
+    MatProgressSpinnerModule,
+    MatIconModule,
+    Gauge,
+    PageHeader,
+    EmptyState,
+  ],
   templateUrl: './reports.html',
   styleUrl: './reports.scss',
 })
@@ -113,12 +128,12 @@ export class Reports implements AfterViewInit, OnDestroy {
       const chart = new Chart(canvasRef.nativeElement, {
         type: 'line',
         data: {
-          labels: stats.trend.map((p) => new Date(p.medido_en).toLocaleDateString()),
+          labels: stats.trend.map((p) => new Date(p.medido_en).toLocaleDateString('es-MX')),
           datasets: [
             {
               data: stats.trend.map((p) => p.valor),
-              borderColor: '#0f7d72',
-              backgroundColor: '#0f7d7222',
+              borderColor: '#0b1f33',
+              backgroundColor: '#0b1f3322',
               borderWidth: 2,
               pointRadius: 0,
               tension: 0.3,

@@ -1,11 +1,17 @@
-<h1 class="page-title admin-title">Administración</h1>
+<wq-page-header title="Administración" subtitle="Usuarios, dispositivos, ubicaciones, parámetros y umbrales." />
 
 <nav class="admin-tabs">
   @for (tab of tabs; track tab.label) {
     @if (tab.path) {
-      <a class="admin-tab" [routerLink]="tab.path" routerLinkActive="active">{{ tab.label }}</a>
+      <a class="admin-tab" [routerLink]="tab.path" routerLinkActive="active">
+        <mat-icon aria-hidden="true">{{ tab.icon }}</mat-icon>
+        {{ tab.label }}
+      </a>
     } @else {
-      <span class="admin-tab disabled" title="Próximamente">{{ tab.label }}</span>
+      <span class="admin-tab disabled" title="Próximamente">
+        <mat-icon aria-hidden="true">{{ tab.icon }}</mat-icon>
+        {{ tab.label }}
+      </span>
     }
   }
 </nav>

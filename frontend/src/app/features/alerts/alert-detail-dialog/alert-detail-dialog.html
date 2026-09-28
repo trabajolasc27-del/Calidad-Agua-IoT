@@ -4,10 +4,8 @@
 
 <mat-dialog-content class="content">
   <div class="summary">
-    <span class="severity-pill" [class.warn]="alert().gravedad === 'ALERTA'" [class.crit]="alert().gravedad === 'CRITICO'">
-      {{ alert().gravedad === 'CRITICO' ? 'Crítico' : 'Alerta' }}
-    </span>
-    <span class="status-pill">{{ statusLabel[alert().estado] }}</span>
+    <wq-status-badge [tone]="alertSeverityStatus(alert().gravedad).tone" [label]="alertSeverityStatus(alert().gravedad).label" [icon]="alertSeverityStatus(alert().gravedad).icon" />
+    <wq-status-badge [tone]="alertStatusMeta(alert().estado).tone" [label]="alertStatusMeta(alert().estado).label" [icon]="alertStatusMeta(alert().estado).icon" />
     <span class="device-name">{{ alert().dispositivos?.nombre }}</span>
   </div>
 
@@ -27,7 +25,7 @@
         <div class="timeline-item">
           <span class="tl-dot"></span>
           <div class="tl-body">
-            <span class="tl-status">{{ statusLabel[h.estado_destino] }}</span>
+            <span class="tl-status">{{ alertStatusMeta(h.estado_destino).label }}</span>
             <span class="tl-meta">
               {{ h.cambiado_en | date: 'short' }}
               @if (h.perfiles?.nombre_completo) {

@@ -1,11 +1,22 @@
 import { Injectable } from '@angular/core';
 
 import { SupabaseService } from '../../core/supabase.service';
-import type { Alert, AlertHistoryEntry, AlertStatus } from '../../core/models/alert.model';
+import type { Alert, AlertHistoryEntry, AlertSeverity, AlertStatus } from '../../core/models/alert.model';
+import type { DashboardDevice } from '../dashboard/dashboard.service';
+import type { Parameter } from '../../core/models/parameter.model';
 
 export interface ServiceResult {
   ok: boolean;
   message?: string;
+}
+
+export interface AlertFilters {
+  status: AlertStatus | 'ALL';
+  severity: AlertSeverity | null;
+  deviceId: string | null;
+  parameterId: string | null;
+  dateFrom: string | null; // ISO
+  dateTo: string | null; // ISO
 }
 
 // Acceso a datos para Alertas (RF-30 a RF-34). Las transiciones de
@@ -18,21 +29,43 @@ export interface ServiceResult {
 export class AlertsService {
   constructor(private readonly supabaseService: SupabaseService) {}
 
-  async listAlerts(status: AlertStatus | 'ALL'): Promise<Alert[]> {
+  async listAlerts(filters: AlertFilters): Promise<Alert[]> {
     let query = this.supabaseService.client
       .from('alertas')
       .select('*, dispositivos(codigo, nombre), parametros(nombre, unidad), mediciones!primera_medicion_id(valor)')
       .order('abierta_en', { ascending: false });
 
-    if (status !== 'ALL') {
-      query = query.eq('estado', status);
-    }
+    if (filters.status !== 'ALL') query = query.eq('estado', filters.status);
+    if (filters.severity) query = query.eq('gravedad', filters.severity);
+    if (filters.deviceId) query = query.eq('dispositivo_id', filters.deviceId);
+    if (filters.parameterId) query = query.eq('parametro_id', filters.parameterId);
+    if (filters.dateFrom) query = query.gte('abierta_en', filters.dateFrom);
+    if (filters.dateTo) query = query.lte('abierta_en', filters.dateTo);
 
     const { data, error } = await query;
     if (error) {
       throw new Error(`No se pudo cargar las alertas: ${error.message}`);
     }
     return (data ?? []) as unknown as Alert[];
+  }
+
+  async listDevices(): Promise<DashboardDevice[]> {
+    const { data, error } = await this.supabaseService.client
+      .from('dispositivos')
+      .select('id, codigo, nombre, estado, ultima_comunicacion')
+      .order('codigo', { ascending: true });
+    if (error) throw new Error(`No se pudo cargar la lista de dispositivos: ${error.message}`);
+    return (data ?? []) as DashboardDevice[];
+  }
+
+  async listParameters(): Promise<Parameter[]> {
+    const { data, error } = await this.supabaseService.client
+      .from('parametros')
+      .select('*')
+      .eq('is_active', true)
+      .order('nombre', { ascending: true });
+    if (error) throw new Error(`No se pudo cargar el catálogo de parámetros: ${error.message}`);
+    return (data ?? []) as Parameter[];
   }
 
   async getHistory(alertId: string): Promise<AlertHistoryEntry[]> {

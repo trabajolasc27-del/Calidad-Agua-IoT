@@ -5,6 +5,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatIconModule } from '@angular/material/icon';
 
 import { AuthService } from '../../../core/auth.service';
 
@@ -15,7 +16,7 @@ import { AuthService } from '../../../core/auth.service';
 @Component({
   selector: 'wq-set-password',
   standalone: true,
-  imports: [ReactiveFormsModule, RouterLink, MatFormFieldModule, MatInputModule, MatButtonModule, MatProgressSpinnerModule],
+  imports: [ReactiveFormsModule, RouterLink, MatFormFieldModule, MatInputModule, MatButtonModule, MatProgressSpinnerModule, MatIconModule],
   templateUrl: './set-password.html',
   styleUrl: './set-password.scss',
 })
@@ -29,6 +30,7 @@ export class SetPassword implements OnInit {
   readonly submitting = signal(false);
   readonly errorMessage = signal<string | null>(null);
   readonly done = signal(false);
+  readonly hidePassword = signal(true);
 
   constructor(
     private readonly authService: AuthService,

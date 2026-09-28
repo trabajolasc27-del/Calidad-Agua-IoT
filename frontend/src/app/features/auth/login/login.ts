@@ -32,6 +32,7 @@ export class Login {
 
   readonly submitting = signal(false);
   readonly errorMessage = signal<string | null>(null);
+  readonly hidePassword = signal(true);
 
   constructor(
     private readonly authService: AuthService,

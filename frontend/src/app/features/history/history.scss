@@ -1,24 +1,9 @@
-.toolbar-title {
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.history-page {
-  max-width: 1000px;
-  margin: 1.5rem auto 3rem;
-  padding: 0 1.5rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
 .filters {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem 0.75rem;
   align-items: flex-start;
+  margin-bottom: 0.75rem;
 
   mat-form-field {
     width: 170px;
@@ -31,15 +16,16 @@
 
 .trend-box {
   height: 160px;
-  border: 1px solid var(--mat-sys-outline-variant, #dde3e2);
-  border-radius: 10px;
+  border: 1px solid var(--wq-border);
+  border-radius: var(--wq-radius-md);
   padding: 0.5rem;
+  margin-bottom: 0.75rem;
 }
 
 .history-table {
   width: 100%;
-  border: 1px solid var(--mat-sys-outline-variant, #dde3e2);
-  border-radius: 8px 8px 0 0;
+  border: 1px solid var(--wq-border);
+  border-radius: var(--wq-radius-md) var(--wq-radius-md) 0 0;
   border-bottom: none;
   overflow: hidden;
 
@@ -49,50 +35,14 @@
 }
 
 mat-paginator {
-  border: 1px solid var(--mat-sys-outline-variant, #dde3e2);
-  border-radius: 0 0 8px 8px;
-}
-
-.status-pill {
-  font-size: 0.75rem;
-  font-weight: 600;
-  padding: 0.15rem 0.55rem;
-  border-radius: 999px;
-
-  &.ok {
-    background: var(--wq-ok-soft);
-    color: var(--wq-ok);
-  }
-  &.warn {
-    background: var(--wq-warn-soft);
-    color: var(--wq-warn);
-  }
-  &.crit {
-    background: var(--wq-crit-soft);
-    color: var(--wq-crit);
-  }
-  &.neutral {
-    background: var(--mat-sys-surface-container-low, #f3f6f5);
-    color: #8a9c9d;
-  }
+  border: 1px solid var(--wq-border);
+  border-radius: 0 0 var(--wq-radius-md) var(--wq-radius-md);
 }
 
 .state-panel {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.75rem;
+  justify-content: center;
   padding: 2.5rem 1rem;
-}
-
-.state-message {
-  margin: 0;
-  color: var(--mat-sys-on-surface-variant, #666);
-  font-size: 0.9rem;
-
-  &.error {
-    color: var(--wq-crit);
-  }
 }
 
 @media (max-width: 640px) {

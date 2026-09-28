@@ -1,0 +1,47 @@
+<wq-page-header title="Dispositivos" subtitle="Consulta de los nodos visibles para tu rol.">
+  <mat-form-field actions appearance="outline" class="search-field">
+    <mat-icon matPrefix aria-hidden="true">search</mat-icon>
+    <input matInput [formControl]="search" placeholder="Buscar por código, nombre o ubicación" />
+  </mat-form-field>
+</wq-page-header>
+
+@switch (state()) {
+  @case ('loading') {
+    <div class="state-panel">
+      <mat-spinner diameter="32" />
+    </div>
+  }
+  @case ('error') {
+    <wq-empty-state icon="error_outline" tone="error" [message]="errorMessage() ?? 'Error al cargar los dispositivos.'" />
+  }
+  @case ('empty') {
+    <wq-empty-state icon="sensors_off" message="No hay dispositivos visibles con este filtro." />
+  }
+  @case ('data') {
+    <ul class="device-grid">
+      @for (d of filtered(); track d.id) {
+        <li class="wq-card device-card">
+          <div class="device-top">
+            <span class="device-code mono">{{ d.codigo }}</span>
+            <wq-status-badge [tone]="deviceStatusMeta(d.estado).tone" [label]="deviceStatusMeta(d.estado).label" [icon]="deviceStatusMeta(d.estado).icon" />
+          </div>
+          <h2 class="device-name">{{ d.nombre }}</h2>
+          <dl class="device-meta">
+            <div>
+              <dt>Ubicación</dt>
+              <dd>{{ d.ubicaciones?.nombre ?? 'Sin asignar' }}</dd>
+            </div>
+            <div>
+              <dt>Última comunicación</dt>
+              <dd>{{ d.ultima_comunicacion ? (d.ultima_comunicacion | date: 'medium') : 'Nunca' }}</dd>
+            </div>
+            <div>
+              <dt>Firmware</dt>
+              <dd>{{ d.version_firmware ?? 'No informado' }}</dd>
+            </div>
+          </dl>
+        </li>
+      }
+    </ul>
+  }
+}

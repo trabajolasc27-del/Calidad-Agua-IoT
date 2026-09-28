@@ -1,0 +1,27 @@
+@if (crumbs().length > 0) {
+  <nav class="crumbs" aria-label="Ubicación actual">
+    @for (c of crumbs(); track c.label; let last = $last) {
+      @if (!last && c.url) {
+        <a [routerLink]="c.url">{{ c.label }}</a>
+        <span aria-hidden="true">/</span>
+      } @else {
+        <span class="current" aria-current="page">{{ c.label }}</span>
+      }
+    }
+  </nav>
+}
+
+<div class="header-row">
+  <div class="titles">
+    <h1>{{ title() }}</h1>
+    @if (subtitle()) {
+      <p class="subtitle">{{ subtitle() }}</p>
+    }
+  </div>
+
+  <div class="actions">
+    <ng-content select="[actions]" />
+  </div>
+</div>
+
+<ng-content />

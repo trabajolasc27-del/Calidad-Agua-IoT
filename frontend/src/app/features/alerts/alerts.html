@@ -1,51 +1,91 @@
-<main class="alerts-page">
-  <h1 class="page-title">Alertas</h1>
+<wq-page-header title="Alertas" subtitle="Seguimiento del ciclo de vida de cada alerta." />
 
-  <mat-button-toggle-group [value]="filter()" (change)="setFilter($event.value)" class="status-filter">
-    <mat-button-toggle value="NUEVA">Nuevas</mat-button-toggle>
-    <mat-button-toggle value="RECONOCIDA">Reconocidas</mat-button-toggle>
-    <mat-button-toggle value="ATENDIDA">Atendidas</mat-button-toggle>
-    <mat-button-toggle value="CERRADA">Cerradas</mat-button-toggle>
-    <mat-button-toggle value="ALL">Todas</mat-button-toggle>
-  </mat-button-toggle-group>
+<mat-button-toggle-group [value]="filter()" (change)="setFilter($event.value)" class="status-filter">
+  <mat-button-toggle value="NUEVA">Nuevas</mat-button-toggle>
+  <mat-button-toggle value="RECONOCIDA">Reconocidas</mat-button-toggle>
+  <mat-button-toggle value="ATENDIDA">Atendidas</mat-button-toggle>
+  <mat-button-toggle value="CERRADA">Cerradas</mat-button-toggle>
+  <mat-button-toggle value="ALL">Todas</mat-button-toggle>
+</mat-button-toggle-group>
 
-  @switch (state()) {
-    @case ('loading') {
-      <div class="state-panel">
-        <mat-spinner diameter="32" />
-      </div>
-    }
-    @case ('error') {
-      <div class="state-panel">
-        <p class="state-message error">{{ errorMessage() }}</p>
-        <button mat-stroked-button (click)="load()">Reintentar</button>
-      </div>
-    }
-    @case ('empty') {
-      <div class="state-panel">
-        <p class="state-message">No hay alertas en este estado.</p>
-      </div>
-    }
-    @case ('data') {
-      <ul class="alerts-list">
-        @for (a of alerts(); track a.id) {
-          <li (click)="open(a)">
-            <span class="severity-pill" [class.warn]="a.gravedad === 'ALERTA'" [class.crit]="a.gravedad === 'CRITICO'">
-              {{ a.gravedad === 'CRITICO' ? 'Crítico' : 'Alerta' }}
-            </span>
-            <div class="alert-info">
-              <span class="alert-device">{{ a.dispositivos?.codigo }} · {{ a.parametros?.nombre }}</span>
-              <span class="alert-date">
-                {{ a.abierta_en | date: 'short' }}
-                @if (a.mediciones?.valor != null) {
-                  · valor: {{ a.mediciones?.valor }} {{ a.parametros?.unidad }}
-                }
-              </span>
-            </div>
-            <span class="status-tag">{{ statusLabel[a.estado] }}</span>
-          </li>
-        }
-      </ul>
-    }
+<form [formGroup]="extraFilters" class="extra-filters">
+  <mat-form-field appearance="outline">
+    <mat-label>Gravedad</mat-label>
+    <mat-select formControlName="severity">
+      <mat-option [value]="null">Todas</mat-option>
+      <mat-option value="ALERTA">Alerta</mat-option>
+      <mat-option value="CRITICO">Crítico</mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <mat-form-field appearance="outline">
+    <mat-label>Dispositivo</mat-label>
+    <mat-select formControlName="deviceId">
+      <mat-option [value]="null">Todos</mat-option>
+      @for (d of devices(); track d.id) {
+        <mat-option [value]="d.id">{{ d.codigo }}</mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
+
+  <mat-form-field appearance="outline">
+    <mat-label>Parámetro</mat-label>
+    <mat-select formControlName="parameterId">
+      <mat-option [value]="null">Todos</mat-option>
+      @for (p of parameters(); track p.id) {
+        <mat-option [value]="p.id">{{ p.nombre }}</mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
+
+  <mat-form-field appearance="outline">
+    <mat-label>Desde</mat-label>
+    <input matInput type="date" formControlName="dateFrom" />
+  </mat-form-field>
+
+  <mat-form-field appearance="outline">
+    <mat-label>Hasta</mat-label>
+    <input matInput type="date" formControlName="dateTo" />
+  </mat-form-field>
+
+  <button mat-stroked-button type="button" (click)="clearExtraFilters()">Limpiar filtros</button>
+</form>
+
+@switch (state()) {
+  @case ('loading') {
+    <div class="state-panel">
+      <mat-spinner diameter="32" />
+    </div>
   }
-</main>
+  @case ('error') {
+    <wq-empty-state icon="error_outline" tone="error" [message]="errorMessage() ?? 'Error al cargar las alertas.'">
+      <button mat-stroked-button (click)="load()">Reintentar</button>
+    </wq-empty-state>
+  }
+  @case ('empty') {
+    <wq-empty-state icon="notifications_off" message="No hay alertas con estos filtros." />
+  }
+  @case ('data') {
+    <ul class="alerts-list">
+      @for (a of alerts(); track a.id) {
+        <li class="wq-card" (click)="open(a)">
+          <wq-status-badge
+            [tone]="alertSeverityStatus(a.gravedad).tone"
+            [label]="alertSeverityStatus(a.gravedad).label"
+            [icon]="alertSeverityStatus(a.gravedad).icon"
+          />
+          <div class="alert-info">
+            <span class="alert-device">{{ a.dispositivos?.codigo }} · {{ a.parametros?.nombre }}</span>
+            <span class="alert-date">
+              {{ a.abierta_en | date: 'short' }}
+              @if (a.mediciones?.valor != null) {
+                · valor: {{ a.mediciones?.valor }} {{ a.parametros?.unidad }}
+              }
+            </span>
+          </div>
+          <wq-status-badge [tone]="alertStatusMeta(a.estado).tone" [label]="alertStatusMeta(a.estado).label" [icon]="alertStatusMeta(a.estado).icon" />
+        </li>
+      }
+    </ul>
+  }
+}

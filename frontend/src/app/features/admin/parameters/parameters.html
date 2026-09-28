@@ -43,11 +43,7 @@
         <ng-container matColumnDef="status">
           <th mat-header-cell *matHeaderCellDef>Estado</th>
           <td mat-cell *matCellDef="let p">
-            @if (p.is_active) {
-              <span class="status-pill ok">Activo</span>
-            } @else {
-              <span class="status-pill inactive">Inactivo</span>
-            }
+            <wq-status-badge [tone]="p.is_active ? 'ok' : 'neutral'" [label]="p.is_active ? 'Activo' : 'Inactivo'" [icon]="p.is_active ? 'check_circle' : 'pause_circle'" />
           </td>
         </ng-container>
 

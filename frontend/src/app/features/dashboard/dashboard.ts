@@ -19,6 +19,10 @@ import { DashboardService, type DashboardDevice } from './dashboard.service';
 import type { LatestMeasurement } from '../../core/models/measurement.model';
 import type { DashboardAlert } from '../../core/models/alert.model';
 import { ParameterCard } from './parameter-card/parameter-card';
+import { PageHeader } from '../../shared/page-header/page-header';
+import { EmptyState } from '../../shared/empty-state/empty-state';
+import { StatusBadge } from '../../shared/status-badge/status-badge';
+import { alertSeverityStatus, alertStatusMeta, deviceStatusMeta } from '../../shared/status.util';
 
 type ViewState = 'loading' | 'data' | 'empty' | 'error';
 type LiveStatus = 'SUBSCRIBED' | 'RECONNECTING' | 'ERROR';
@@ -39,7 +43,17 @@ type LiveStatus = 'SUBSCRIBED' | 'RECONNECTING' | 'ERROR';
 @Component({
   selector: 'wq-dashboard',
   standalone: true,
-  imports: [ReactiveFormsModule, MatButtonModule, MatSelectModule, MatProgressSpinnerModule, MatIconModule, ParameterCard],
+  imports: [
+    ReactiveFormsModule,
+    MatButtonModule,
+    MatSelectModule,
+    MatProgressSpinnerModule,
+    MatIconModule,
+    ParameterCard,
+    PageHeader,
+    EmptyState,
+    StatusBadge,
+  ],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss',
 })
@@ -66,6 +80,10 @@ export class Dashboard implements OnInit, AfterViewInit, OnDestroy {
 
   private readonly trendCharts: Chart[] = [];
   private viewReady = false;
+
+  readonly deviceStatusMeta = deviceStatusMeta;
+  readonly alertSeverityStatus = alertSeverityStatus;
+  readonly alertStatusMeta = alertStatusMeta;
 
   constructor(private readonly dashboardService: DashboardService) {}
 
@@ -158,7 +176,7 @@ export class Dashboard implements OnInit, AfterViewInit, OnDestroy {
       const canvasRef = canvases[i];
       if (!canvasRef || m.trend.length === 0) return;
 
-      const color = m.evaluation_result === 'CRITICO' ? '#b23b3b' : m.evaluation_result === 'ALERTA' ? '#9c6d0a' : '#0f7d72';
+      const color = m.evaluation_result === 'CRITICO' ? '#dc2626' : m.evaluation_result === 'ALERTA' ? '#d97706' : '#0b1f33';
 
       const chart = new Chart(canvasRef.nativeElement, {
         type: 'line',
@@ -198,6 +216,6 @@ export class Dashboard implements OnInit, AfterViewInit, OnDestroy {
   lastSeenLabel(): string {
     const device = this.selectedDevice();
     if (!device?.ultima_comunicacion) return 'Nunca';
-    return new Date(device.ultima_comunicacion).toLocaleString();
+    return new Date(device.ultima_comunicacion).toLocaleString('es-MX');
   }
 }

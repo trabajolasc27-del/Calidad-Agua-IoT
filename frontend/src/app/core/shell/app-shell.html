@@ -1,44 +1,102 @@
-<mat-toolbar color="primary" class="shell-toolbar">
-  <a routerLink="/panel" class="brand">
-    <!-- Marca propia: gota estilizada. Reemplaza el icono generico de Material que traia la app antes del rediseño. -->
-    <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" class="brand-mark">
-      <path
-        fill="currentColor"
-        d="M12 2C8.5 7 5 11.2 5 15a7 7 0 0 0 14 0c0-3.8-3.5-8-7-13Z"
-      />
-    </svg>
-    <span class="brand-text">Calidad del Agua</span>
-  </a>
+<a class="skip-link" href="#wq-main-content">Saltar al contenido principal</a>
 
-  <nav class="shell-nav">
-    <a mat-button routerLink="/panel" routerLinkActive="active">Panel</a>
-    <a mat-button routerLink="/mapa" routerLinkActive="active">Mapa</a>
-    <a mat-button routerLink="/historial" routerLinkActive="active">Historial</a>
-    <a mat-button routerLink="/alertas" routerLinkActive="active">Alertas</a>
-    @if (authService.role() === 'administrador' || authService.role() === 'analista') {
-      <a mat-button routerLink="/reportes" routerLinkActive="active">Reportes</a>
-    }
-    @if (authService.role() === 'administrador') {
-      <a mat-button routerLink="/administracion" routerLinkActive="active">Administración</a>
-    }
-  </nav>
+<mat-sidenav-container class="wq-shell" [class.collapsed]="collapsed() && !isMobile()">
+  <mat-sidenav
+    #drawer
+    class="wq-sidenav"
+    [mode]="sidenavMode()"
+    [opened]="sidenavOpened()"
+    (closedStart)="mobileOpen.set(false)"
+  >
+    <a routerLink="/panel" class="brand" (click)="closeMobileNav()">
+      <svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true" class="brand-mark">
+        <path
+          fill="currentColor"
+          d="M12 2C8.5 7 5 11.2 5 15a7 7 0 0 0 14 0c0-3.8-3.5-8-7-13Z"
+        />
+      </svg>
+      <span class="brand-text">Calidad del Agua</span>
+    </a>
 
-  <span class="spacer"></span>
+    <mat-nav-list class="wq-nav">
+      @for (item of items(); track item.path) {
+        <a
+          mat-list-item
+          [routerLink]="item.path"
+          routerLinkActive="active"
+          [matTooltip]="collapsed() && !isMobile() ? item.label : ''"
+          matTooltipPosition="right"
+          (click)="closeMobileNav()"
+        >
+          <mat-icon matListItemIcon aria-hidden="true">{{ item.icon }}</mat-icon>
+          <span matListItemTitle class="nav-label">{{ item.label }}</span>
+        </a>
+      }
+    </mat-nav-list>
 
-  <button mat-button [matMenuTriggerFor]="userMenu" class="user-trigger">
-    <span class="user-name">{{ authService.profile()?.nombre_completo || authService.session()?.user?.email }}</span>
-    <mat-icon aria-hidden="true">expand_more</mat-icon>
-  </button>
-  <mat-menu #userMenu="matMenu">
-    <div class="user-menu-header">
-      <span class="user-menu-name">{{ authService.profile()?.nombre_completo || authService.session()?.user?.email }}</span>
-      <span class="user-menu-role">{{ authService.role() }}</span>
+    <div class="sidenav-footer">
+      <a mat-list-item routerLink="/perfil" routerLinkActive="active" (click)="closeMobileNav()">
+        <mat-icon matListItemIcon aria-hidden="true">account_circle</mat-icon>
+        <span matListItemTitle class="nav-label">Mi perfil</span>
+      </a>
+      <a mat-list-item routerLink="/informacion-tecnica" routerLinkActive="active" (click)="closeMobileNav()">
+        <mat-icon matListItemIcon aria-hidden="true">info</mat-icon>
+        <span matListItemTitle class="nav-label">Información técnica</span>
+      </a>
+
+      @if (!isMobile()) {
+        <button mat-list-item class="collapse-btn" (click)="toggleCollapsed()" type="button">
+          <mat-icon matListItemIcon aria-hidden="true">{{ collapsed() ? 'chevron_right' : 'chevron_left' }}</mat-icon>
+          <span matListItemTitle class="nav-label">Contraer menú</span>
+        </button>
+      }
     </div>
-    <button mat-menu-item (click)="logout()">
-      <mat-icon aria-hidden="true">logout</mat-icon>
-      Cerrar sesión
-    </button>
-  </mat-menu>
-</mat-toolbar>
+  </mat-sidenav>
 
-<router-outlet />
+  <mat-sidenav-content>
+    <header class="wq-header">
+      <button mat-icon-button type="button" (click)="isMobile() ? mobileOpen.set(true) : toggleCollapsed()" aria-label="Abrir/cerrar menú de navegación">
+        <mat-icon aria-hidden="true">menu</mat-icon>
+      </button>
+
+      <span class="spacer"></span>
+
+      <button
+        mat-icon-button
+        type="button"
+        routerLink="/alertas"
+        [matBadge]="notifications.count() > 0 ? notifications.count() : null"
+        matBadgeColor="warn"
+        matBadgeSize="small"
+        [attr.aria-label]="notifications.hasActive() ? notifications.count() + ' alertas activas' : 'Sin alertas activas'"
+        matTooltip="Alertas activas"
+      >
+        <mat-icon aria-hidden="true">notifications</mat-icon>
+      </button>
+
+      <button mat-button [matMenuTriggerFor]="userMenu" class="user-trigger">
+        <mat-icon aria-hidden="true">account_circle</mat-icon>
+        <span class="user-name">{{ authService.profile()?.nombre_completo || authService.session()?.user?.email }}</span>
+        <mat-icon aria-hidden="true">expand_more</mat-icon>
+      </button>
+      <mat-menu #userMenu="matMenu">
+        <div class="user-menu-header">
+          <span class="user-menu-name">{{ authService.profile()?.nombre_completo || authService.session()?.user?.email }}</span>
+          <span class="user-menu-role">{{ authService.role() ? roleLabels[authService.role()!] : '' }}</span>
+        </div>
+        <button mat-menu-item routerLink="/perfil">
+          <mat-icon aria-hidden="true">account_circle</mat-icon>
+          Mi perfil
+        </button>
+        <button mat-menu-item (click)="logout()">
+          <mat-icon aria-hidden="true">logout</mat-icon>
+          Cerrar sesión
+        </button>
+      </mat-menu>
+    </header>
+
+    <main id="wq-main-content" class="wq-content">
+      <router-outlet />
+    </main>
+  </mat-sidenav-content>
+</mat-sidenav-container>
