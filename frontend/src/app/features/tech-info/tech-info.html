@@ -1,0 +1,46 @@
+<wq-page-header title="Información técnica" subtitle="Componentes del proyecto: qué mide cada sensor y cómo se usa." />
+
+<p class="disclaimer">
+  <mat-icon aria-hidden="true">info</mat-icon>
+  Los modelos exactos de los sensores de agua todavía no se han seleccionado ni adquirido (acción pendiente, ver bitácora del proyecto). Esta ficha muestra lo que ya está definido: qué mide cada componente, en qué unidad y con qué rango trabaja esta plataforma.
+</p>
+
+<div class="tech-grid">
+  @for (item of items; track item.nombre) {
+    <article class="wq-card tech-card">
+      <div class="tech-head">
+        <mat-icon aria-hidden="true">{{ item.icon }}</mat-icon>
+        <h2>{{ item.nombre }}</h2>
+      </div>
+      <p class="funcion">{{ item.funcion }}</p>
+      <dl class="tech-meta">
+        <div>
+          <dt>Variable medida</dt>
+          <dd>{{ item.variable }}</dd>
+        </div>
+        <div>
+          <dt>Unidad</dt>
+          <dd>{{ item.unidad }}</dd>
+        </div>
+        @if (item.rango) {
+          <div>
+            <dt>Rango usado en el proyecto</dt>
+            <dd>{{ item.rango }}</dd>
+          </div>
+        }
+      </dl>
+      @if (item.recomendaciones) {
+        <p class="recomendacion">
+          <mat-icon aria-hidden="true">tips_and_updates</mat-icon>
+          {{ item.recomendaciones }}
+        </p>
+      }
+      @if (item.modeloPendiente) {
+        <p class="pendiente">
+          <mat-icon aria-hidden="true">pending</mat-icon>
+          Modelo exacto: pendiente de selección y documentación.
+        </p>
+      }
+    </article>
+  }
+</div>

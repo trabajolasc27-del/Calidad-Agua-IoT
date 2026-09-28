@@ -1,5 +1,5 @@
-<main class="dashboard">
-  <div class="toolbar-row">
+<wq-page-header title="Panel" subtitle="Estado del sistema en tiempo real.">
+  <div actions class="header-actions">
     @switch (devicesState()) {
       @case ('loading') {
         <mat-spinner diameter="24" />
@@ -29,89 +29,86 @@
       }
     }
   </div>
+</wq-page-header>
 
-  @switch (dataState()) {
-    @case ('loading') {
-      <div class="state-panel">
-        <mat-spinner diameter="32" />
-      </div>
-    }
-    @case ('error') {
-      <div class="state-panel">
-        <p class="state-message error">{{ dataError() }}</p>
-        @if (selectedDevice()) {
-          <button mat-stroked-button (click)="refreshData(selectedDevice()!.id)">Reintentar</button>
-        }
-      </div>
-    }
-    @case ('empty') {
-      <div class="state-panel">
-        <p class="state-message">Este dispositivo todavía no ha enviado ninguna medición.</p>
-      </div>
-    }
-    @case ('data') {
-      <section class="cards-grid">
-        @for (m of measurements(); track m.parameter.id) {
-          <wq-parameter-card [measurement]="m" />
-        }
-      </section>
-
-      <section class="panels-row">
-        <div class="panel">
-          <span class="panel-title">Estado del dispositivo</span>
-          @if (selectedDevice(); as device) {
-            <div class="device-status">
-              <span class="status-pill" [class.ok]="device.estado === 'activo'" [class.inactive]="device.estado !== 'activo'">
-                {{ device.estado === 'activo' ? 'Activo' : 'Inactivo' }}
-              </span>
-              <span class="last-seen">Última comunicación: {{ lastSeenLabel() }}</span>
-            </div>
-          }
-        </div>
-
-        <div class="panel">
-          <span class="panel-title">Alertas activas</span>
-          @if (alerts().length === 0) {
-            <p class="state-message">Sin alertas activas.</p>
-          } @else {
-            <ul class="alerts-list">
-              @for (a of alerts(); track a.id) {
-                <li>
-                  <span class="alert-pill" [class.warn]="a.gravedad === 'ALERTA'" [class.crit]="a.gravedad === 'CRITICO'">
-                    {{ a.gravedad === 'CRITICO' ? 'Crítico' : 'Alerta' }}
-                  </span>
-                  <span class="alert-param">
-                    {{ a.nombre_parametro }}
-                    @if (a.valor != null) {
-                      · {{ a.valor }} {{ a.unidad }}
-                    }
-                  </span>
-                  <span class="alert-status">{{ a.estado }}</span>
-                </li>
-              }
-            </ul>
-          }
-        </div>
-      </section>
-
-      <!-- Tendencia reciente (RF-24): un mini-grafica por parametro, cada
-           una en su propia escala -- pH, OD, turbidez y temperatura tienen
-           rangos numericos muy distintos, mezclarlas en un solo eje las
-           haria ilegibles (misma razon por la que Historial y Reportes
-           solo grafican un parametro fijo a la vez). -->
-      <section class="trend-section">
-        <span class="panel-title">Tendencia reciente</span>
-        <div class="trend-grid">
-          @for (m of measurements(); track m.parameter.id) {
-            <div class="trend-item">
-              <span class="trend-label">{{ m.parameter.nombre }}</span>
-              <div class="trend-canvas-wrap">
-                <canvas #trendCanvas></canvas>
-              </div>
-            </div>
-          }
-        </div>
-      </section>
-    }
+@switch (dataState()) {
+  @case ('loading') {
+    <div class="state-panel">
+      <mat-spinner diameter="32" />
+    </div>
   }
-</main>
+  @case ('error') {
+    <wq-empty-state icon="error_outline" tone="error" [message]="dataError() ?? 'Error al cargar el panel.'">
+      @if (selectedDevice()) {
+        <button mat-stroked-button (click)="refreshData(selectedDevice()!.id)">Reintentar</button>
+      }
+    </wq-empty-state>
+  }
+  @case ('empty') {
+    <wq-empty-state icon="sensors_off" message="Este dispositivo todavía no ha enviado ninguna medición." />
+  }
+  @case ('data') {
+    <section class="cards-grid">
+      @for (m of measurements(); track m.parameter.id) {
+        <wq-parameter-card [measurement]="m" />
+      }
+    </section>
+
+    <section class="panels-row">
+      <div class="wq-card panel">
+        <span class="panel-title">Estado del dispositivo</span>
+        @if (selectedDevice(); as device) {
+          <div class="device-status">
+            <wq-status-badge [tone]="deviceStatusMeta(device.estado).tone" [label]="deviceStatusMeta(device.estado).label" [icon]="deviceStatusMeta(device.estado).icon" />
+            <span class="location-line">
+              <mat-icon aria-hidden="true">place</mat-icon>
+              {{ device.ubicaciones?.nombre ?? 'Sin ubicación asignada' }}
+            </span>
+            <span class="last-seen">Última comunicación: {{ lastSeenLabel() }}</span>
+          </div>
+        }
+      </div>
+
+      <div class="wq-card panel">
+        <span class="panel-title">Alertas activas</span>
+        @if (alerts().length === 0) {
+          <p class="state-message">Sin alertas activas.</p>
+        } @else {
+          <ul class="alerts-list">
+            @for (a of alerts(); track a.id) {
+              <li>
+                <wq-status-badge [tone]="alertSeverityStatus(a.gravedad).tone" [label]="alertSeverityStatus(a.gravedad).label" [icon]="alertSeverityStatus(a.gravedad).icon" />
+                <span class="alert-param">
+                  {{ a.nombre_parametro }}
+                  @if (a.valor != null) {
+                    · {{ a.valor }} {{ a.unidad }}
+                  }
+                </span>
+                <span class="alert-status">{{ alertStatusMeta(a.estado).label }}</span>
+              </li>
+            }
+          </ul>
+        }
+      </div>
+    </section>
+
+    <!-- Tendencia reciente (RF-24): un mini-grafica por parametro, cada
+         una en su propia escala -- pH, OD, turbidez y temperatura tienen
+         rangos numericos muy distintos, mezclarlas en un solo eje las
+         haria ilegibles (misma razon por la que Historial y Reportes
+         solo grafican un parametro fijo a la vez). -->
+    <section class="wq-card trend-section">
+      <span class="panel-title">Tendencia reciente</span>
+      <div class="trend-grid">
+        @for (m of measurements(); track m.parameter.id) {
+          <div class="trend-item">
+            <span class="trend-label">{{ m.parameter.nombre }}</span>
+            <div class="trend-canvas-wrap">
+              <canvas #trendCanvas></canvas>
+            </div>
+          </div>
+        }
+      </div>
+    </section>
+  }
+}

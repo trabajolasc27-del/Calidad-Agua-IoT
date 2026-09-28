@@ -1,0 +1,22 @@
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  min-width: 320px;
+}
+
+.kind-toggle {
+  align-self: flex-start;
+  margin-bottom: 0.25rem;
+
+  mat-icon {
+    margin-right: 0.3rem;
+    vertical-align: middle;
+  }
+}
+
+.form-error {
+  color: var(--wq-crit);
+  font-size: 0.85rem;
+  margin: 0;
+}

@@ -5,6 +5,8 @@ import * as L from 'leaflet';
 
 import { MapService, type MapLocation } from './map.service';
 import { fixLeafletDefaultIcon } from '../../core/leaflet-icon-fix';
+import { PageHeader } from '../../shared/page-header/page-header';
+import { EmptyState } from '../../shared/empty-state/empty-state';
 
 type ViewState = 'loading' | 'data' | 'empty' | 'error';
 
@@ -14,7 +16,7 @@ type ViewState = 'loading' | 'data' | 'empty' | 'error';
 @Component({
   selector: 'wq-map-view',
   standalone: true,
-  imports: [MatButtonModule, MatProgressSpinnerModule],
+  imports: [MatButtonModule, MatProgressSpinnerModule, PageHeader, EmptyState],
   templateUrl: './map-view.html',
   styleUrl: './map-view.scss',
 })

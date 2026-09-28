@@ -19,44 +19,71 @@ Este proyecto tiene como antecedente conceptual el documento `Purametric (1).doc
 
 ## Estado actual
 
-**Fase 1 (Semanas 1–3): Análisis y diseño — documentos base creados, pendiente punto de control con el usuario.** Ver el detalle en [docs/PROGRESS.md](docs/PROGRESS.md).
+Plataforma funcional de punta a punta: base de datos, autenticación y roles, ingesta desde ESP32/simulador, motor de evaluación, tiempo real, alertas, historial, reportes (PDF/Excel), y un rediseño visual y funcional completo de la interfaz (identidad propia, navegación por barra lateral, componentes reutilizables). Ver el detalle sesión por sesión en [docs/PROGRESS.md](docs/PROGRESS.md) y las decisiones tomadas en [docs/DECISIONS.md](docs/DECISIONS.md).
+
+Pendiente: selección y adquisición de los sensores físicos de oxígeno disuelto y temperatura ([docs/MANUAL_ACTIONS.md](docs/MANUAL_ACTIONS.md) #3), integración de envío de correo (Brevo), y pruebas automatizadas más allá de las que ya existen.
 
 ## Tecnologías
 
-Angular + TypeScript · Angular Material/Bootstrap · Supabase (PostgreSQL, Auth, Row Level Security, Edge Functions, Realtime) · Chart.js · Leaflet + OpenStreetMap · ExcelJS · pdfmake/jsPDF · Brevo (correo) · Playwright (si resulta compatible).
+- **Frontend:** Angular 21 (standalone components, signals) + Angular Material 21, Chart.js, Leaflet/OpenStreetMap, pdfmake, ExcelJS.
+- **Backend:** Supabase (PostgreSQL, Auth, Row Level Security, Edge Functions, Realtime).
+- **Firmware:** ESP32 (HTTPS + JSON) — ver `firmware/esp32-test/`.
+- **Herramientas de prueba:** simulador Node.js (`tools/simulator/`), peticiones `.http` de ejemplo (`tools/api-tests/`).
 
-Las versiones exactas se fijarán y documentarán al ejecutar el scaffolding real en la Fase 2 (ver [docs/DECISIONS.md](docs/DECISIONS.md) D-010) — no se declaran números de versión no verificados.
+Versiones exactas en [docs/DECISIONS.md](docs/DECISIONS.md) D-010.
 
 ## Estructura del repositorio
 
 ```
 D:\IOT
 ├── README.md
-├── .env.example
-├── .gitignore
-├── Purametric (1).docx        # antecedente conceptual, no se modifica
-├── docs/
-│   ├── PROJECT_PLAN.md        # plan de 16 semanas
-│   ├── ARCHITECTURE.md        # arquitectura y stack
-│   ├── REQUIREMENTS.md        # requerimientos funcionales y no funcionales
-│   ├── USE_CASES.md           # casos de uso
-│   ├── ROLE_MATRIX.md         # matriz de roles y permisos
-│   ├── API_CONTRACT.md        # contrato JSON del ESP32 y endpoints
-│   ├── DATABASE_DESIGN.md     # modelo de datos y diccionario de datos
-│   ├── WIREFRAMES.md          # wireframes de todas las pantallas
-│   ├── MANUAL_ACTIONS.md      # acciones que debe hacer el usuario manualmente
-│   ├── DECISIONS.md           # decisiones y contradicciones registradas
-│   └── PROGRESS.md            # registro de avance por sesión
-├── frontend/                  # (Fase 2) aplicación Angular
-└── supabase/                  # (Fase 2) migraciones, funciones y seed
+├── docs/                       # documentación del proyecto (ver índice abajo)
+├── frontend/                   # aplicación Angular
+│   └── src/app/
+│       ├── core/                # sesión, guards, shell de navegación, modelos compartidos
+│       ├── shared/               # componentes reutilizables (gauge, page-header, status-badge, …)
+│       └── features/             # una carpeta por módulo/pantalla
+├── supabase/
+│   ├── migrations/              # esquema, RLS, funciones (en español, ver D-021)
+│   └── functions/                # Edge Functions (ingesta, alta de usuarios)
+├── firmware/esp32-test/          # firmware de prueba (hardware provisional, ver D-016)
+└── tools/                        # simulador de mediciones y peticiones de prueba
 ```
 
-Las carpetas `frontend/` y `supabase/` aún no existen; se crean en la Fase 2.
+## Documentación
+
+| Documento | Contenido |
+|---|---|
+| [docs/PROJECT_PLAN.md](docs/PROJECT_PLAN.md) | Plan de 16 semanas / 4 etapas |
+| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Arquitectura general y stack |
+| [docs/ARQUITECTURA_FRONTEND.md](docs/ARQUITECTURA_FRONTEND.md) | Estructura del frontend Angular, flujo de datos, estados |
+| [docs/GUIA_INTERFAZ.md](docs/GUIA_INTERFAZ.md) | Sistema de diseño: paleta, componentes reutilizables, patrones visuales |
+| [docs/MODULOS.md](docs/MODULOS.md) | Qué hace cada pantalla/módulo y de qué depende |
+| [docs/REQUIREMENTS.md](docs/REQUIREMENTS.md) | Requerimientos funcionales y no funcionales |
+| [docs/USE_CASES.md](docs/USE_CASES.md) | Casos de uso |
+| [docs/ROLE_MATRIX.md](docs/ROLE_MATRIX.md) | Matriz de roles y permisos |
+| [docs/API_CONTRACT.md](docs/API_CONTRACT.md) | Contrato JSON del ESP32 y endpoints |
+| [docs/DATABASE_DESIGN.md](docs/DATABASE_DESIGN.md) | Modelo de datos y diccionario de datos |
+| [docs/WIREFRAMES.md](docs/WIREFRAMES.md) | Wireframes de baja fidelidad |
+| [docs/PRUEBAS.md](docs/PRUEBAS.md) | Cómo ejecutar y probar el proyecto |
+| [docs/MANUAL_ACTIONS.md](docs/MANUAL_ACTIONS.md) | Acciones pendientes que debe hacer el usuario manualmente |
+| [docs/DECISIONS.md](docs/DECISIONS.md) | Decisiones técnicas y su razonamiento |
+| [docs/PROGRESS.md](docs/PROGRESS.md) | Registro de avance por sesión |
 
 ## Roles
 
 Administrador, Analista ambiental, Técnico de campo. Detalle completo en [docs/ROLE_MATRIX.md](docs/ROLE_MATRIX.md).
 
+## Cómo ejecutar el proyecto
+
+Ver [docs/PRUEBAS.md](docs/PRUEBAS.md) para instrucciones completas (instalación, variables de entorno, comandos de compilación y prueba).
+
+```bash
+cd frontend
+npm install
+npm start        # http://localhost:4200
+```
+
 ## Cómo continuar
 
-Ver "Próxima actividad recomendada" en [docs/PROGRESS.md](docs/PROGRESS.md).
+Ver "Cómo continuar en otra sesión" al final de la entrada más reciente en [docs/PROGRESS.md](docs/PROGRESS.md).

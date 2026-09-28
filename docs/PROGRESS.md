@@ -1,5 +1,42 @@
 # Registro de Progreso
 
+## Sesión 6 — 2026-09-27
+
+### Motivo de la sesión
+El usuario pidió un rediseño general, funcional y visual de toda la plataforma — no solo colores/tipografía, sino distribución, navegación, componentes reutilizables y experiencia de uso en todos los módulos — a partir de capturas de referencia de otro panel IoT (sin copiarlas) y una especificación muy detallada (paleta exacta, estructura de navegación por pantalla, componentes reutilizables, manejo de estados, idioma/formato regional, restricciones, criterios de aceptación). Pidió explícitamente diagnóstico primero, luego implementación directa sin pausas a pedir preferencias de estilo.
+
+### Qué se hizo
+Ver [DECISIONS.md](DECISIONS.md) D-023 para el detalle técnico completo. En resumen:
+
+- **Identidad visual nueva** (azul profundo + turquesa, sustituye el teal de D-022) generada con el mismo mecanismo M3 de siempre; verde/ámbar/rojo quedaron reservados exclusivamente para los 3 estados de evaluación.
+- **Navegación rediseñada de raíz**: `AppShell` pasó de una barra horizontal a una barra lateral (`MatSidenav`) plegable en escritorio y convertida en cajón deslizable en pantallas angostas, con encabezado compacto (campana de notificaciones con conteo real de alertas activas, menú de usuario).
+- **5 componentes reutilizables nuevos** (`shared/`): `PageHeader`, `StatusBadge` (+ `status.util.ts` centralizando el mapeo de cada tipo de estado), `EmptyState`, `ConfirmDialog`/`ConfirmService`.
+- **4 módulos nuevos**: Perfil, Información técnica, Dispositivos (lectura para los 3 roles), Calibraciones y mantenimiento (el backend ya existía completo sin ninguna pantalla que lo usara).
+- Aplicado el sistema nuevo a las 9 pantallas ya existentes (Login/Recuperar/Establecer contraseña con panel de marca + mostrar/ocultar contraseña, Dashboard, Mapa, Historial, Alertas con filtros nuevos por gravedad/dispositivo/parámetro/fecha, Reportes con exportación con indicador de progreso, y las 5 subpantallas de Administración).
+- Confirmaciones agregadas donde antes faltaban o usaban `confirm()` nativo: activar/desactivar dispositivo, emitir credencial, eliminar ubicación, cerrar alerta.
+
+### Hallazgos reales corregidos (no solo estéticos)
+- **Sin formato regional configurado en todo el proyecto**: el pipe `date` de Angular llevaba usando en-US desde siempre. Se registró `LOCALE_ID: 'es-MX'` + los datos de locale correspondientes, y se corrigieron los `toLocaleString()` nativos que no lo heredan solos. Verificado en vivo: las fechas de Historial pasaron de "9/14/2026, 5:22 PM" a "14/09/26, 5:22 p.m.".
+- El paginador de Material (`MatPaginatorIntl`) también traía sus etiquetas en inglés por defecto — corregido.
+- Una prueba unitaria estaba rota desde el scaffold inicial del proyecto (`app.spec.ts` buscaba contenido que nunca existió) — nadie la había ejecutado. Corregida, y se agregó una suite nueva para `status.util.ts`.
+- Dos huecos de alcance reales encontrados en la inspección inicial (Fase 1 pedida explícitamente): Alertas ya vive en español en la base de datos desde D-021 (no había nada que "traducir"), y los modelos exactos de los sensores de agua nunca se documentaron (dos de los 4 sensores ni siquiera se han adquirido) — la pantalla de Información técnica lo refleja honestamente en vez de inventar especificaciones.
+
+### Pruebas ejecutadas
+- `npx tsc --noEmit` y `npx ng build` limpios después de cada bloque grande de cambios (repetido más de 10 veces a lo largo de la sesión).
+- `npm test`: 2 archivos, 6 pruebas, todas verdes (incluida la corrección del test roto y la suite nueva de `status.util.ts`).
+- No hay ESLint configurado en el proyecto — no hay lint que ejecutar (se documenta como tal, no se fabricó un resultado).
+- **Recorrido en vivo con sesión real autenticada** (administrador): las 13 rutas de la aplicación, sin errores nuevos de consola. Se generó y verificó un registro real en Calibraciones y mantenimiento (persistido y recuperado correctamente de Supabase), se generó un reporte real con exportación a PDF/Excel disparada sin errores, se probó `cerrar otras sesiones` contra Supabase Auth real (mensaje de éxito, sesión actual no afectada), se probó el diálogo de confirmación al desactivar un dispositivo (cancelado a propósito para no alterar datos), y se abrió el detalle de una alerta ya cerrada verificando su línea de tiempo completa.
+- Responsivo probado manualmente en ~1366×768 (paneles de marca del login visibles), ~800px (ancho nativo del panel de pruebas), 768×1024 (la barra lateral se mantiene fija, no colapsa a cajón) y 390×844 (cajón deslizable funcionando, contenido sin desbordamientos).
+- **No se probó**: los formularios de alta/edición de usuario/dispositivo/ubicación/parámetro/umbral uno por uno con datos inválidos (se confirmó que abren y renderizan correctamente, pero no se recorrió cada validación de campo); tampoco se verificó el contenido exacto de un PDF/Excel exportado (solo que el botón dispara la descarga sin lanzar una excepción).
+
+### Documentación creada o actualizada
+`README.md` (estaba desactualizado desde la Fase 1 del proyecto, reescrito para reflejar el estado real), `docs/ARQUITECTURA_FRONTEND.md` (nuevo), `docs/GUIA_INTERFAZ.md` (nuevo, el sistema de diseño), `docs/MODULOS.md` (nuevo), `docs/PRUEBAS.md` (nuevo), `docs/DECISIONS.md` D-023.
+
+### Cómo continuar en otra sesión
+El rediseño queda funcionalmente completo y verificado en vivo. Pendiente no bloqueante: pasada de comentarios de cabecera en los diálogos de Administración que no se tocaron, pruebas unitarias para componentes con dependencias de Material/Supabase (necesitaría configurar mocks/harnesses que el proyecto no tiene todavía), y la selección real de los sensores de oxígeno disuelto/temperatura (acción manual del usuario). Después: retomar Brevo o las pruebas físicas de Arduino/ESP32.
+
+---
+
 ## Sesión 5 — 2026-09-24
 
 ### Motivo de la sesión

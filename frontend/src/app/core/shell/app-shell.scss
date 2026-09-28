@@ -1,24 +1,55 @@
-.shell-toolbar {
+:host {
+  display: block;
+  height: 100%;
+}
+
+$sidenav-width: 240px;
+$sidenav-width-collapsed: 72px;
+
+.wq-shell {
+  height: 100%;
+  background: var(--wq-bg);
+}
+
+.wq-sidenav {
+  width: $sidenav-width;
+  background: var(--wq-primary);
+  color: #fff;
+  border-right: none;
   display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  position: sticky;
-  top: 0;
-  z-index: 10;
+  flex-direction: column;
+  transition: width 0.18s ease;
+
+  // Contenido de la lista de Material trae su propio color de texto claro
+  // por defecto (pensado para superficies blancas); se sobreescribe aqui
+  // porque el fondo del sidenav es el azul de marca, no una superficie.
+  ::ng-deep .mdc-list-item__primary-text,
+  ::ng-deep .mat-mdc-list-item-title {
+    color: rgba(255, 255, 255, 0.92) !important;
+  }
+  ::ng-deep .mat-icon {
+    color: rgba(255, 255, 255, 0.85);
+  }
+}
+
+.collapsed .wq-sidenav {
+  width: $sidenav-width-collapsed;
+
+  .nav-label,
+  .brand-text {
+    display: none;
+  }
 }
 
 .brand {
   display: flex;
   align-items: center;
-  gap: 0.4rem;
-  color: inherit;
+  gap: 0.55rem;
+  color: #fff;
   text-decoration: none;
+  padding: 1.1rem 1rem;
   flex: none;
   min-width: 0;
-}
-
-.brand-mark {
-  flex: none;
 }
 
 .brand-text {
@@ -30,47 +61,60 @@
   text-overflow: ellipsis;
 }
 
-.shell-nav {
-  display: flex;
-  align-items: center;
-  gap: 0.15rem;
-  min-width: 0;
-  overflow-x: auto;
-  scrollbar-width: none;
-
-  &::-webkit-scrollbar {
-    display: none;
-  }
-
-  // mat-button trae min-width: 64px de Material (pensado para etiquetas
-  // cortas como "OK"/"Cancelar"). "Administración" y "Reportes" no caben
-  // ahi, y como un boton no recorta su contenido por defecto, el texto se
-  // desbordaba visualmente sobre el siguiente enlace en vez de ajustarse
-  // -- el mismo tipo de problema de flex-shrink que ya se habia visto
-  // antes en mat-toolbar (ver historial de PROGRESS.md), esta vez con
-  // min-width de boton en vez de min-width de flex item.
-  a {
-    min-width: 0;
-    padding: 0 0.6rem;
-    white-space: nowrap;
-    flex: none;
-  }
+.wq-nav {
+  flex: 1;
+  overflow-y: auto;
+  padding-top: 0.25rem;
 
   a.active {
-    font-weight: 700;
-    text-decoration: underline;
-    text-underline-offset: 4px;
+    background: rgba(255, 255, 255, 0.14);
+
+    ::ng-deep .mdc-list-item__primary-text {
+      font-weight: 700 !important;
+    }
   }
+}
+
+.sidenav-footer {
+  border-top: 1px solid rgba(255, 255, 255, 0.14);
+  padding-bottom: 0.5rem;
+
+  .collapse-btn {
+    width: 100%;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font: inherit;
+  }
+}
+
+.wq-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  height: 56px;
+  padding: 0 0.75rem;
+  background: var(--wq-surface);
+  border-bottom: 1px solid var(--wq-border);
 }
 
 .spacer {
   flex: 1;
-  min-width: 0.5rem;
 }
 
 .user-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
   min-width: 0;
   flex: none;
+
+  mat-icon:first-child {
+    color: var(--wq-text-soft);
+  }
 }
 
 .user-name {
@@ -94,13 +138,20 @@
 
 .user-menu-role {
   font-size: 0.75rem;
-  color: var(--mat-sys-on-surface-variant, #666);
-  text-transform: capitalize;
+  color: var(--wq-text-soft);
 }
 
-@media (max-width: 760px) {
-  .brand-text {
-    display: none;
+.wq-content {
+  min-height: calc(100% - 56px);
+  padding: 1.25rem 1.5rem 3rem;
+  max-width: 1180px;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+@media (max-width: 640px) {
+  .wq-content {
+    padding: 1rem 0.85rem 3rem;
   }
   .user-name {
     display: none;

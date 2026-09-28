@@ -1,0 +1,81 @@
+<wq-page-header title="Mi perfil" subtitle="Información de tu cuenta y seguridad." />
+
+<section class="wq-card info-card">
+  <h2>Datos de la cuenta</h2>
+  <dl class="info-grid">
+    <div>
+      <dt>Nombre</dt>
+      <dd>{{ authService.profile()?.nombre_completo || 'Sin registrar' }}</dd>
+    </div>
+    <div>
+      <dt>Correo</dt>
+      <dd>{{ authService.session()?.user?.email }}</dd>
+    </div>
+    <div>
+      <dt>Rol</dt>
+      <dd>{{ authService.role() ? roleLabels[authService.role()!] : '—' }}</dd>
+    </div>
+    <div>
+      <dt>Estado de la cuenta</dt>
+      <dd>
+        <span class="wq-status-pill" [class.ok]="authService.profile()?.is_active" [class.neutral]="!authService.profile()?.is_active">
+          {{ authService.profile()?.is_active ? 'Activa' : 'Inactiva' }}
+        </span>
+      </dd>
+    </div>
+  </dl>
+  <p class="hint">
+    <mat-icon aria-hidden="true">info</mat-icon>
+    Tu nombre y tu rol los administra un Administrador desde Administración &gt; Usuarios.
+  </p>
+</section>
+
+<section class="wq-card">
+  <h2>Cambiar contraseña</h2>
+  <form [formGroup]="passwordForm" (ngSubmit)="changePassword()" novalidate class="password-form">
+    <mat-form-field appearance="outline">
+      <mat-label>Contraseña nueva</mat-label>
+      <input matInput [type]="hidePassword() ? 'password' : 'text'" formControlName="password" autocomplete="new-password" />
+      <button mat-icon-button matSuffix type="button" (click)="hidePassword.set(!hidePassword())" [attr.aria-label]="hidePassword() ? 'Mostrar contraseña' : 'Ocultar contraseña'">
+        <mat-icon aria-hidden="true">{{ hidePassword() ? 'visibility' : 'visibility_off' }}</mat-icon>
+      </button>
+      @if (passwordForm.controls.password.touched && passwordForm.controls.password.hasError('required')) {
+        <mat-error>La contraseña es obligatoria.</mat-error>
+      }
+      @if (passwordForm.controls.password.touched && passwordForm.controls.password.hasError('minlength')) {
+        <mat-error>Debe tener al menos 6 caracteres.</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Confirmar contraseña</mat-label>
+      <input matInput [type]="hideConfirm() ? 'password' : 'text'" formControlName="confirm" autocomplete="new-password" />
+      <button mat-icon-button matSuffix type="button" (click)="hideConfirm.set(!hideConfirm())" [attr.aria-label]="hideConfirm() ? 'Mostrar contraseña' : 'Ocultar contraseña'">
+        <mat-icon aria-hidden="true">{{ hideConfirm() ? 'visibility' : 'visibility_off' }}</mat-icon>
+      </button>
+      @if (passwordForm.hasError('mismatch') && passwordForm.controls.confirm.touched) {
+        <mat-error>Las contraseñas no coinciden.</mat-error>
+      }
+    </mat-form-field>
+
+    @if (passwordMessage()) {
+      <p class="form-message" [class.error]="passwordMessageTone() === 'error'" role="status">{{ passwordMessage() }}</p>
+    }
+
+    <button mat-flat-button color="primary" type="submit" [disabled]="passwordSubmitting()">
+      {{ passwordSubmitting() ? 'Guardando…' : 'Actualizar contraseña' }}
+    </button>
+  </form>
+</section>
+
+<section class="wq-card">
+  <h2>Sesiones activas</h2>
+  <p class="hint-text">Si iniciaste sesión en otro equipo o navegador y quieres cerrarla de forma remota, usa esta opción. Tu sesión actual no se verá afectada.</p>
+  @if (sessionsMessage()) {
+    <p class="form-message" [class.error]="sessionsMessageTone() === 'error'" role="status">{{ sessionsMessage() }}</p>
+  }
+  <button mat-stroked-button type="button" [disabled]="sessionsSubmitting()" (click)="closeOtherSessions()">
+    <mat-icon aria-hidden="true">logout</mat-icon>
+    Cerrar otras sesiones
+  </button>
+</section>

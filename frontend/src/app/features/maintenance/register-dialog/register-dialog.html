@@ -1,0 +1,61 @@
+<h2 mat-dialog-title>Registrar evento</h2>
+
+<form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+  <mat-dialog-content class="content">
+    <mat-button-toggle-group formControlName="kind" class="kind-toggle" aria-label="Tipo de evento">
+      <mat-button-toggle value="calibracion">
+        <mat-icon aria-hidden="true">tune</mat-icon>
+        Calibración
+      </mat-button-toggle>
+      <mat-button-toggle value="mantenimiento">
+        <mat-icon aria-hidden="true">build</mat-icon>
+        Mantenimiento
+      </mat-button-toggle>
+    </mat-button-toggle-group>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Dispositivo</mat-label>
+      <mat-select formControlName="dispositivo_id">
+        @for (d of data.devices; track d.id) {
+          <mat-option [value]="d.id">{{ d.codigo }} — {{ d.nombre }}</mat-option>
+        }
+      </mat-select>
+      @if (form.controls.dispositivo_id.touched && form.controls.dispositivo_id.hasError('required')) {
+        <mat-error>Selecciona un dispositivo.</mat-error>
+      }
+    </mat-form-field>
+
+    @if (form.controls.kind.value === 'calibracion') {
+      <mat-form-field appearance="outline">
+        <mat-label>Parámetro calibrado (opcional)</mat-label>
+        <mat-select formControlName="parametro_id">
+          <mat-option [value]="null">Sin especificar</mat-option>
+          @for (p of data.parameters; track p.id) {
+            <mat-option [value]="p.id">{{ p.nombre }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+    }
+
+    <mat-form-field appearance="outline">
+      <mat-label>Notas</mat-label>
+      <textarea matInput formControlName="notas" rows="3" placeholder="Qué se hizo, observaciones, piezas cambiadas…"></textarea>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Próxima fecha sugerida (opcional)</mat-label>
+      <input matInput type="date" formControlName="proxima_fecha" />
+    </mat-form-field>
+
+    @if (errorMessage()) {
+      <p class="form-error" role="alert">{{ errorMessage() }}</p>
+    }
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-stroked-button type="button" [disabled]="submitting()" (click)="ref.close(false)">Cancelar</button>
+    <button mat-flat-button color="primary" type="submit" [disabled]="submitting()">
+      {{ submitting() ? 'Guardando…' : 'Registrar' }}
+    </button>
+  </mat-dialog-actions>
+</form>

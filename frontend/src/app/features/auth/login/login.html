@@ -1,44 +1,67 @@
-<div class="login-page">
-  <form class="login-card" [formGroup]="form" (ngSubmit)="submit()" novalidate>
-    <div class="login-header">
-      <span class="eyebrow">Plataforma IoT de Calidad del Agua</span>
-      <h1>Iniciar sesión</h1>
-    </div>
+<div class="auth-page">
+  <div class="auth-brand-panel">
+    <svg viewBox="0 0 24 24" width="44" height="44" class="brand-mark" aria-hidden="true">
+      <path fill="currentColor" d="M12 2C8.5 7 5 11.2 5 15a7 7 0 0 0 14 0c0-3.8-3.5-8-7-13Z" />
+    </svg>
+    <h1>Calidad del Agua</h1>
+    <p>Plataforma de monitoreo IoT: pH, oxígeno disuelto, turbidez y temperatura en tiempo real, con alertas automáticas y reportes por dispositivo.</p>
+    <svg class="wave" viewBox="0 0 500 80" preserveAspectRatio="none" aria-hidden="true">
+      <path fill="rgba(255,255,255,0.08)" d="M0,40 C125,80 375,0 500,40 L500,80 L0,80 Z" />
+    </svg>
+  </div>
 
-    <mat-form-field appearance="outline">
-      <mat-label>Correo electrónico</mat-label>
-      <input matInput type="email" formControlName="email" autocomplete="email" required />
-      @if (form.controls.email.touched && form.controls.email.hasError('required')) {
-        <mat-error>El correo es obligatorio.</mat-error>
+  <div class="auth-form-panel">
+    <form class="auth-card" [formGroup]="form" (ngSubmit)="submit()" novalidate aria-labelledby="login-title">
+      <div class="auth-header">
+        <span class="eyebrow">Plataforma IoT de Calidad del Agua</span>
+        <h1 id="login-title">Iniciar sesión</h1>
+      </div>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Correo electrónico</mat-label>
+        <input matInput type="email" formControlName="email" autocomplete="email" required />
+        @if (form.controls.email.touched && form.controls.email.hasError('required')) {
+          <mat-error>El correo es obligatorio.</mat-error>
+        }
+        @if (form.controls.email.touched && form.controls.email.hasError('email')) {
+          <mat-error>Ingresa un correo válido.</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Contraseña</mat-label>
+        <input matInput [type]="hidePassword() ? 'password' : 'text'" formControlName="password" autocomplete="current-password" required />
+        <button
+          mat-icon-button
+          matSuffix
+          type="button"
+          (click)="hidePassword.set(!hidePassword())"
+          [attr.aria-label]="hidePassword() ? 'Mostrar contraseña' : 'Ocultar contraseña'"
+          [attr.aria-pressed]="!hidePassword()"
+        >
+          <mat-icon aria-hidden="true">{{ hidePassword() ? 'visibility' : 'visibility_off' }}</mat-icon>
+        </button>
+        @if (form.controls.password.touched && form.controls.password.hasError('required')) {
+          <mat-error>La contraseña es obligatoria.</mat-error>
+        }
+      </mat-form-field>
+
+      @if (errorMessage()) {
+        <p class="form-error" role="alert">
+          <mat-icon aria-hidden="true">error_outline</mat-icon>
+          {{ errorMessage() }}
+        </p>
       }
-      @if (form.controls.email.touched && form.controls.email.hasError('email')) {
-        <mat-error>Ingresa un correo válido.</mat-error>
-      }
-    </mat-form-field>
 
-    <mat-form-field appearance="outline">
-      <mat-label>Contraseña</mat-label>
-      <input matInput type="password" formControlName="password" autocomplete="current-password" required />
-      @if (form.controls.password.touched && form.controls.password.hasError('required')) {
-        <mat-error>La contraseña es obligatoria.</mat-error>
-      }
-    </mat-form-field>
+      <button mat-flat-button color="primary" type="submit" [disabled]="submitting()">
+        @if (submitting()) {
+          <mat-spinner diameter="20" />
+        } @else {
+          Iniciar sesión
+        }
+      </button>
 
-    @if (errorMessage()) {
-      <p class="form-error" role="alert">
-        <mat-icon aria-hidden="true">error_outline</mat-icon>
-        {{ errorMessage() }}
-      </p>
-    }
-
-    <button mat-flat-button color="primary" type="submit" [disabled]="submitting()">
-      @if (submitting()) {
-        <mat-spinner diameter="20" />
-      } @else {
-        Iniciar sesión
-      }
-    </button>
-
-    <a class="forgot-link" routerLink="/recuperar-contrasena">¿Olvidaste tu contraseña?</a>
-  </form>
+      <a class="forgot-link" routerLink="/recuperar-contrasena">¿Olvidaste tu contraseña?</a>
+    </form>
+  </div>
 </div>

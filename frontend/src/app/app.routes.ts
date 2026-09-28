@@ -45,6 +45,28 @@ export const routes: Routes = [
         loadComponent: () => import('./features/history/history').then((m) => m.History),
       },
       {
+        // Lectura de dispositivos para los 3 roles (antes solo existia bajo
+        // Administracion, exclusivo de admin). La politica RLS
+        // dispositivos_seleccionar ya limitaba esto correctamente en el
+        // servidor (admin/analista ven todos, un tecnico solo los suyos
+        // asignados) -- esta pantalla solo le da a esa regla una pantalla
+        // propia en vez de dejarla sin uso para 2 de los 3 roles.
+        path: 'dispositivos',
+        loadComponent: () => import('./features/devices/devices-list').then((m) => m.DevicesList),
+      },
+      {
+        path: 'mantenimiento',
+        loadComponent: () => import('./features/maintenance/maintenance').then((m) => m.Maintenance),
+      },
+      {
+        path: 'perfil',
+        loadComponent: () => import('./features/profile/profile').then((m) => m.Profile),
+      },
+      {
+        path: 'informacion-tecnica',
+        loadComponent: () => import('./features/tech-info/tech-info').then((m) => m.TechInfo),
+      },
+      {
         path: 'reportes',
         canActivate: [roleGuard(['administrador', 'analista'])],
         loadComponent: () => import('./features/reports/reports').then((m) => m.Reports),

@@ -12,6 +12,10 @@ import { DevicesService } from './devices.service';
 import type { Device } from '../../../core/models/device.model';
 import { DeviceFormDialog, type DeviceFormDialogData } from './device-form-dialog/device-form-dialog';
 import { DeviceCredentialDialog } from './device-credential-dialog/device-credential-dialog';
+import { EmptyState } from '../../../shared/empty-state/empty-state';
+import { StatusBadge } from '../../../shared/status-badge/status-badge';
+import { deviceStatusMeta } from '../../../shared/status.util';
+import { ConfirmService } from '../../../shared/confirm-dialog/confirm.service';
 
 type ViewState = 'loading' | 'data' | 'empty' | 'error';
 
@@ -28,6 +32,8 @@ type ViewState = 'loading' | 'data' | 'empty' | 'error';
     MatDialogModule,
     MatMenuModule,
     MatTooltipModule,
+    EmptyState,
+    StatusBadge,
   ],
   templateUrl: './devices.html',
   styleUrl: './devices.scss',
@@ -39,9 +45,12 @@ export class Devices implements OnInit {
   readonly devices = signal<Device[]>([]);
   readonly errorMessage = signal<string | null>(null);
 
+  readonly deviceStatusMeta = deviceStatusMeta;
+
   constructor(
     private readonly devicesService: DevicesService,
     private readonly dialog: MatDialog,
+    private readonly confirmService: ConfirmService,
   ) {}
 
   ngOnInit(): void {
@@ -82,7 +91,18 @@ export class Devices implements OnInit {
   }
 
   async toggleStatus(device: Device): Promise<void> {
-    const next = device.estado === 'activo' ? 'inactivo' : 'activo';
+    const activating = device.estado !== 'activo';
+    const confirmed = await this.confirmService.ask({
+      title: activating ? 'Activar dispositivo' : 'Desactivar dispositivo',
+      message: activating
+        ? `"${device.codigo}" volverá a aparecer como activo y podrá enviar mediciones.`
+        : `"${device.codigo}" dejará de aceptar mediciones hasta que se reactive.`,
+      confirmLabel: activating ? 'Activar' : 'Desactivar',
+      tone: activating ? 'default' : 'danger',
+    });
+    if (!confirmed) return;
+
+    const next = activating ? 'activo' : 'inactivo';
     const result = await this.devicesService.setStatus(device.id, next);
     if (result.ok) {
       void this.load();
@@ -92,6 +112,14 @@ export class Devices implements OnInit {
   }
 
   async rotateCredential(device: Device): Promise<void> {
+    const confirmed = await this.confirmService.ask({
+      title: 'Emitir nueva credencial',
+      message: `Se invalidará la credencial actual de "${device.codigo}" de inmediato. El dispositivo físico necesitará la credencial nueva para volver a enviar datos.`,
+      confirmLabel: 'Emitir nueva credencial',
+      tone: 'danger',
+    });
+    if (!confirmed) return;
+
     await this.issueCredential(device.id, device.codigo);
   }
 

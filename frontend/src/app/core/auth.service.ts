@@ -81,6 +81,18 @@ export class AuthService {
     await this.supabaseService.client.auth.signOut();
   }
 
+  // Cierra cualquier otra sesión activa del mismo usuario (otros
+  // navegadores/dispositivos) sin afectar la sesión actual -- soportado de
+  // forma nativa por Supabase Auth (`scope: 'others'`), no requiere lógica
+  // propia de administración de sesiones.
+  async signOutOtherSessions(): Promise<AuthResult> {
+    const { error } = await this.supabaseService.client.auth.signOut({ scope: 'others' });
+    if (error) {
+      return { ok: false, message: this.translateAuthError(error.message) };
+    }
+    return { ok: true };
+  }
+
   async requestPasswordReset(email: string): Promise<AuthResult> {
     const { error } = await this.supabaseService.client.auth.resetPasswordForEmail(email, {
       redirectTo: `${window.location.origin}/restablecer-contrasena`,

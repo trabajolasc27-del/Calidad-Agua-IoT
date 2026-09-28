@@ -1,0 +1,77 @@
+<wq-page-header title="Calibraciones y mantenimiento" subtitle="Bitácora de calibraciones y mantenimientos por dispositivo.">
+  <button actions mat-flat-button color="primary" type="button" [disabled]="!canRegister()" (click)="openRegisterDialog()">
+    <mat-icon aria-hidden="true">add</mat-icon>
+    Registrar evento
+  </button>
+</wq-page-header>
+
+<div class="filter-row">
+  <mat-form-field appearance="outline">
+    <mat-label>Dispositivo</mat-label>
+    <mat-select [formControl]="deviceFilter">
+      <mat-option [value]="null">Todos</mat-option>
+      @for (d of devices(); track d.id) {
+        <mat-option [value]="d.id">{{ d.codigo }} — {{ d.nombre }}</mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
+</div>
+
+@if (!canRegister() && authService.role() === 'analista') {
+  <p class="read-only-note">Como analista ambiental tienes acceso de solo lectura a esta bitácora.</p>
+}
+@if (!canRegister() && authService.role() === 'tecnico_campo') {
+  <p class="read-only-note">No tienes dispositivos asignados todavía, así que no puedes registrar eventos.</p>
+}
+
+@switch (state()) {
+  @case ('loading') {
+    <div class="state-panel">
+      <mat-spinner diameter="32" />
+    </div>
+  }
+  @case ('error') {
+    <wq-empty-state icon="error_outline" tone="error" [message]="errorMessage() ?? 'Error al cargar la bitácora.'">
+      <button mat-stroked-button (click)="load()">Reintentar</button>
+    </wq-empty-state>
+  }
+  @case ('empty') {
+    <wq-empty-state icon="build_circle" message="Todavía no hay calibraciones ni mantenimientos registrados para este filtro.">
+      @if (canRegister()) {
+        <button mat-stroked-button (click)="openRegisterDialog()">Registrar el primero</button>
+      }
+    </wq-empty-state>
+  }
+  @case ('data') {
+    <ul class="event-list">
+      @for (e of events(); track e.id) {
+        <li class="wq-card event-item">
+          <span class="event-icon" [class.calibracion]="e.kind === 'calibracion'">
+            <mat-icon aria-hidden="true">{{ e.kind === 'calibracion' ? 'tune' : 'build' }}</mat-icon>
+          </span>
+          <div class="event-body">
+            <div class="event-top">
+              <strong>{{ e.tipoLabel }}</strong>
+              @if (e.parametro) {
+                <span class="event-param">· {{ e.parametro }}</span>
+              }
+            </div>
+            <span class="event-device mono">{{ e.dispositivo?.codigo ?? '—' }} — {{ e.dispositivo?.nombre }}</span>
+            @if (e.notas) {
+              <p class="event-notes">{{ e.notas }}</p>
+            }
+            <div class="event-meta">
+              <span>{{ e.fecha | date: 'medium' }}</span>
+              @if (e.responsable) {
+                <span>· {{ e.responsable }}</span>
+              }
+              @if (e.proximaFecha) {
+                <span class="next-due">· próxima: {{ e.proximaFecha | date: 'shortDate' }}</span>
+              }
+            </div>
+          </div>
+        </li>
+      }
+    </ul>
+  }
+}

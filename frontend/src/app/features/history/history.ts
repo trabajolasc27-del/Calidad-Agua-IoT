@@ -14,6 +14,10 @@ import { HistoryService, type HistoryFilters, type HistoryRow } from './history.
 import type { DashboardDevice } from '../dashboard/dashboard.service';
 import type { Parameter } from '../../core/models/parameter.model';
 import type { EvaluationResult } from '../../core/models/measurement.model';
+import { PageHeader } from '../../shared/page-header/page-header';
+import { EmptyState } from '../../shared/empty-state/empty-state';
+import { StatusBadge } from '../../shared/status-badge/status-badge';
+import { evaluationStatus } from '../../shared/status.util';
 
 type ViewState = 'loading' | 'data' | 'empty' | 'error';
 
@@ -34,6 +38,9 @@ type ViewState = 'loading' | 'data' | 'empty' | 'error';
     MatTableModule,
     MatPaginatorModule,
     MatProgressSpinnerModule,
+    PageHeader,
+    EmptyState,
+    StatusBadge,
   ],
   templateUrl: './history.html',
   styleUrl: './history.scss',
@@ -65,6 +72,8 @@ export class History implements OnInit, AfterViewInit, OnDestroy {
 
   private chart?: Chart;
   private viewReady = false;
+
+  readonly evaluationStatus = evaluationStatus;
 
   constructor(private readonly historyService: HistoryService) {
     this.pageSize = historyService.pageSize;
@@ -141,12 +150,12 @@ export class History implements OnInit, AfterViewInit, OnDestroy {
     const config: ChartConfiguration<'line'> = {
       type: 'line',
       data: {
-        labels: points.map((p) => new Date(p.medido_en).toLocaleString()),
+        labels: points.map((p) => new Date(p.medido_en).toLocaleString('es-MX')),
         datasets: [
           {
             data: points.map((p) => p.valor),
-            borderColor: '#0f7d72',
-            backgroundColor: '#0f7d7222',
+            borderColor: '#0b1f33',
+            backgroundColor: '#0b1f3322',
             borderWidth: 2,
             pointRadius: 0,
             tension: 0.3,

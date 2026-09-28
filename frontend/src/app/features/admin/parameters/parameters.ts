@@ -7,6 +7,7 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { ParametersService } from './parameters.service';
 import type { Parameter } from '../../../core/models/parameter.model';
 import { ParameterFormDialog } from './parameter-form-dialog/parameter-form-dialog';
+import { StatusBadge } from '../../../shared/status-badge/status-badge';
 
 type ViewState = 'loading' | 'data' | 'error';
 
@@ -15,7 +16,7 @@ type ViewState = 'loading' | 'data' | 'error';
 @Component({
   selector: 'wq-parameters',
   standalone: true,
-  imports: [MatTableModule, MatButtonModule, MatProgressSpinnerModule, MatDialogModule],
+  imports: [MatTableModule, MatButtonModule, MatProgressSpinnerModule, MatDialogModule, StatusBadge],
   templateUrl: './parameters.html',
   styleUrl: './parameters.scss',
 })
